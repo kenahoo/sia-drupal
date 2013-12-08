@@ -30,7 +30,7 @@ define( 'CIVICRM_UF'               , 'Drupal6'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , 'mysql://sia_drupal:ektaa!@mysql.singersinaccord.org/singersinaccord_drupal?new_link=true' );
+define( 'CIVICRM_UF_DSN'           , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in:11362/pantheon?new_link=true' );
 
 /**
  * CiviCRM Database Settings
@@ -51,7 +51,7 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://sia_drupal:ektaa!@mysql.singersina
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'          , 'mysql://sia_drupal:ektaa!@mysql.singersinaccord.org/singersinaccord_crm?new_link=true' );
+define( 'CIVICRM_DSN'          , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in/civicrm?new_link=true' );
 
 /**
  * File System Paths:

@@ -24,6 +24,53 @@
 define( 'CIVICRM_UF'               , 'Drupal6'        );
 
 /**
+ * Pantheon Systems:
+ *
+ * Repopulate needed variables based on the Pantheon environment if applicable.
+ * http://www.kalamuna.com/news/civicrm-pantheon
+ *
+ */
+if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
+  $env = json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE);
+  if (!empty($env['conf']['pantheon_binding'])) {
+    $pantheon_db = $env['databases']['default']['default'];
+    $pantheon_conf = $env['conf'];
+
+    //user name and password
+    $db_string = $pantheon_db['driver'] . '://' . $pantheon_db['username'] . ':' . $pantheon_db['password'] . '@';
+    //host
+    $db_string .= 'dbserver.' . $pantheon_conf['pantheon_environment'] . '.' . $pantheon_conf['pantheon_site_uuid'] . '.drush.in' . ':' . $pantheon_db['port'];
+    // database
+    $db_string .= '/' . $pantheon_db['database'] . '?new_link=true';
+
+    // define the database strings
+    define('CIVICRM_UF_DSN', $db_string);
+    define('CIVICRM_DSN', $db_string);
+
+    // define the file paths
+    global $civicrm_root;
+
+    //$civicrm_root = '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/code/' . str_replace('drupal', '', drupal_get_path('module', 'civicrm'));
+    $civicrm_root = '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/code/profiles/civicrm_starterkit/modules/civicrm';
+    define('CIVICRM_TEMPLATE_COMPILEDIR', '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/files/civicrm/templates_c/');
+
+    // Use Drupal base url and path
+    global $base_url, $base_path;
+    define('CIVICRM_UF_BASEURL', $base_url . '/');
+    define( 'CIVICRM_IDS_ENABLE', 0);
+    define( 'CIVICRM_SITE_KEY', '2391f678908b90245f6306c04d3e3b09' );
+  
+    if ( $pantheon_conf['pantheon_environment'] == 'dev' || $pantheon_conf['pantheon_environment'] == 'test' ){ 
+      /**
+      * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
+      * This will not send any email, so ensure this is commented out in production
+      */
+     define( 'CIVICRM_MAIL_LOG', '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/code/sites/default/files/civicrm/templates_c/mail.log' );
+    }  
+  }
+} else {
+
+/**
  * Content Management System (CMS) Datasource:
  *
  * Update this setting with your CMS (Drupal or Joomla) database username, server and DB name. Comment it out if using CiviCRM standalone.
@@ -137,6 +184,8 @@ define( 'CIVICRM_UF_BASEURL'      , 'http://www.singersinaccord.org/' );
  * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
  */
 define( 'CIVICRM_SITE_KEY', null );
+
+} // end Pantheon check
 
 /**
  * 

@@ -51,7 +51,7 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://pantheon:14a4463ffb7541d49dce98e26
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'          , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in/civicrm?new_link=true' );
+define( 'CIVICRM_DSN'          , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in:11362/civicrm?new_link=true' );
 
 /**
  * File System Paths:

@@ -51,7 +51,7 @@ if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
     global $civicrm_root;
 
     //$civicrm_root = '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/code/' . str_replace('drupal', '', drupal_get_path('module', 'civicrm'));
-    $civicrm_root = '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/code/profiles/civicrm_starterkit/modules/civicrm';
+    $civicrm_root = '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/code/sites/all/modules/civicrm';
     define('CIVICRM_TEMPLATE_COMPILEDIR', '/srv/bindings/' . $pantheon_conf['pantheon_binding'] . '/files/civicrm/templates_c/');
 
     // Use Drupal base url and path

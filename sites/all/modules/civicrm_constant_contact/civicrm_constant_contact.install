@@ -1,0 +1,175 @@
+<?php
+
+/**
+ * @file 
+ */
+
+/**
+ * Implementation of hook_install() 
+ */
+ 
+//TODO: add uninstall function
+//Use civicrm_custom_field_delete and civicrm_custom_group_delete 
+function civicrm_constant_contact_install() {
+  variable_set('civicrm_constant_contact_apipath','https://api.constantcontact.com/ws/customers/');
+  //load CiviCRM
+  civicrm_initialize();
+  require_once "api/v2/CustomGroup.php";
+  $settings = array();
+  
+  //Add Group Sync tracking fields
+  $params = array(
+                'title'            => 'ConstantContact',
+                'name'             => 'civicrm_constant_contact_sync_group',
+                'extends'          => array('Group'),
+                'weight'           => 0,
+                'collapse_display' => 0,
+                'help_pre'         => "These fields are used to determine if this group will be synced with Constant Contact",
+                'is_active'        => 1
+                );
+
+  $customGroupGroups =& civicrm_custom_group_create($params);
+  
+  $settings[civicrm_constant_contact_sync_group] = $customGroupGroups;
+  
+  $params      = array (
+                      'custom_group_id' => $customGroupGroups['id'],
+                      'label'           => 'Constant Contact List ID',
+                      'column_name'     => 'civicrm_constant_contact_list_id',                      
+                      'html_type'       => 'Text',
+                      'data_type'       => 'String',
+                      'weight'          => 3,
+                      'is_required'     => 0,
+                      'is_searchable'   => 0,
+                      'is_active'       => 1,
+                      'is_view'         => 1,
+                      );
+
+  $customFieldListId =& civicrm_custom_field_create($params);
+  
+  $settings[civicrm_constant_contact_list_id] = $customFieldListId;
+  $settings[civicrm_constant_contact_list_id][field_name] = 'civicrm_constant_contact_list_id_' .  $customFieldListId[result][customFieldId];
+
+  $params      = array (
+                      'custom_group_id' => $customGroupGroups['id'],
+                      'label'           => 'Synchronize with Constant Contact',
+                      'column_name'     => 'civicrm_constant_contact_group_sync',
+                      'html_type'       => 'Radio',
+                      'data_type'       => 'Boolean',
+                      'weight'          => 4,
+                      'is_required'     => 0,
+                      'is_searchable'   => 1,
+                      'is_active'       => 1,
+                      );
+
+  $customFieldSync =& civicrm_custom_field_create($params);
+  
+  $settings[civicrm_constant_contact_group_sync_field] = $customFieldSync;
+  $settings[civicrm_constant_contact_group_sync_field][field_name] = 'civicrm_constant_contact_group_sync_' .  $customFieldSync[result][customFieldId];
+
+  //Add Individual sync tracking field
+  $params = array(
+                'title'            => 'ConstantContactUploadTracking',
+                'name'             => 'civicrm_constant_contact_upload_tracking',
+                'extends'          => array('Contact'),
+                'weight'           => 0,
+                'collapse_display' => 0,
+                'help_pre'         => "These fields are used to determine if this group will be synced with Constant Contact",
+                'is_active'        => 1,
+                'is_multiple'      => 1,
+                'style'            => 'Tab',
+                );
+
+  $customGroupUploadTracking =& civicrm_custom_group_create($params);
+
+  $settings[civicrm_constant_contact_upload_tracking] = $customGroupUploadTracking;
+
+  $params      = array (
+                      'custom_group_id' => $customGroupUploadTracking['id'],
+                      'label'           => 'CiviCRM Group ID',
+                      'column_name'            => 'civicrm_constant_contact_contact_group_id',
+                      'html_type'       => 'Text',
+                      'data_type'       => 'Int',
+                      'weight'          => 1,
+                      'is_required'     => 0,
+                      'is_searchable'   => 0,
+                      'is_active'       => 1,
+                      'is_view'         => 1,
+                      );
+
+  $customFieldUploadTrackingGroupId =& civicrm_custom_field_create($params);
+
+  $settings[civicrm_constant_contact_contact_group_id] = $customFieldUploadTrackingGroupId;
+  $settings[civicrm_constant_contact_contact_group_id][field_name] = 'civicrm_constant_contact_contact_group_id_' .  $customFieldUploadTrackingGroupId[result][customFieldId];
+
+  $params      = array (
+                      'custom_group_id' => $customGroupUploadTracking['id'],
+                      'label'           => 'Last Upload Date',
+                      'column_name'     => 'civicrm_constant_contact_contact_upload_date',
+                      'html_type'       => 'Select Date',
+                      'data_type'       => 'Date',
+                      'weight'          => 1,
+                      'is_required'     => 0,
+                      'is_searchable'   => 0,
+                      'is_active'       => 1,
+                      'is_view'         => 1,
+                      );
+
+  $customFieldUploadTrackingDateUploaded =& civicrm_custom_field_create($params);
+
+  $settings[civicrm_constant_contact_contact_upload_date] = $customFieldUploadTrackingDateUploaded;
+  $settings[civicrm_constant_contact_contact_upload_date][field_name] = 'civicrm_constant_contact_contact_upload_date_' .  $customFieldUploadTrackingDateUploaded[result][customFieldId];
+
+  variable_set('civicrm_constant_contact',$settings);
+  variable_set('partner_base_url','https://api.constantcontact.com/ws/partners/rootyhollow/siteowners');
+
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function civicrm_constant_contact_uninstall() {
+  //load CiviCRM
+  civicrm_initialize();
+  require_once "api/v2/CustomGroup.php";
+  $settings = array();
+  $settings = variable_get('civicrm_constant_contact', array());
+
+  $params      = $settings[civicrm_constant_contact_list_id];
+
+  $customFieldListId =& civicrm_custom_field_delete($params);
+
+  $params      = $settings[civicrm_constant_contact_group_sync];
+
+  $customFieldSync =& civicrm_custom_field_delete($params);
+
+  //Delete Group Sync tracking fields
+  $params      = array (
+                      'id' => $settings[civicrm_constant_contact_sync_group]['id'],
+                      );
+
+  $customGroupGroups =& civicrm_custom_group_delete($params);
+
+  $params      = $settings[civicrm_constant_contact_contact_group_id];
+
+
+  $customFieldUploadTrackingGroupId =& civicrm_custom_field_delete($params);
+
+  $params      = $settings[civicrm_constant_contact_contact_upload_date];
+
+
+  $customFieldUploadTrackingDateUploaded =& civicrm_custom_field_delete($params);
+  
+  //Delete Individual sync tracking field
+  $params      = array (
+                      'id' => $settings[civicrm_constant_contact_upload_tracking]['id'],
+                      );
+
+  $customGroupUploadTracking =& civicrm_custom_group_delete($params);
+
+  variable_del('civicrm_constant_contact');
+  variable_del('civicrm_constant_contact_apipath');
+  variable_del('civicrm_constant_contact_username');
+  variable_del('civicrm_constant_contact_apikey');
+
+}

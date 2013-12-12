@@ -1,0 +1,13 @@
+name = CiviCRM Constant Contact Module
+description = Implement CiviCRM hooks to interface with Constant Contact in order to keep individuals, groups, and lists in synch between the two platforms.
+dependencies[] = civicrm
+package = CiviCRM
+core = 6.x
+version = 6.x-1.x-beta2
+
+; Information added by drupal.org packaging script on 2011-05-11
+version = "6.x-1.2"
+core = "6.x"
+project = "civicrm_constant_contact"
+datestamp = "1305145615"
+

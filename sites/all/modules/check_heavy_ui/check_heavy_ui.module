@@ -1,0 +1,185 @@
+<?php
+/**
+ * @file
+ * Unobtrusively adds 'select all' for rows, colums, and sections to
+ * reduce the number of clicks necessary for administering permissions
+ * and other checkbox heavy items in the future
+ */
+
+// Permissions
+define('ADMINISTER_CHECK_HEAVY_UI', 'administer check heavy ui');
+define('ACCESS_CHECK_HEAVY_UI', 'access check heavy ui');
+define('DEFAULT_CHECK_HEAVY_UI_STATE', true);
+
+/**
+* Implementation of hook_perm().
+*/
+function check_heavy_ui_perm() {
+  return array(ACCESS_CHECK_HEAVY_UI, ADMINISTER_CHECK_HEAVY_UI);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function check_heavy_ui_menu() {
+
+  $items['admin/user/check_heavy_ui'] = array(
+    'title' => t('Check Heavy UI'),
+    'description' => t('Enhances checkbox-heavy pages with easy multiple selection.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('check_heavy_ui_admin_settings'),
+    'access arguments' => array(ADMINISTER_CHECK_HEAVY_UI),
+    'type' => MENU_NORMAL_ITEM
+  );
+
+  return $items;
+}
+
+/**
+ * Callback from hook_menu for admin settings.
+ */
+function check_heavy_ui_admin_settings() {
+  $form = array();
+
+  $form['check_heavy_ui_pages'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Apply check-heavy UI to these pages'),
+    '#description' => t('These are the pages that will have check-heavy
+                        interface enhancements applied.')
+  );
+  $form['check_heavy_ui_pages']['apply_chui_user_permissions'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('apply_chui_user_permissions', DEFAULT_CHECK_HEAVY_UI_STATE),
+    '#title' => t('admin/user/permissions'),
+    '#description' => t('Apply check-heavy UI to the permissions matrix'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * This is a slightly dodgy work-around for there being no
+ * straight-forward way to override hook_theme functions from another
+ * module using this modules' namespace, hence phptemplate is being
+ * called to override the permissions form below. This is a modified
+ * copy of theme_user_admin_perm() from modules/user/user.admin.inc in
+ * the core user module, and the main modifications to it were adding
+ * more descriptive css classes to drastically reduce the traversing
+ * that the included jQuery module has to do when checking boxes for
+ * rows, columns, sections, or columns in sections, and adding array
+ * keys for headers at each module's section so I could inject the
+ * elements for role selection per module from the jQuery plugin.
+ */
+function _check_heavy_ui_user_admin_perm($form) {
+
+  //Initialization of jQuery selector object used by the jQuery module,
+  //as well as styling bits initialized for the jquery.checkbox.js
+  //module, passed to the _check_heavy_ui_add_resources() function below
+  $empty_img='/'.drupal_get_path('module', 'check_heavy_ui') .'/images/empty.png';
+  $js_init=<<<JSINIT
+$(document).ready(function() {
+  selectors = new Object({
+      selectAllColumn:{
+        insertionPoint:'thead.tableHeader-processed th.checkbox',
+        findByIdPrepend:'check-all-role-',
+        boxesClassPrepend:'role-',
+        additionalClass:'check-all-controller-column'
+        },
+      selectAllSection:{
+        insertionPoint:'td.module-check-all',
+        findByIdPrepend:'module-',	
+        additionalClass:'check-all-controller-section'				
+        },
+      selectAllSectionRole:{
+        insertionPoint:'td.module-check-all-role',
+        findByIdPrepend:'module-check-role-',	
+        boxesClassPrepend:'role-',
+        additionalClass:'check-all-controller-section-role'
+        },				
+      selectAllRow:{
+        insertionPoint:'td.permission',				
+        boxes:'.form-checkbox',
+        additionalClass:'check-all-controller-row'					
+        }
+      });
+  $.checkHeavyUI(selectors, {binders: 'check uncheck',
+                              checkAllClass:'check-all-controller'});
+
+  //Sections are set up
+  $('input:checkbox.check-all-controller-column').checkbox({cls:'jquery-safari-checkbox', empty:'{$empty_img}'});
+  $('input:checkbox.check-all-controller-section-role').checkbox({cls:'jquery-safari-checkbox', empty:'{$empty_img}'});
+  $('input:checkbox.check-all-controller-section').checkbox({cls:'jquery-safari-checkbox', empty:'{$empty_img}'});
+  $('input:checkbox.check-all-controller-row').checkbox({cls:'jquery-safari-checkbox', empty:'{$empty_img}'});
+
+});
+JSINIT;
+
+  _check_heavy_ui_add_resources($js_init);
+  //Overriding of theme_user_admin_perm()
+  $roles = user_roles();
+  foreach (element_children($form['permission']) as $key) {
+    // Don't take form control structures
+    if (is_array($form['permission'][$key])) {
+      $row = array();
+      // Module name
+      if (is_numeric($key)) {
+        $r = $row[] = array('data' => t('@module module',
+          array('@module' => drupal_render($form['permission'][$key]))),
+                'class' => 'module module-check-all',
+                'id' => 'module-'. $form['permission'][$key]['#value']);
+          $module_check_class_name = $form['permission'][$key]['#value'];
+          foreach(element_children($form['role_names']) as $rrid => $rid) {
+            $row[] =  array('class' => 'module module-check-all-role',
+                            'id' => 'module-check-role-'. $module_check_class_name.'-'.$rrid);
+          }
+      }
+      else {
+        $row[] = array('data' => drupal_render($form['permission'][$key]), 'class' => 'permission');
+        foreach (element_children($form['checkboxes']) as $rrid => $rid) {
+          if (is_array($form['checkboxes'][$rid])) {
+            $r = $row[] = array('data' => drupal_render($form['checkboxes'][$rid][$key]),
+                          'class' => 'checkbox checkbox-'.$module_check_class_name.
+                                    ' checkbox-'.$module_check_class_name.'-role-'.$rrid. ' role-'.$rrid,
+                          'title' => $roles[$rid] .' : '. t($key));
+          }
+        }
+      }
+      $rows[] = $row;
+    }
+  }
+  $header[] = (t('Permission'));
+  foreach (element_children($form['role_names']) as $rrid => $rid) {
+    if (is_array($form['role_names'][$rid])) {
+      $h = $header[] = array('data' => drupal_render($form['role_names'][$rid]),
+                              'class' => 'checkbox',
+                              'id' =>'check-all-role-'.$rrid);
+    }
+  }
+  $output = theme('table', $header, $rows, array('id' => 'permissions'));
+  $output .= drupal_render($form);
+  return $output;
+}
+
+/**
+ * Actually overrides theme_user_admin_perm from core user module
+ */
+function phptemplate_user_admin_perm($form) {
+  if(user_access('access check heavy ui') && variable_get('apply_chui_user_permissions', DEFAULT_CHECK_HEAVY_UI_STATE))
+    return _check_heavy_ui_user_admin_perm($form);
+  else
+    return theme_user_admin_perm($form);
+}
+
+/**
+ * Function to add JavaScript and CSS if needed required, takes one
+ * argument for inline JavaScript to initialize the included modules
+ */
+function _check_heavy_ui_add_resources($js_init) {
+  drupal_add_js(drupal_get_path('module', 'check_heavy_ui') .'/jquery.checkbox.js', 'module');
+  drupal_add_js(drupal_get_path('module', 'check_heavy_ui') .'/check_heavy_ui.js', 'module');
+  drupal_add_js($js_init, 'inline');
+  drupal_add_css(drupal_get_path('module', 'check_heavy_ui') .'/check_heavy_ui.css', 'module');
+}
+
+
+

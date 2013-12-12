@@ -1,0 +1,1658 @@
+<?php
+
+
+/**
+ * civicrm_constant_contact.module
+ *
+ * Module built to deal with the interactions that take place between CiviCRM, and Constant Contact
+ *
+ * @author Darrell Draper <darrell.draper@fmr.com>
+ * @authorNathan Porter <nathan.porter@fmr.com>
+ * @author David Heiniluoma <david.heiniluoma@fmr.com>
+ *
+ * @version  1.0.0
+ * @module civicrm_constant_contact
+ */
+
+/**
+ * Implementation of hook_civicrm_pageRun
+ *
+ * Called at the load of a page, and triggered only when the page being viewed is CRM_Event_Page_Event_Info. Once there, the template is alterred so that the custom group GoToWebinar is not displayed.
+ *
+ * @module  civicrm_constant_contact
+ * @param  Referece $page A reference to the page being loaded.
+ */
+  function civicrm_constant_contact_civicrm_pageRun( &$page ) {
+
+  //Check to confirm that the page is CRM_Event_Page_EventInfo, and if it is not, break out immediately.
+  if ( $page->getVar( '_name' ) != 'CRM_Group_Form_Edit' ) {
+    return;
+  }
+  
+  //Grab the template from the page, and extract the variable that was passed as viewCustomData to the template
+  $smarty  =& CRM_Core_Smarty::singleton( );
+  
+  //Check to make sure there is actually custom data going to the template.
+  if ($details =& $smarty->get_template_vars( 'viewCustomData' )) {
+    
+  //Parse through the custom data looking for the ConstantContact group. If it is found, overwrite it as NULL.
+    foreach ( $details as &$detail ) {
+      foreach ( $detail as &$custom ) {
+        if ( $custom['title'] == 'ConstantContact' || $custom['name'] == 'ConstantContact' ) {
+          $detail = NULL;
+          break;         
+        }
+      }
+    }
+    //Re-assign the details array with the NULLed GoToWebinar section  to the template so that other custom data can still be displayed, but GoToWebinar information is removed entirely.
+    $smarty->assign_by_ref( 'viewCustomData', $details );
+    }
+    return FALSE;
+  }
+
+/**
+ * Implementation of hook_civicrm_pre
+ *
+ *
+ * @module  civicrm_constant_contact
+ * @param  String $op The name of the operation bing called on an object.
+ * @param  String $objectName The name of the object aka Participant.
+ * @param  Integer $objectId The unique identifier of the object.
+ * @param  Reference $objectRef A reference to the instance of the object being passed.
+ */
+function civicrm_constant_contact_civicrm_pre( $op, $objectName, $objectId, &$objectRef ) {
+  switch ( $objectName ) {
+    case "Group":
+      civicrm_constant_contact_civicrm_pre_manage_group( $op, $objectName, $objectId, $objectRef );
+      break;
+    case "Individual":
+      civicrm_constant_contact_civicrm_pre_manage_individual( $op, $objectName, $objectId, $objectRef );
+      break;
+    default:
+      //If it is not an Individual or Group, we want to break out.
+      return FALSE;
+  }
+}
+ 
+/**
+ *  Implementation of hook_civicrm_post
+ *
+ * @module  civicrm_constant_contact
+ * @param  String $op The name of the operation bing called on an object.
+ * @param  String $objectName The name of the object aka Participant.
+ * @param  Integer $objectId The unique identifier of the object.
+ * @param  Reference $objectRef A reference to the instance of the object being passed.
+ */
+function civicrm_constant_contact_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
+  switch ( $objectName ) {
+    case "Group":
+      civicrm_constant_contact_civicrm_post_manage_group( $op, $objectName, $objectId, $objectRef );
+      break;
+    case "Individual":
+      civicrm_constant_contact_civicrm_post_manage_individual( $op, $objectName, $objectId, $objectRef );
+      break;
+    case "GroupContact":
+      civicrm_constant_contact_civicrm_post_manage_groupContacts( $op, $objectName, $objectId, $objectRef );
+    default:
+      //If it is not an Individual or Group, or Group Contact, we want to break out
+      return FALSE;
+    }
+}
+
+/**
+ * Implementation fo hook_civicrm_tab
+ */
+function civicrm_constant_contact_civicrm_tabs(&$tabs, $contactID) {
+  $settings = variable_get('civicrm_constant_contact_settings', array());
+  //Hide the tab holding the upload tracking
+  foreach ($tabs as $key => $value) {
+    if ($value['id'] == 'custom_'. $settings['civicrm_constant_contact_upload_tracking']['id']) unset($tabs[$key]);
+  }
+}
+
+/**
+ * civicrm_constant_contact_civicrm_post_manage_groupContacts
+ *
+ * Called when a member is added or removed from a group, after db update
+ *
+ * @module  civicrm_constant_contact
+ * @param  $op  - Type of operation being performed (create/delete)
+ * @param  $objectName - GroupContact
+ * @param  $objectId  - Civi ID for the group being added to or removed from
+ * @param  $objectRef  - An array of all members being added or removed from the group
+ */
+function civicrm_constant_contact_civicrm_post_manage_groupContacts( $op, $objectName, $objectId, $objectRef ) {
+  cc_log('group contact');
+  cc_log('op: '. $op);
+  cc_log('ob name: '. $objectName);
+  //Get the name of the table
+  $settings = variable_get('civicrm_constant_contact', array());
+  // table for the Constant Contact custom fields
+  $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+  //feild query for the sync boolean
+  $sync_field = $settings['civicrm_constant_contact_group_sync_field']['field_name'];
+  //querry to execute
+  $sync_query = "
+  SELECT $sync_field
+      FROM $table
+      WHERE entity_id=$objectId LIMIT 1";
+  $constant_contact_group_sync_bool = CRM_Core_DAO::singleValueQuery ( $sync_query, CRM_Core_DAO::$_NULLArray );
+  if ( !$constant_contact_group_sync_bool) {
+  //do nothing for this set of contacts since the group is not synced
+    return;
+  }
+  else {
+    switch ($op) {
+      case "create":
+        //a member has been added to a group
+        $numMembers = sizeof($objectRef); //number of memebers changes
+        if ($numMembers > 5) {
+          $group_members = CRM_Contact_BAO_Group::getMember( $objectId );
+          $constant_contact_id = get_cc_group_id($objectId);
+          //Similarly retrieve the field for the constantcontact ID from the custom fields table with another obscure constantcontact based query.
+          $ccID_field = $settings['civicrm_constant_contact_list_id']['field_name'];
+          $constant_contact_group_id = recreateGroup($objectId, $constant_contact_id, $table, $ccID_field, $sync_field);
+          $sql = "
+              UPDATE $table
+              SET $ccID_field=$constant_contact_group_id
+              WHERE entity_id=$objectId
+              ";
+          CRM_Core_DAO::executeQuery( $sql, CRM_Core_DAO::$_NULLArray );
+          if (bulk_update($group_members, $constant_contact_group_id)) {
+            civicrm_constant_contact_display($numMembers .' contacts added to the group '. $objectRef->title);
+          } 
+          else {
+            civicrm_constant_contact_display('Failed to update the group '. $objectRef->title);
+          }//else
+        }  
+        else { //if > 25
+          foreach ($objectRef as $contact_id) {
+            cc_log('contact id: '. $contact_id);
+            //get contact information
+            $contactDetails = getContactDetails($contact_id);
+            cc_log('got deatils');
+            $contactEmail = civicrm_constant_contact_get_primary_email($contact_id);
+            cc_log('got email');
+            //add/edit the user in CC
+            $result = add_or_edit_subscriber($contactEmail, $contactDetails);
+            if ( $result ) {//check for success
+              civicrm_constant_contact_display($contactEmail .' synced successfully in Constant Contact');
+              cc_log('Group Contact with e-mail '. $contactEmail .' synced successfully in Constant Contact for CiviCRM group with ID: '. $objectId .'.');
+            }
+            else {
+              civicrm_constant_contact_display($contactEmail .' failed to sync with Constant Contact');
+              cc_log('The group Contact with e-mail '. $contactEmail .' could not be synced in Constant Contact for CiviCRM group with ID: '. $objectId .'.', WATCHDOG_ERROR);
+              //** TODO:
+              //add code here to remove the created GroupContact from this group in Civi to keep data synched
+              //** End TODO
+              //----------------------------------------------------------------------------------  
+            }
+          }
+        }
+        break;
+      case "delete":
+        //a member has been removed from a group
+        $numMembers = sizeof($objectRef); //number of memebers changes
+        if ($numMembers > 5) {
+          $group_members = CRM_Contact_BAO_Group::getMember( $objectId );
+          $constant_contact_id = get_cc_group_id($objectId);
+          $ccID_field = $settings['civicrm_constant_contact_list_id']['field_name'];
+          $constant_contact_group_id = recreateGroup($objectId, $constant_contact_id, $table, $ccID_field, $sync_field);
+          $sql = "
+              UPDATE $table
+              SET $ccID_field=$constant_contact_group_id
+              WHERE entity_id=$objectId";
+          CRM_Core_DAO::executeQuery( $sql, CRM_Core_DAO::$_NULLArray );
+          if (bulk_update($group_members, $constant_contact_group_id)) {
+            civicrm_constant_contact_display($numMembers .' contacts removed from the group '. $objectRef->title);
+          }
+          else { //if add yes
+            civicrm_constant_contact_display('Failed to update the group '. $objectRef->title);
+          }//else
+        }
+        else { //if >25
+          foreach ($objectRef as $contact_id) {
+            //get contact information
+            $contactDetails = getContactDetails($contact_id);
+            $contactEmail = civicrm_constant_contact_get_primary_email($contact_id);
+            //add/edit the user in CC
+            $result = add_or_edit_subscriber($contactEmail, $contactDetails);
+            if ( $result ) {//check for success
+              civicrm_constant_contact_display($contactEmail .' synced successfully in Constant Contact');
+              cc_log('Group Contact with e-mail '. $contactEmail .' synced successfully in Constant Contact for CiviCRM group with ID: '. $objectId .'.');
+            }
+            else {
+                civicrm_constant_contact_display($contactEmail .' failed to sync with Constant Contact');
+                cc_log('The group Contact with e-mail '. $contactEmail .' could not be synced in Constant Contact for CiviCRM group with ID: '. $objectId .'.', WATCHDOG_ERROR);
+              //** TODO:
+              //add code here to remove the created GroupContact from this group in Civi to keep data synched
+              //** End TODO
+              //----------------------------------------------------------------------------------
+            }
+          }
+        }
+        break;
+      default:
+        //We aren't concerned with any other action at this time.
+        return FALSE;
+    }
+  }
+}
+
+/**
+ * civicrm_constant_contact_civicrm_pre_manage_group
+ *
+ * Called before a group is added/edited/deleted in civi
+ *
+ * @module  civicrm_constant_contact
+ * @param  $op  - Type of operation being performed (create/delete)
+ * @param  $objectName - Group
+ * @param  $objectId  - Civi ID for the group being added to or removed from
+ * @param  $objectRef  - An array storing information about the group
+ */
+function civicrm_constant_contact_civicrm_pre_manage_group( $op, $objectName, $objectId, &$objectRef ) {
+  if ( $op == "edit" ) {
+    //Due to the nature of the custom constantcontact  group and field, retrieve the table name with an obscure query relying on the group being named something involving constantcontact.
+    $settings = variable_get('civicrm_constant_contact', array());
+    // table for the Constant Contact custom fields
+    $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+    //feild query for the sync boolean
+    $sync_field = $settings['civicrm_constant_contact_group_sync_field']['field_name'];
+    $sync_query = "SELECT $sync_field
+      FROM $table
+      WHERE entity_id=$objectId LIMIT 1";
+    $constant_contact_group_sync_bool = CRM_Core_DAO::singleValueQuery ( $sync_query, CRM_Core_DAO::$_NULLArray );
+    //store the sync boolean as a session variable
+    $_SESSION['cc_sync_bool'] = $constant_contact_group_sync_bool;
+  }
+  elseif ( $op == "delete" ) {
+    //Creating a group is handled in the post hook
+    //Editing a group is handled in the post hook
+    $settings = variable_get('civicrm_constant_contact', array());
+    // table for the Constant Contact custom fields
+    $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+    //feild query for the sync boolean
+    $sync_field = $settings['civicrm_constant_contact_group_sync_field']['field_name'];
+    $sync_query = "SELECT $sync_field
+      FROM $table
+      WHERE entity_id=$objectId LIMIT 1";
+    $constant_contact_group_sync_bool = CRM_Core_DAO::singleValueQuery ( $sync_query, CRM_Core_DAO::$_NULLArray );
+    //do nothing if the group isn't synced
+    if (!$constant_contact_group_sync_bool) {
+      return FALSE;
+    }
+    // Sync Field ID
+    $ccID_field = $settings['civicrm_constant_contact_list_id']['field_name'];
+    $ccID_query = "
+      SELECT $ccID_field 
+      FROM $table
+      WHERE entity_id = $objectId LIMIT 1";
+    $constant_contact_group_id = CRM_Core_DAO::singleValueQuery( $ccID_query, CRM_Core_DAO::$_NULLArray );
+    if (deleteGroup($constant_contact_group_id, $objectRef)) {
+      civicrm_constant_contact_display('The group '. $objectRef->title .' was successfully deleted from Constant Contact.');
+      cc_log('The group '. $objectRef->title .' was successfully deleted from Constant Contact.');          
+    }
+    else {
+      civicrm_constant_contact_display('The group '. $objectRef->title .' failed to be deleted from Constant Contact.');
+    }
+  }
+}
+
+/**
+  * civicrm_constant_contact_civicrm_pre_manage_individual(
+  *
+  * Called before an individual is added/edited/deleted in civi
+  *
+  * @module  civicrm_constant_contact
+  * @param  $op  - Type of operation being performed (create/delete)
+  * @param  $objectName - Individual
+  * @param  $objectId  - Civi ID for the individual being changed
+  * @param  $objectRef  - An array storing information about the individual
+  */
+function civicrm_constant_contact_civicrm_pre_manage_individual( $op, $objectName, $objectId, &$objectRef ) {
+  //if the action is an update we need to store the e-mail address before it changes
+  $old_email = civicrm_constant_contact_get_primary_email($objectId);
+  switch ( $op ) {
+    case "edit":
+      //store e-mail address as a session variable
+      $_SESSION['cc_old_email_address'] = $old_email;
+      break;
+    case "delete":
+      $contact = getSubcribers($old_email, "");
+      $id = $contact['items'][0]['id'];
+      if ( empty( $id ) ) {
+        return FALSE;
+      }
+      $feilds = getContactDetails($objectId);
+      if ($result = deleteSubscriber($old_email, $feilds)) {
+        cc_log($ObjectRef->title .' removed from Constant Contact');
+        civicrm_constant_contact_display("Contact Removed Succesfully.");
+      }
+      else {
+        civicrm_constant_contact_display("Contact Remove Failed.");
+        cc_log($ObjectRef->title .' failed to be removed from Constant Contact');
+      }
+      break;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+ * civicrm_constant_contact_civicrm_post_manage_group
+ *
+ * Called after a group is added/edited/deleted in civi
+ *
+ * @module  civicrm_constant_contact
+ * @param  $op  - Type of operation being performed (create/delete)
+ * @param  $objectName - Group
+ * @param  $objectId  - Civi ID for the group being added to or removed from
+ * @param  $objectRef  - An array storing information about the group
+ */
+function civicrm_constant_contact_civicrm_post_manage_group( $op, $objectName, $objectId, &$objectRef ) {
+  //set_time_limit(5);
+  if ($op == "create") {
+    $settings = variable_get('civicrm_constant_contact', array());
+    // table for the Constant Contact custom fields
+    $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+    //feild query for the sync boolean
+    $sync_field = $settings['civicrm_constant_contact_group_sync_field']['field_name'];
+    $sync_query = "SELECT $sync_field
+      FROM $table
+      WHERE entity_id=$objectId LIMIT 1";
+    $constant_contact_group_sync_bool = CRM_Core_DAO::singleValueQuery ( $sync_query, CRM_Core_DAO::$_NULLArray );
+    if ($constant_contact_group_sync_bool) {
+      //try to create the group in Constant Contact
+      $cleanId = explode("/", addGroup($objectRef));
+      $constant_contact_group_id = $cleanId[7];
+      //WARNING!!: Very destructive check here - remove everything in, referenceing, or even looking sideways at this group
+      if ( !$constant_contact_group_id ) {
+        civicrm_constant_contact_display('The group '. $objectRef->title .' failed to be created in Constant Contact. Group was not created in CiviCRM.', 'error');
+        cc_log('The group '. $objectRef->title .' failed to be created in Constant Contact. Group was not created in CiviCRM.', WATCHDOG_ERROR);
+        $objectRef->discard( $objectId );
+        return FALSE;
+      }
+      // Similarly retrieve the field for the constantcontact ID from the custom fields table with another obscure constantcontact based query.
+      $ccID_field = $settings['civicrm_constant_contact_list_id']['field_name'];
+      $sql = "UPDATE $table
+        SET $ccID_field=$constant_contact_group_id
+        WHERE entity_id=$objectId";
+      CRM_Core_DAO::executeQuery( $sql, CRM_Core_DAO::$_NULLArray );
+      cc_log('The group '. $objectRef->title .' was successfully created in Constant Contact. The associated group id in Constant Contact is '. $constant_contact_group_id .'.');
+      civicrm_constant_contact_display('The group '. $objectRef->title . ' was successfully created in Constant Contact.');
+    }//if sync
+  }
+  elseif ($op == "edit") { //end if create
+    $count = 1;
+    $settings = variable_get('civicrm_constant_contact', array());
+    // table for the Constant Contact custom fields
+    $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+    //feild query for the sync boolean
+    $sync_field = $settings['civicrm_constant_contact_group_sync_field']['field_name'];
+
+    $sync_query = "SELECT $sync_field
+      FROM $table
+      WHERE entity_id=$objectId LIMIT 1";
+    $constant_contact_group_sync_bool = CRM_Core_DAO::singleValueQuery ( $sync_query, CRM_Core_DAO::$_NULLArray );
+    if (empty($constant_contact_group_sync_bool)) {
+      $constant_contact_group_sync_bool = FALSE;
+    }
+    //Similarly retrieve the field for the constantcontact ID from the custom fields table with another obscure constantcontact based query.
+    $ccID_field = $settings['civicrm_constant_contact_list_id']['field_name'];
+    $ccID_query = "SELECT $ccID_field 
+        FROM $table
+        WHERE entity_id = $objectId LIMIT 1";
+    $constant_contact_group_id = CRM_Core_DAO::singleValueQuery( $ccID_query, CRM_Core_DAO::$_NULLArray );
+    if (empty($constant_contact_group_id)) {
+      $constant_contact_group_id = FALSE;
+    }
+    $old_cc_sync = $_SESSION['cc_sync_bool'];
+    if (empty($old_cc_sync)) {
+      $old_cc_sync = FALSE;
+    }
+    //group is supposed to be synced to constant contact
+    if ($constant_contact_group_sync_bool) {
+      //the group is going from no sync to sync
+      if (!$old_cc_sync) {
+        //if the group already exists in constant contact this id will be valid
+        if ($constant_contact_group_id) {
+          if (editGroup($constant_contact_group_id, $objectRef)) {
+            civicrm_constant_contact_display('The group '. $objectRef->title .' was successfully edited in Constant Contact.');
+            cc_log('The group '. $objectRef->title .' was successfully edited in Constant Contact.');
+          }
+          else { //if edit group
+            civicrm_constant_contact_display('The group '. $objectRef->title . ' failed to be edited in Constant Contact.');
+            cc_log('The group '. $objectRef->title . ' failed to be edited in Constant Contact.');
+          }//else edit group
+        } 
+        else {//if $constant_contact_group_id
+          //the group doesn't exist and must be created  
+          //create group and store return URI
+          $cleanId = explode("/", addGroup($objectRef));
+          //strip the uri to just the constant contact group ID
+          $constant_contact_group_id = $cleanId[7];
+          //WARNING!!: Very destructive check here - remove everything in, referenceing, or even looking sideways at this group
+          if ( !$constant_contact_group_id  ) {
+            civicrm_constant_contact_display('The group '. $objectRef->title . ' failed to be created in Constant Contact.', 'error');
+            cc_log('The group '. $objectRef->title . ' failed to be created in Constant Contact.', WATCHDOG_ERROR);
+            //$objectRef->discard( $objectId );
+            $sync_query = "UPDATE $table
+            SET $sync_field = 0
+            WHERE entity_id=$objectId LIMIT 1";
+            $constant_contact_group_sync_bool = CRM_Core_DAO::executeQuery ( $sync_query, CRM_Core_DAO::$_NULLArray );
+
+            return FALSE;
+          }//if !$constant_contact_group_id 
+            //store the CC group ID to the DB
+            $sql = "UPDATE $table
+              SET $ccID_field=$constant_contact_group_id
+              WHERE entity_id=$objectId";
+            CRM_Core_DAO::executeQuery( $sql, CRM_Core_DAO::$_NULLArray );
+            cc_log('The group '. $objectRef->title . ' was successfully created in Constant Contact. The associated group id in Constant Contact is '. $constant_contact_group_id .'.');
+            civicrm_constant_contact_display('The group '. $objectRef->title . ' was successfully created in Constant Contact.');
+        }//else
+        //group has been created or updated add members to the group in contant contact
+        //get group members from civi
+        $group_members = CRM_Contact_BAO_Group::getMember( $objectId );
+        $cc_group_id = get_cc_group_id($objectId);
+  $numMembers = sizeof($group_members);
+        if ($numMembers > 25) {
+          if (bulk_update( $group_members, $cc_group_id)) {
+            civicrm_constant_contact_display($numMembers .' added to the group '. $objectRef->title);
+          } 
+          else {
+            civicrm_constant_contact_display('Failed to update the group '. $objectRef->title);
+          }
+        } 
+        else { //if members>25
+          //add or edit each group member in civi
+          foreach ($group_members as $contact) {
+            cc_log('count: '. $count);
+            $count++;
+            $contact_id = $contact['contact_id'];
+            $contactDetails = getContactDetails($contact_id);
+            $contactEmail = civicrm_constant_contact_get_primary_email($contact_id);
+            if (!empty($contactEmail)) {
+              cc_log('old add?');
+              $result = add_or_edit_subscriber($contactEmail, $contactDetails);
+              if ( $result ) {
+                civicrm_constant_contact_display($contactEmail .' synced successfully in Constant Contact');
+                cc_log('Group Contact with e-mail '. $contactEmail . ' synced successfully in Constant Contact for CiviCRM group with ID: '. $objectId . '.');
+              } 
+              else {//if result
+                civicrm_constant_contact_display($contactEmail . ' failed to sync with Constant Contact');
+                cc_log('The group Contact with e-mail '. $contactEmail .' could not be synced in Constant Contact for   CiviCRM group with ID: '. $objectId .'.', WATCHDOG_ERROR);
+                //** TODO:
+                //add code here to remove the created GroupContact from this group in Civi to keep data synched
+                //** End TODO
+                //----------------------------------------------------------------------------------
+              }//else add failed
+            } 
+            else {//if empty
+              cc_log('Could not sync contact: No e-mail address');
+            }
+          }//for each
+        }//else members < 25
+      } 
+      else {//if !$_SESSION['cc_sync_bool']
+        //group is staying synced, means just a name change
+        if (editGroup($constant_contact_group_id, $objectRef)) {
+          civicrm_constant_contact_display('The group '. $objectRef->title .' was successfully edited in Constant Contact.');
+          cc_log('The group '. $objectRef->title .' was successfully edited in Constant Contact.');
+        } 
+        else { //if edit group
+          civicrm_constant_contact_display('The group '. $objectRef->title .' failed to be edited in Constant Contact.');
+          cc_log('The group '. $objectRef->title .' failed to be edited in Constant Contact.');
+        }//else edit group  
+                  
+      }//else
+    } 
+    else {//if $constant_contact_group_sync_bool
+      //from sync to no sync
+      if ($old_cc_sync) {
+        cc_log('sync to no sync');
+        if (deleteGroup($constant_contact_group_id)) {
+          civicrm_constant_contact_display('The group '. $objectRef->title .' was successfully deleted from Constant Contact.');
+          cc_log('The group '. $objectRef->title .' was successfully deleted from Constant Contact.');
+        } 
+        else {
+          civicrm_constant_contact_display('The group '. $objectRef->title .' failed to be deleted from Constant Contact.');
+        }
+        //delete the constant contact ID from the db
+        $constant_contact_group_id = '';
+        $sql = "UPDATE $table
+            SET $ccID_field=''
+            WHERE entity_id=$objectId";
+        CRM_Core_DAO::executeQuery( $sql, CRM_Core_DAO::$_NULLArray );
+      }// if $_SESSION['cc_sync_bool']
+    }//no sync
+  }//if (op == edit)
+}
+
+/**
+ * civicrm_constant_contact_civicrm_post_manage_individual(
+ *
+ * Called after db update in civi
+ *
+ * @module  civicrm_constant_contact
+ * @param  $op  - Type of operation being performed (create/delete)
+ * @param  $objectName - Individual
+ * @param  $objectId  - Civi ID for the individual being changed
+ * @param  $objectRef  - An array storing information about the individual
+ */
+
+function civicrm_constant_contact_civicrm_post_manage_individual( $op, $objectName, $objectId, &$objectRef ) {
+  switch ( $op ) {
+    case "edit":
+      //Get the new email address, so we can quit now if the old and new emails are both blank
+      $new_email = civicrm_constant_contact_get_primary_email($objectId);
+      //If old and new emails are both empty, display a message and don't do any synchronization
+      if (strlen(trim($_SESSION['cc_old_email_address'])) == 0 && 
+        strlen(trim($new_email)) == 0) {
+        civicrm_constant_contact_display("Did not sync contact to Constant Contact because there was no email address for the contact.");
+        unset($_SESSION['cc_old_email_address']);
+        return;
+      }
+      $old_email = $_SESSION['cc_old_email_address'];
+      $contact = getSubcribers($old_email, "");
+      $id = $contact['items'][0]['id'];
+      //create XML to store the contact information
+      $id = "urn:uuid:E8553C09F4xcvxCCC53F481214230867087";
+      $feilds = getContactDetails($objectId);
+      $result = add_or_edit_subscriber($_SESSION['cc_old_email_address'], $feilds);
+      if ($result) {
+        civicrm_constant_contact_display('Contact Updated in Constant Contact');
+      } 
+      else {
+        civicrm_constant_contact_display('Contact Update Failed in Constant Contact');
+      }
+      break;
+    default:
+      //Nothing needs to happen if someone views this
+      return FALSE;
+  }
+}
+  
+/**
+ * doServerCall
+ *
+ * Used to connect to the constant contact servers
+ *
+ * @module  civicrm_constant_contact
+ * @param  $request - the URI for the request
+ * @param  $parameter - additional data to be sent to the servers
+ * @param  $type - specifies the http type of the request
+ *
+ * @return The XML response received
+ */ 
+function doServerCall($request, $parameter = '', $type="GET", $loginType = "") {
+  $ch = curl_init();
+  if ($loginType != 'Partner') $request = str_replace('http://', 'https://', $request); // Convert id URI to BASIC compliant
+  curl_setopt($ch, CURLOPT_URL, $request);
+  curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)");
+  curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+  curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+  $requestLogin = makeLogin($loginType);
+  curl_setopt($ch, CURLOPT_USERPWD, $requestLogin);
+  // curl_setopt ($ch, CURLOPT_FOLLOWLOCATION  ,1); 
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type:application/atom+xml"));
+  curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+  switch ($type) {
+    case 'POST': 
+      curl_setopt($ch, CURLOPT_POST, 1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS , $parameter);
+      break;
+    case 'PUT':
+      $tmpfile = tmpfile();
+      fwrite($tmpfile, $parameter);
+      fseek($tmpfile, 0);        
+      curl_setopt($ch, CURLOPT_INFILE, $tmpfile); 
+      curl_setopt($ch, CURLOPT_PUT, 1);
+      curl_setopt($ch, CURLOPT_INFILESIZE, strlen($parameter));
+      fclose($tmpfile); 
+      break;
+    case 'DELETE':
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");        
+      break;
+      default:
+        curl_setopt($ch, CURLOPT_HTTPGET, 1);
+        break;
+  }
+  $emessage = curl_exec($ch);
+  //civicrm_constant_contact_display($emassage); // echo $request.'<br />';
+  //set to TRUE to see debug messages
+  $error = curl_error($ch);
+  if ($error) { 
+    drupal_set_message($error, 'error'); 
+  }
+  curl_close($ch);
+  //if ($emessage) { $return = array('return' => TRUE, 'body' => $emessage); }
+  //else { $return = array('return' => FALSE, 'body' => $error); }
+  return $emessage; # This returns HTML
+}
+  
+/**
+ * makeLogin
+ *
+ * Returns a login string with the username, passowrd, and api key built in
+ *
+ * @module  civicrm_constant_contact
+ *
+ * @return String used for logging into constant contact servers
+ */  
+function makeLogin($type = "") {
+  return   $requestLogin = variable_get('civicrm_constant_contact_apikey', "")."%".variable_get('civicrm_constant_contact_username', "").":".variable_get('civicrm_constant_contact_password', "");
+}
+
+function createAccountXML( $params= array() ) {
+  include_once('Partner.php');
+
+  /*
+   * Setup parameters for creating a new "Partner"
+   * This is where you insert your partner account credentials
+   */
+  $partnerCreds['partnerName'] = '';
+  $partnerCreds['password'] = '';
+  $partnerCreds['apiKey'] = '';
+  $Partner = new Partner($partnerCreds);
+
+  /*
+ * Setup parameters for creating a new "Account"
+ * This is where you place information for the account you want to create
+ */
+  $acct['loginName'] = $params['SiteOwnerLoginName'];
+  $acct['password'] = $params['SiteOwnerPassword'];
+  $acct['siteName'] = $params['SiteName'];
+  $acct['sitePhone'] = $params['SitePhone'];
+  $acct['siteUrl'] = $params['SiteURL'];
+  $acct['singleBilling'] = False;
+  $acct['emailMarketing'] = True;
+  $Account = new Account($acct);
+
+  /*
+ * Setup parameters for creating a new "Account Contact"
+ * This is the contact information for the account you are creating
+ */
+  $contact['firstName'] = $params['SiteContactFirstName'];
+  $contact['lastName'] = $params['SiteContactLastName'];
+  $contact['email'] = $params['SiteContactEmail'];
+  $contact['phone'] = $params['SiteContactPhone'];
+  $contact['countryCode'] = $params['SiteContactCountryCode'];
+  $contact['stateCode'] = $params['SiteContactStateCode'];
+  $AccountContact = new AccountContact($contact);
+
+
+  // Provision the new 'Account' with the set 'Account Contact' under the provided 'Partner' account.
+  $xml = $Partner->provisionAccount($Account, $AccountContact);
+
+}
+
+/**
+ * createContactXML
+ *
+ * Create XML formed in the manner that constant contact expects
+ *
+ * @module  civicrm_constant_contact
+ * @param  $id - constant contact id for the individual
+ * @param  $params  - an array storing user data
+ *
+ * @return  XML describing the contact
+ */
+ 
+function createContactXML($id, $params = array()) {  
+  if (empty($id)) {
+    $id = "urn:uuid:E8553C09F4xcvxCCC53F481214230867087";
+  }
+  $update_date = date("Y-m-d").'T'.date("H:i:s").'+01:00';
+  $xml_string = "<entry xmlns='http://www.w3.org/2005/Atom'></entry>";
+  $xml_object = simplexml_load_string($xml_string);
+  $title_node = $xml_object->addChild("title", htmlspecialchars("TitleNode"));
+  $updated_node = $xml_object->addChild("updated", htmlspecialchars($update_date));
+  $author_node = $xml_object->addChild("author", "");
+  $author_name = $author_node->addChild("name", htmlspecialchars("Civi Contact"));
+  $id_node = $xml_object->addChild("id", $id);
+  $summary_node = $xml_object->addChild("summary", htmlspecialchars("Customer document"));
+  $summary_node->addAttribute("type", "text");
+  $content_node = $xml_object->addChild("content");
+  $content_node->addAttribute("type", "application/vnd.ctct+xml");
+  $contact_node = $content_node->addChild("Contact", "Customer document");
+  $contact_node->addAttribute("xmlns", "http://ws.constantcontact.com/ns/1.0/");
+  $email_node = $contact_node->addChild("EmailAddress", urldecode(htmlspecialchars($params['email_address'])));
+  $fname_node = $contact_node->addChild("FirstName", urldecode(htmlspecialchars($params['first_name'])));
+  $lname_node = $contact_node->addChild("LastName", urldecode(htmlspecialchars($params['last_name'])));
+  $lname_node = $contact_node->addChild("MiddleName", urldecode(htmlspecialchars($params['middle_name'])));
+  $lname_node = $contact_node->addChild("CompanyName", urldecode(htmlspecialchars($params['company_name'])));
+  $lname_node = $contact_node->addChild("JobTitle", urldecode(htmlspecialchars($params['job_title'])));
+  /*
+  *Civi currenty doesn't hold this feild
+  if ($params['status'] == 'Do Not Mail') {
+    $this->actionBy = 'ACTION_BY_CONTACT';
+  }*/
+  $optin_node = $contact_node->addChild("OptInSource", htmlspecialchars("ACTION_BY_CONTACT"));  
+  /*
+   * Addresses are no longer supported
+   */
+  //$hn_node = $contact_node->addChild("HomePhone", htmlspecialchars($params['home_number']));
+  //$wn_node = $contact_node->addChild("WorkPhone", htmlspecialchars($params['work_number']));
+  //$ad1_node = $contact_node->addChild("Addr1", htmlspecialchars($params['address_line_1']));
+  //$ad2_node = $contact_node->addChild("Addr2", htmlspecialchars($params['address_line_2']));
+  //$ad3_node = $contact_node->addChild("Addr3", htmlspecialchars($params['address_line_3']));
+  //$city_node = $contact_node->addChild("City", htmlspecialchars($params['city_name']));
+  //$state_node = $contact_node->addChild("StateCode", htmlspecialchars($params['state_code']));
+  //$state_name = $contact_node->addChild("StateName", htmlspecialchars($params['state_name']));
+  //$zip_node = $contact_node->addChild("PostalCode", htmlspecialchars($params['zip_code']));
+  //$note_node = $contact_node->addChild("Note", htmlspecialchars($params['notes']));
+  //$emailtype_node = $contact_node->addChild("EmailType", htmlspecialchars($params['mail_type']));
+  /*
+   * Currently constant contact does not use custom feilds
+   */
+  /*
+    if (!empty($params['custom_fields'])) {
+      foreach ($params['custom_fields'] as $k=>$v) {
+        $contact_node->addChild("CustomField". $k, htmlspecialchars($v));
+      }
+    }
+   */
+  $contactlists_node = $contact_node->addChild("ContactLists");
+  if ($params['lists']) {
+    foreach ($params['lists'] as $tmp) {
+      $contactlist_node = $contactlists_node->addChild("ContactList");
+      $contactlist_node->addAttribute("id", $tmp);
+    }
+  }
+  $entry = $xml_object->asXML();
+  return $entry; 
+}
+
+/**
+ * addSubscriber
+ *
+ * Adds a user as a subscriber in constant contact
+ *
+ * @module  civicrm_constant_contact
+ * @param  $feilds  - Array storing user information
+ *
+ * @return  TRUE in case of success or FALSE otherwise
+ */
+
+function addSubscriber($feilds) {
+  $contactXML = createContactXML("", $feilds);
+  //cc_log('add XML: '.(string)$contactXML);
+  $call = variable_get('civicrm_constant_contact_apipath', "").variable_get('civicrm_constant_contact_username', "").'/contacts';
+  $return = doServerCall($call, $contactXML, 'POST');
+  $parsedReturn = simplexml_load_string($return);
+  if ($return) {
+    return TRUE; 
+  } 
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Edit the contact pointed at by the URL
+ *
+ * @module  civicrm_constant_contact
+ *
+ * @param string $contactUrl - identifies the url for the modified contac
+ * @param string $contactXML - formed XML with contact information
+ *
+ *  @return TRUE in case of success or FALSE otherwise
+ */
+
+function add_or_edit_subscriber($contactEmail, $feilds) {
+  $contact = getSubcribers($contactEmail, "");
+  $id = $contact['items'][0]['id'];
+  if (empty($id)) {
+    $result = addSubscriber($feilds);
+    return $result;
+  }
+  else {
+    $contactXML = createContactXML($id, $feilds);
+    //cc_log('edit XML: '.(string)$contactXML);
+    $return = doServerCall($id, $contactXML, 'PUT');
+  }
+  if (!empty($return)) {
+    if (strpos($return, '<')!== FALSE) {
+      $parsedReturn = simplexml_load_string($return);
+      if (!empty($parsedReturn->message)) {
+        $lastError = $parsedReturn->message;
+      }
+    } 
+    else {
+      $lastError = $return;
+    }
+      drupal_set_message($lastError, 'warning');
+      return FALSE;
+  }
+    return TRUE;
+}
+
+/**
+ * Removes a subcriber
+ *
+ * @module  civicrm_constant_contact
+ *
+ * @param string $email - contact email address
+ * @return TRUE in case of success or FALSE otherwise
+ */
+
+function deleteSubscriber($contactEmail, $feilds) {
+  $contact = getSubcribers($contactEmail, "");
+  $id = $contact['items'][0]['id'];
+  $constant_contact_delete_id = array();
+  $feilds['lists'] = $constant_contact_delete_id;
+  $contactXML = createContactXML($id, $feilds);
+  $return = doServerCall($id, $contactXML, 'PUT');
+  if (!empty($return)) {
+    if (strpos($return, '<')!== FALSE) {
+      $parsedReturn = simplexml_load_string($return);
+      if (!empty($parsedReturn->message)) {
+        $lastError = $parsedReturn->message;
+      }
+    } 
+    else {
+      $lastError = $parsedReturn->message;
+    }
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * civicrm_constant_contact_get_primary_email
+ *
+ * @module  civicrm_constant_contact
+ *
+ * @param civi Id for an individual
+ * @return the primary e-mail address stored in civi
+ */
+
+function civicrm_constant_contact_get_primary_email($contact_id) {
+  //Get all the emails associated with the given contact ID
+  $array = array();
+  $all_user_emails = CRM_Core_DAO::commonRetrieveAll('CRM_Core_DAO_Email', 'contact_id', $contact_id, $array, array(        'is_primary', 'email'));
+  //Look for the email with the primary variable set, and return that address
+  foreach ($all_user_emails as $email) {
+    if ($email['is_primary']=='1') {
+      return $email['email'];
+    }
+  }
+  //If no primary address was found, return NULL
+  return NULL;
+}
+
+/**
+ * civicrm_constant_contact_get_primary_address
+ *
+ * @module  civicrm_constant_contact
+ *
+ * @param civi Id for an individual
+ * @return the primary street address stored in civi
+ */
+function civicrm_constant_contact_get_primary_address($contact_id) {
+  //Get all the addresses for the given contact ID
+  cc_log('insinde get primary addres');
+  $array = array();
+  $all_addresses = CRM_Core_DAO::commonRetrieveAll('CRM_Core_DAO_Address', 
+                                                     'contact_id', 
+                                                     $contact_id, 
+                                                     $array, 
+                                                     array('is_primary',
+                                                           'street_address',
+                                                           'supplemental_address_1',
+                                                           'supplemental_address_2',
+                                                           'city',
+                                                           'state_province_id',
+                                                           'postal_code'));
+  //Find the primary address, and lookup the state name for it, adding it to the array
+  foreach ($all_addresses as $address) {
+    if ($address['is_primary']=='1') {
+    cc_log('insede primary ook');
+    $address['stateName'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $address['state_province_id'], 'name', 'id');
+    cc_log('state name: '. $address['stateName']);
+    $address['stateCode'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $address['state_province_id'], 'abbreviation', 'id');
+    cc_log('state code: '. $address['stateCode']);
+    cc_log('attempt to return primary: '. $address);
+      return $address;
+    }
+  }
+  //If no primary address was found, return NULL
+  return NULL;
+}
+
+/**
+ * getSubcribers
+ * Returns list of contacts if no e-mail is specified
+ * If an e-mail is specified it returns a single contact
+ *
+ * @module  civicrm_constant_contact
+ *
+ * @param string $email
+ * @return Bi-Dimenstional array with information about contacts. 
+ */
+
+function getSubcribers($email = '', $page = '') {
+  $contacts = array();
+  $contacts['items'] = array();
+  $apipath = variable_get('civicrm_constant_contact_apipath', "");
+  $username = variable_get('civicrm_constant_contact_username', "");
+  if (!empty($email)) {
+    $call = $apipath . $username .'/contacts?email='. $email;
+  }
+  else {
+    if (!empty($page)) {
+      $call = $apipath . $username . $page;
+    }
+    else {
+      $call = $apitpath . $username .'/contacts';
+    }
+  }
+  $return = doServerCall($call);
+  $parsedReturn = simplexml_load_string($return);
+  $requestLogin = makeLogin();
+  //we parse here the link array to establish which are the next page and previous page
+  foreach ($parsedReturn->link as $item) {
+    $attributes = $item->Attributes();
+    if (!empty($attributes['rel']) && $attributes['rel']=='next') {
+      $tmp = explode($requestLogin, $attributes['href']);
+      $contacts['next'] = $tmp[1];
+    }
+    if (!empty($attributes['rel']) && $attributes['rel']=='first') {
+      $tmp = explode($requestLogin, $attributes['href']);
+      $contacts['first'] = $tmp[1];
+    }
+    if (!empty($attributes['rel']) && $attributes['rel']=='current') {
+      $tmp = explode($requestLogin, $attributes['href']);
+      $contacts['current'] = $tmp[1];
+    }
+  }
+  foreach ($parsedReturn->entry as $item) {
+    $tmp = array();
+    $tmp['id'] = (string)$item->id;
+    $tmp['title'] = (string)$item->title;
+    $tmp['status'] = (string)$item->content->Contact->Status;
+    $tmp['EmailAddress'] = (string)$item->content->Contact->EmailAddress;
+    $tmp['EmailType'] = (string)$item->content->Contact->EmailType;
+    $tmp['Name'] = (string)$item->content->Contact->Name;
+    $contacts['items'][] = $tmp;
+  }
+  return $contacts;
+}
+
+/**
+ * createGroupXML
+ *
+ * @param string $id - the id of the group, or blank if a new group
+ * @param string $groupName - the name of the gourp
+ * @return XML storing data for the group to be created
+ */
+function createGroupXML($id, $groupName) {
+  if (empty($id)) {
+    $id = "data:,";
+  }
+  $update_date = date("Y-m-d") .'T'. date("H:i:s") .'+01:00';
+  $xml_string = "<entry xmlns='http://www.w3.org/2005/Atom'></entry>";
+  $xml_object = simplexml_load_string($xml_string);
+  $id_node = $xml_object->addChild("id", htmlspecialchars($id));
+  $title_node = $xml_object->addChild("title");
+  $author_node = $xml_object->addChild("author");
+  $updated_node = $xml_object->addChild("updated", htmlspecialchars($update_date));
+  $content_node = $xml_object->addChild("content");
+  $content_node->addAttribute("type", "application/vnd.ctct+xml");
+  $contactList_node = $content_node->addChild("ContactList");
+  $contactList_node->addAttribute("xmlns", "http://ws.constantcontact.com/ns/1.0/");
+  $optIn_node = $contactList_node->addchild("OptInDefault", htmlspecialchars("FALSE"));
+  $name_node = $contactList_node->addChild("Name", htmlspecialchars($groupName));
+  $sortOrder_node = $contactList_node->addChild("SortOrder", htmlspecialchars("99"));
+  $entry = $xml_object->asXML();
+  return $entry;
+}
+
+/**
+ * Upload a new group to ConstantContact server
+ *
+ * @param strong $groupName - name for the new group
+ * @return URI for the newly created group, 
+ */
+function addGroup($groupName) {
+  $call = variable_get('civicrm_constant_contact_apipath', "") . variable_get('civicrm_constant_contact_username', "") .'/lists';
+  $groupXML = createGroupXML("", $groupName);
+  $return = doServerCall($call, $groupXML, 'POST');
+  $parsedReturn = simplexml_load_string($return);
+  $created_id = $parsedReturn->id; 
+  if ($created_id) {
+    return $created_id; 
+  } 
+  else {
+    return FALSE; 
+  }
+}
+  
+/**
+ * Edit a group on the ConstantContact server
+ *
+ * @param string $groupName - new name for the group 
+ * @param string $groupURI- URI for the group
+ *
+ * @return TRUE for success
+ */
+function editGroup($groupId, $groupName) {
+  $groupURI = makeGroupURI($groupId);
+  $return = doServerCall($groupURI, createGroupXML($groupURI, $groupName) , 'PUT');
+  $parsedReturn = simplexml_load_string($return);
+  if (!empty($return)) {
+    if (strpos($return, '<')!== FALSE) {
+      $parsedReturn = simplexml_load_string($return);
+      if (!empty($parsedReturn->message)) {
+        $lastError = $parsedReturn->message;
+      }
+    } 
+    else {
+      $lastError = $parsedReturn->message;
+    }
+      return FALSE;
+  }
+    return TRUE;
+}
+
+/**
+ * Upload delete a group from the ConstantContact server
+ *
+ * @param strong $groupID - the associated ID for the group
+ *
+ * @return TRUE upon success
+ */
+function deleteGroup($groupId) {
+  $groupURI = makeGroupURI($groupId);
+  $return = doServerCall($groupURI, '', 'DELETE');
+  if (!empty($return)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * Display help and module information
+ *
+ * @param path which path of the site we're displaying help
+ * @param arg array that holds the current path as would be returned from arg() function
+ * @return help text for the path
+ */
+function civicrm_constant_contact_help($path, $arg) {
+  $output = '';  //declare output variable
+  switch ($path) {
+    case "admin/help#civicrm_constant_contact":
+      $output = '<p>'.  t("Copies contact changes to Constant Contact") .'</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implemantation of hook_form
+ * Add an account at Constant Contact
+ */
+function civicrm_constant_contact_new_account_form() {
+  Global $user;
+  _civicrm_constant_contact_ctctWrapper_file_check ();
+  $form = array();
+  $form['SiteOwnerLoginName'] = array(
+    '#type' => 'textfield',
+    '#title' => t('New Constant Contact Username'),
+    '#default_value' => variable_get('civicrm_constant_contact_username', ''),
+    '#description' => t("The username used to log into Constant Contact"),
+    '#required' => TRUE,
+  );
+  $form['SiteOwnerPassword'] = array(
+    '#type' => 'password',
+    '#title' => t('New Constant Contact password'),
+    '#description' => t("Greater than 6 characters and cannot include ` ! ~ # % ^"),
+    '#required' => TRUE,
+  );
+  $form['SiteName'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Organization Name'),
+    '#description' => t("Name of the organization you represent"),
+    '#required' => TRUE,
+  );
+  $form['SitePhone'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Organization Phone'),
+    '#description' => t("Phone number for your organization with - in the number"),
+    '#required' => FALSE,
+  );
+  $form['SiteURL'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Organization Website'),
+    '#description' => t("URL for your website"),
+    '#required' => FALSE,
+  );
+  $form['SiteContactFirstName'] = array(
+    '#type' => 'textfield',
+    '#title' => t('First Name'),
+    '#description' => t("First name of the user"),
+    '#required' => TRUE,
+  );
+  $form['SiteContactLastName'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Last Name'),
+    '#description' => t("Last name of the user"),
+    '#required' => TRUE,
+  );
+  $form['SiteContactEmail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail Address'),
+    '#description' => t("Email address of the user "),
+    '#default_value' => $user->mail,
+    '#required' => TRUE,
+  );
+  $form['SiteContactPhone'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Phone'),
+    '#description' => t("Phone number of the user "),
+    '#required' => TRUE,
+  );
+  $form['SiteContactCountryCode'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Country Code'),
+    '#description' => t("A code for the country where the user resides"),
+    '#default_value' => 'US',
+    '#required' => TRUE,
+  );
+  $form['SiteContactStateCode'] = array(
+    '#type' => 'textfield',
+    '#title' => t('State Code'),
+    '#description' => t("A code for the state where the user resides"),
+    '#required' => TRUE,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Add Constant Contact Account',
+  );
+  return $form;
+}
+
+function civicrm_constant_contact_new_account_form_validate ($form, &$form_state) {
+  preg_match('(`|!|~|#|%|^)', $form_state['values']['SiteOwnerPassword'], $out);
+  if ( !empty($out[0]) ) {
+    drupal_set_message('The password cannot contain the characters ` ! ~ # % ^ ', 'error', FALSE);
+  }
+  if (strlen($form_state['values']['SiteOwnerPassword']) < 7 ) {
+    drupal_set_message('The passwrd must be at least 6 characters', 'error', FALSE);
+  }
+}
+
+function civicrm_constant_contact_new_account_form_submit ($form, &$form_state) {
+  $xml = createAccountXML($form_state['values']);
+  if ($xml = TRUE) {
+    drupal_set_message("Constant Contact Account created successfully, you should be receiving a confirmation e-mail shortly", 'status');
+  }
+  else {
+    drupal_set_message("Your account wasn't created.  The error message read:" . $xml, 'error');
+  }
+}
+
+/**
+ * Implemantation of hook_form
+ * Create the form for changing settings for this plugin
+ * @author David Heiniluoma <david.heiniluoma@fmr.com>
+ */
+function civicrm_constant_contact_admin_form() {
+  _civicrm_constant_contact_ctctWrapper_file_check();
+  $form = array();
+  $form['civicrm_constant_contact_username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Constant Contact Username'),
+    '#default_value' => variable_get('civicrm_constant_contact_username', ''),
+    '#description' => t("The username used to log into Constant Contact"),
+    '#required' => TRUE,
+  );
+  $form['civicrm_constant_contact_password'] = array(
+    '#type' => 'password',
+    '#title' => t('Constant Contact Current Password'),
+    '#default_value' => '',
+    '#required' => TRUE,
+    '#description' => t("The current password used to log into Constant Contact"),
+  );
+  $form['civicrm_constant_contact_apikey'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Constant Contact API Key'),
+    '#default_value' => variable_get('civicrm_constant_contact_apikey', ''),
+    '#description' => t("The API Key used to log into Constant Contact (confirm)"),
+    '#required' => TRUE,
+  );
+  $form['civicrm_constant_contact_apipath'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Constant Contact API Path'),
+    '#default_value' => variable_get('civicrm_constant_contact_apipath', ''),
+    '#description' => t("The API Path used to log into Constant Contact (confirm)"),
+    '#required' => TRUE,
+  );
+  return system_settings_form($form);
+}
+
+/**
+ * Implementation of hook_menu
+ * Map the URL for changing options to the form
+ * @author David Heiniluoma <david.heiniluoma@fmr.com>
+ */
+function civicrm_constant_contact_menu() {
+  $items = array();
+  $items['admin/settings/civicrm_constant_contact'] = array(
+    'title' => t('Constant Contact push module settings'),
+    'description' => t('Settings for pushing changes to Constant Contact'),
+    'access arguments' => array('access administration pages'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('civicrm_constant_contact_admin_form'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+  $items['admin/settings/civicrm_constant_contact/settings'] = array(
+    'title' => t('Constant Contact push module settings'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+   );
+  //$items['admin/settings/civicrm_constant_contact/account'] = array(
+  //  'title' => t('Create Demo Constant Contact Account'),
+  //  'description' => t('Create a new Constant Contact Account'),
+  //  'page callback' => 'drupal_get_form',
+  //  'page arguments' => array('civicrm_constant_contact_new_account_form'),
+  //  'access arguments' => array('access administration pages'),
+  //  'type' => MENU_LOCAL_TASK,
+  // );
+  return $items;
+}
+
+/**
+* Wrapper for the drupal message display function. Displays the given message if the user has admin access
+*
+* @param msg the message to display
+* @param level the message level to display with. Defaults to INFO
+*/
+function civicrm_constant_contact_display($msg, $level = 'info') {
+  if (user_access('access administration pages')) {
+    drupal_set_message(t($msg), $level);
+  }
+}
+
+
+/**
+* Wrapper for the drupal logging function. Logs the given message
+*
+* @param msg the message to log
+* @param level the message level to log. Defaults to DEBUG
+* @param type the message type to log. Defaults to CiviCRM-diapush
+*/
+function cc_log($msg, $level = WATCHDOG_DEBUG, $type = 'CiviCRM-ConstantContact') {
+  watchdog($type, 
+    htmlentities($msg),
+    NULL, 
+    $level
+  );
+}
+
+/**
+* makeGroupURI
+*
+* @param constant contact group ID
+*
+* @return Built URI for the constant contact group
+*/
+function makeGroupURI($groupId) {
+  $userName = variable_get('civicrm_constant_contact_username', "");
+  $uri = "http://api.constantcontact.com/ws/customers/". $userName ."/lists/". $groupId;
+  return $uri;
+}
+
+/**
+* getContactDetails
+*
+* @param civi individual ID
+*
+* @return array storing information about an individual
+*/
+function getContactDetails($objectId) {
+  require_once 'api/v2/utils.php'; 
+  require_once 'CRM/Contact/BAO/GroupContact.php'; 
+  require_once 'CRM/Core/Permission.php';
+  //Gather the contact details
+  $fname = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $objectId, 'first_name');
+  $lname = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $objectId, 'last_name');
+  $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $objectId, 'job_title');
+  $org = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $objectId, 'organization_name');
+  /*$address_array = civicrm_constant_contact_get_primary_address($objectId);
+    $street = $address_array['street_address'];
+    $street2 = $address_array['supplemental_address_1'];
+    $street3 = $address_array['supplemental_address_2'];
+    $city = $address_array['city'];
+    $stateName = $address_array['stateName'];
+    $stateCode = $address_array['stateCode'];
+    $zip = $address_array['postal_code'];*/
+    //$group_titles_by_id = CRM_Contact_BAO_GroupContact::getGroupList( $objectId );
+  $group_titles_by_id = CRM_Contact_BAO_GroupContact::getContactGroup( $objectId, "Added" );
+  $constant_contact_group_ids = array();
+  if ( sizeof( $group_titles_by_id ) <= 0 ) {
+  //do nothing
+  } 
+  else {
+    foreach ($group_titles_by_id as $group_id=>$group_title) {
+      $civi_id = $group_title['group_id'];
+      $cc_group_id = get_cc_group_id( $civi_id );
+      $cc_group_id_uri = makeGroupURI($cc_group_id);
+      if ( !empty($cc_group_id) ) {
+        $constant_contact_group_ids[$group_id]=$cc_group_id_uri;
+      }//if
+    }//foreach
+  }//else
+  $new_email = civicrm_constant_contact_get_primary_email($objectId);
+  //Put the data fields into an array
+  $fields = array( 
+    'first_name' => $fname,
+    'last_name' => $lname,
+    'middle_name' => "",
+    'email_address' => $new_email, 
+    'company_name' => $org, 
+    'job_title' => $title, 
+    'address_line_1' => $street, 
+    'address_line_2' => $street2,
+    'address_line_3' => $street3, 
+    'city_name' => $city, 
+    //'state_name' => $stateName,
+    'state_code' => $stateCode,
+    'zip_code' => $zip,
+    'lists' => $constant_contact_group_ids);
+  return $fields;
+}
+
+/**
+* get_cc_group_id
+*
+* @param civi group ID
+*
+* @return constant contact group id
+*/
+function get_cc_group_id( $group_id ) {
+  $settings = variable_get('civicrm_constant_contact', array());
+  $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+  $field = $settings['civicrm_constant_contact_list_id']['field_name'];  
+  $sql = "SELECT $field 
+      FROM $table 
+      WHERE entity_id = $group_id LIMIT 1";
+  $constant_contact_group_id = CRM_Core_DAO::singleValueQuery( $sql, CRM_Core_DAO::$_NULLArray );
+  //return CRM_Core_DAO::singleValueQuery( $sql, CRM_Core_DAO::$_NULLArray );
+  return $constant_contact_group_id;
+}
+
+/*  Begin bulk updater */
+
+function contact_upload_finished( $success, $results, $operations ) {
+  if ($success) {
+    $message = 'Finished successfully.';
+    $message .= '<br> Processed ' . count($results['names']) . ' records.<br>';
+  }
+  else {
+    $error_operation = reset($operations);
+    $message = 'An error occurred while processing ' . $error_operation[0] . ' with arg ' . print_r($error_operation[1], TRUE);
+  }
+  drupal_set_message($message);
+}
+
+function contact_upload( $members, $cc_url, &$context ) {
+
+  define('APIKEY', variable_get('civicrm_constant_contact_apikey', NULL));
+  define('USERNAME', variable_get('civicrm_constant_contact_username', NULL));
+  define('PASSWORD', variable_get('civicrm_constant_contact_password', NULL));
+  include_once('ctctWrapper.php');
+  civicrm_initialize();
+
+  if ( !isset($context['sandbox']['progress']) ) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['max'] = 50;
+  }
+
+  $start = count($context['results']['names']);
+
+  if ( $start == count($members) ) {
+    $context['finished'] = 1;
+    return;
+  }
+
+  $contact_id = $members[$start];
+  $contactDetails = getContactDetails($contact_id);
+  $contactEmail = civicrm_constant_contact_get_primary_email($contact_id);
+  if (!empty($contactEmail)) {
+    $contact = new Contact();
+    $contact->setEmailAddress($contactEmail);
+    $contact->setFirstName($contactDetails['first_name']);
+    $contact->setLastName($contactDetails['last_name']);
+    $contact->setLists( $cc_url );
+    $context['results']['names'][] = $contact;
+
+    $context['message'] = 'Now processing ' . $contactDetails['first_name'] . ' ' . $contactDetails['last_name'];
+    $names = $context['results']['names'];
+    if ( !empty($names) ) {
+      $contact = $context['results']['names'][$start];
+      $col = new ContactsCollection();
+      $var = $col->createContact($contact);
+    }
+  }
+  else {
+    $context['results']['names'][] = 'placeholder';
+    $context['message'] = 'Skipping record ' . $contact_id;
+  }
+
+  $context['sandbox']['progress']++;
+
+  if ( $context['sandbox']['progress'] != $context['sandbox']['max'] ) {
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+}
+
+function test_bu() {
+  $gm = array();
+  for ($i = 0; $i<700; $i++) {
+    $gm[$i+1158] = $i+1158;
+  }
+  $a = bulk_update($gm, 1);
+  print "<BR> Got to end: <BR>";
+  //dpr($a);
+}
+
+/**
+* bulk_update
+*
+* @param $group_members - an array holding civi ids to be added to a group
+* @param $cc_group_id - the constant contact group to add the users to
+*
+* @return TRUE for success, FALSE if error
+*/
+function bulk_update($group_members, $cc_group_id) {
+  $cc_url = makeGroupURI($cc_group_id);
+  $count = count($group_members);
+  $group_members = array_keys($group_members);  //the original writer used the keys to hold contact ids
+
+  $batch = array(
+    'operations' => array(),
+    'finished' => 'contact_upload_finished',
+    'title' => 'processing contacts',
+    'init_message' => t('Contacts processing'),
+    'progress_message' => t('Processed @current out of @total'),
+    'error_message' => t('Error...'),
+    );
+
+  $handled = 0;
+  while ($handled < $count) {
+    $batch['operations'][] = array('contact_upload', array($group_members, $cc_url));
+    $handled += 50;
+  }
+
+  batch_set($batch);
+  batch_process('/');
+}//function
+
+  /* end bulk updater */
+
+/**
+ * civiconstantconstant_cron
+ *
+ * called as part of the Drupal cron job, this function retrieves users from Constant Contact that have opted out, and marks
+ * them as such in CiviCRM. It also acts to port over all of the members of smart groups into Constant Contact.
+ *
+ * @return Mixed returns the result of the database update query used for the function.
+ */
+function civicrm_constant_contact_cron() {
+  civicrm_initialize();
+  global $civicrm_root;
+  require_once $civicrm_root . '/CRM/Contact/BAO/Group.php';
+  require_once $civicrm_root . '/CRM/Contact/BAO/GroupContact.php';
+  // Call the function to go out an update all of the smart groups.
+  updateSmartGroups(); 
+  $username = variable_get('civicrm_constant_contact_username', "");
+  $providers_username = "providerscouncil";
+  $url = "https://api.constantcontact.com/ws/customers/". $username ."/lists/do-not-mail/members";
+  $xml_string = doServerCall( $url );
+  if ( !$xml_string ) {
+    cc_log("The Do Not Mail list could not be retrieved from Constant Contact. Opted out contacts were not updated in CiviCRM.", WATCHDOG_ERROR);
+    return FALSE;
+  }
+  $xml_obj = simplexml_load_string($xml_string);
+  $email_str = "";
+  foreach ($xml_obj->entry as $member) {
+    $email_str.="'" .(string)$member->content->ContactListMember->EmailAddress. "',";
+  }
+  $email_str = trim( $email_str, "," );
+  $sql = "
+      UPDATE civicrm_contact
+      SET is_opt_out=1
+      WHERE id IN
+        (SELECT DISTINCT contact_id
+         FROM civicrm_email
+         WHERE email IN ($email_str) AND is_primary=1)";
+  //civiconstantcron_logger( $sql );
+  cc_log( "The Constant Contact members with email addresses: ". $email_str ." have been marked as opted out in CiviCRM." );
+  cc_log( "Opted out contacts have successfully been synchronized between Constant Contact and CiviCRM." );
+  return CRM_Core_DAO::executeQuery( $sql );
+}
+
+/**
+ * updateSmartGroups
+ *
+ * Function called to loop through the smart groups that are set to sync in CiviCRM, and updates who the 
+ * members of each group are in Contstant Contact.
+ */
+function  updateSmartGroups() {
+  $settings = variable_get('civicrm_constant_contact', array());
+  // table for the Constant Contact custom fields
+  $table = $settings['civicrm_constant_contact_sync_group']['table_name'];
+  // field for the constant contact id
+  $cc_id_field = $settings['civicrm_constant_contact_list_id']['field_name'];
+  // feild query for the sync boolean
+  $sync_field = $settings['civicrm_constant_contact_group_sync_field']['field_name'];
+  // get the smart groups that are set to be synced
+  $smart_groups_sql = "
+    SELECT c.entity_id AS smart_group_id, c. $cc_id_field AS smart_cc_group_id
+    FROM civicrm_group g, $table c
+    WHERE (g.saved_search_id IS NOT NULL AND c.entity_id=g.id) AND $sync_field='1'";
+  $data = CRM_Core_DAO::executeQuery( $smart_groups_sql );
+  // Retrieve the relevant information from the object returned, building the array of Smart Groups
+  while( $data->fetch() ) {
+    $smart_groups[] = array('group_id'=>$data->smart_group_id, 'cc_group_id'=>$data->smart_cc_group_id, 'members'=>array() );
+  }
+  foreach ($smart_groups as $smart_group) {
+    /**
+     * Here we need to delete and then recreate the smart group in CC, getting the cc id back
+     */
+    $new_cc_group_id = recreateGroup( $smart_group['group_id'], $smart_group['cc_group_id'], $table, $cc_id_field, $sync_field );
+    /**
+     * If we retrieve a new CC id, then proceed, otherwise alert the user that there has been an error with
+     * this group id(civi group id provided to user).
+     */
+    if ( $new_cc_group_id ) {
+      // reset the cc_group_id for the group for posterity in the array
+      $smart_group['cc_group_id'] = $new_cc_group_id;
+      //retrieve all of the members of this group (the previous function used, only retrieved 25)
+      $members = CRM_Contact_BAO_Group::getMember( $smart_group['group_id'] );
+      /**
+       * Loop over all of the members found for the group, only putting those with email addresses into the 
+       * array of members for the group to be sent to CC as email is our CC unique identifier.
+       */
+      foreach ( $members as $id=>$one ) {
+        $email = civicrm_constant_contact_get_primary_email( $id );
+        if ( !empty( $email ) ) {
+          $smart_group['members'][$id] = 1;
+        }
+      }
+      /**
+       * Run the bulk update function that is tied to an activity call in the CC api. 
+       * It is noted in the CC documentation that this should not be called for groups 
+       * smaller than 25, but after communicating with CC, they said it was just advisory,
+       * and that in our situation, we wouldn't be expected to code special conditions.
+       */
+      bulk_update( $smart_group['members'], $smart_group['cc_group_id'] );
+    } 
+    else {
+      cc_log( "The smart group with id ". $smart_group['group_id'] ." failed to be recreated in Constant Contact. Please unsync and resync the group in CiviCRM.", WATCHDOG_ERROR );
+    }
+  }
+  cc_log( 'Smart groups successfully updated in Constant Contact' );
+}
+
+/**
+ * recreateGroup
+ *
+ * Function called to recreate the smart group in CC because we are re-adding everyone to the group in CC. If
+ * the recreation fails, the code removes the previous CC id in the database, and sets the group to unsync, as 
+ * well as logs a failure to the database.
+ *
+ * @param   Integer $group_id This is the CiviCRM group id for the group that is to be recreated
+ * @param   Integer $cc_group_id This is the Constant Contact group id for the group that is to be recreated
+ * @param   String   $table This is the custom table for the CC information in civi
+ * @param   String   $cc_group_id_field This is the custom field for the CC group id in civi
+ * @param   String   $cc_group_id_field This is the custom field for the CC sync status in civi
+ * @return  Mixed  returns the cc group id on success, otherwise returns FALSE
+ */
+function recreateGroup( $group_id, $cc_group_id, $table, $cc_group_id_field, $sync_field ) {
+  //delete the group in CC
+  $delete_status = deleteGroup( $cc_group_id );
+  //get the title of the group to be passed to CC
+  $sql = "
+    SELECT title
+    FROM civicrm_group 
+    WHERE id=$group_id";
+  $group_title = CRM_Core_DAO::singleValueQuery( $sql, CRM_Core_DAO::$_NULLArray );
+  //call the addGroup function and get the new CC id out
+  $cleanId = explode("/", addGroup($group_title));
+  $constant_contact_group_id = $cleanId[7];
+  //if we get a new cc id back, store it in the database, otherwise, remove all cc information from the table in civi
+  if ( $constant_contact_group_id ) {
+    $update_sql = "
+        UPDATE $table
+        SET $cc_group_id_field=$constant_contact_group_id
+        WHERE entity_id=$group_id";
+  CRM_Core_DAO::executeQuery( $update_sql, CRM_Core_DAO::$_NULLArray );
+    return $constant_contact_group_id;
+  } 
+  else {
+    $update_sql = "
+        UPDATE $table
+        SET $cc_group_id_field='', $sync_field=''
+        WHERE entity_id=$group_id";
+    CRM_Core_DAO::executeQuery( $update_sql, CRM_Core_DAO::$_NULLArray );
+    cc_log("The smart group with id ". $smart_group['group_id'] ." failed to be recreated in Constant Contact. Please unsync and resync the group in CiviCRM.", WATCHDOG_ERROR );
+    return FALSE;
+  }
+}
+
+function _civicrm_constant_contact_ctctWrapper_file_check() {
+  $module_dir = drupal_get_path('module', 'civicrm_constant_contact');
+  if (!file_exists($module_dir . '/ctctWrapper.php')) {
+    $options = array( 'attributes' =>
+                      array('target' => '_blank'),
+                    );
+    drupal_set_message(t('The Constant Contact PHP library is missing please'). l(' download', 'http://sourceforge.net/projects/ctctphplib', $options) . t(" it and follow installation instruction in the README.txt file."), "error");
+  }
+  
+}

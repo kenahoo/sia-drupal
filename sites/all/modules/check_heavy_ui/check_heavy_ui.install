@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install file for Check Heavy UI.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function check_heavy_ui_install() {
+  return;
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function check_heavy_ui_uninstall() {
+  variable_del('apply_chui_user_permissions');
+}

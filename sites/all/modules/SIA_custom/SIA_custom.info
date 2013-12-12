@@ -1,0 +1,6 @@
+name = SIA Custom Function Library
+description = This module contains my PHP helper functions.
+core = 6.x
+package = "SIA Custom Function Library"
+
+version = "6.x-0.1"

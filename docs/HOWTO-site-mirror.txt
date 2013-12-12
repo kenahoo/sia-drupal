@@ -1,0 +1,42 @@
+#!/bin/sh
+
+FROM=singersinaccord.org
+TO=singersinaccord.org
+
+# How to create a full local mirror of the SIA web site, for testing purposes etc.
+#
+# 1) copy all the files from the live site to the local machine:
+
+  rsync -aKv --exclude=rec --exclude=reh $FROM:singersinaccord.org/ $TO/
+
+# I already had the rec/ and reh/ directories locally, and I didn't want to re-copy them because they're big.
+
+# 2) Make sure MySQL and PHP are installed & working nicely together.  I had to create a symlink for PHP to be happy:
+unless (-e '/var/mysql/mysql.sock') {
+  system "sudo ln -s /tmp/mysql.sock /var/mysql/mysql.sock";
+}
+
+# 3) Grab the latest live database data and import into MySQL:
+  ssh singersinaccord.org cat data/backups/mysql/2013-09-04 | gunzip -c | mysql
+
+4) Create the proper MySQL users:
+  GRANT ALL ON singersinaccord_drupal.* TO 'sia_drupal'@'localhost' IDENTIFIED BY 'ektaa!';
+  GRANT ALL ON singersinaccord_crm.*    TO 'sia_drupal'@'localhost' IDENTIFIED BY 'ektaa!';
+
+5) Edit some config files:
+
+sites/default/settings.conf:
+  $db_url = 'mysqli://sia_drupal:ektaa%21@localhost/singersinaccord_drupal';
+sites/default/civicrm.settings.conf:
+  define( 'CIVICRM_UF_DSN'           , 'mysql://sia_drupal:ektaa!@localhost/singersinaccord_drupal?new_link=true' );
+  define( 'CIVICRM_DSN'          , 'mysql://sia_drupal:ektaa!@localhost/singersinaccord_crm?new_link=true' );
+  $site_root = '/Users/ken/Documents/SIA/singersinaccord.org';
+
+6) Edit /etc/apache2/httpd.conf to point DocumentRoot to the new singersinaccord.org/ directory:
+  DocumentRoot "/Users/ken/Documents/SIA/singersinaccord.org"
+
+7) Enable mod_rewrite in /etc/apache2/httpd.conf:
+  AllowOverride All AuthConfig
+
+8) Disable 'session443' module:
+  mv sites/all/modules/session443 ../

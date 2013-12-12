@@ -1,0 +1,23 @@
+How to create a full local mirror of the SIA web site, for testing purposes etc.
+
+1) copy all the files from the live site to the local machine:
+  rsync -aKv --exclude=rec --exclude=reh singersinaccord.org:singersinaccord.org/ singersinaccord.org/
+
+I already had the rec/ and reh/ directories locally, and I didn't want to re-copy them because they're big.
+
+2) Make sure MySQL and PHP are installed & working nicely together.  I had to create a symlink for PHP to be happy:
+  sudo ln -s /tmp/mysql.sock /var/mysql/mysql.sock
+
+3) Grab the latest live database data and import into MySQL:
+  ssh singersinaccord.org cat data/backups/mysql/2012-02-20 | gunzip -c | mysql
+
+4) Create the proper MySQL users:
+  GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON singersinaccord_drupal.* TO 'sia_drupal'@'localhost' IDENTIFIED BY 'ektaa!';
+  GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON singersinaccord_crm.* TO 'sia_drupal'@'localhost' IDENTIFIED BY 'ektaa!';
+
+5) Edit /etc/apache2/httpd.conf to point DocumentRoot to the new singersinaccord.org/ directory:
+  DocumentRoot "/Users/ken/Documents/SIA/singersinaccord.org"
+
+6) Enable mod_rewrite in /etc/apache2/httpd.conf:
+  AllowOverride All AuthConfig
+

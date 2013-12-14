@@ -50,7 +50,8 @@ function blueprint_preprocess_page(&$vars) {
     $headers = drupal_set_header();
 
     // if this is a 403 and they aren't logged in, tell them they need to log in
-    if (strpos($headers, 'HTTP/1.1 403 Forbidden') && !$user->uid) {
+    if ( // strpos($headers, 'HTTP/1.1 403 Forbidden') &&
+     !$user->uid) {
       $title = t('Please login to continue');
     }
     $vars['title'] = $title;

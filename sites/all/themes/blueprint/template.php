@@ -144,8 +144,8 @@ function blueprint_preprocess_page(&$vars) {
     $css['screen,projection']['theme'][$vars['bp_library_path'] .'/blueprint/plugins/rtl/screen.css'] = TRUE;
 
     //setup rtl css for IE
-    $vars['styles_ie']['ie'] = '<link href="'. $path .'css/ie-rtl.css" rel="stylesheet"  type="text/css"  media="screen, projection" />';
-    $vars['styles_ie']['ie6'] = '<link href="'. $path .'css/ie6-rtl.css" rel="stylesheet"  type="text/css"  media="screen, projection" />';
+    $vars['styles_ie_rtl']['ie'] = '<link href="'. $path .'css/ie-rtl.css" rel="stylesheet"  type="text/css"  media="screen, projection" />';
+    $vars['styles_ie_rtl']['ie6'] = '<link href="'. $path .'css/ie6-rtl.css" rel="stylesheet"  type="text/css"  media="screen, projection" />';
   }
 
   // Make sure framework styles are placed above all others.

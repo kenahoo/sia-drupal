@@ -14,11 +14,9 @@
   <!--[if lte IE 7]>
     <link rel="stylesheet" href="<?php print $base_path . $bp_library_path; ?>blueprint/ie.css" type="text/css" media="screen, projection">
     <link href="<?php print $path_parent; ?>css/ie.css" rel="stylesheet"  type="text/css"  media="screen, projection" />
-    <?php $styles_ie_rtl['ie']; ?>
   <![endif]-->
   <!--[if lte IE 6]>
     <link href="<?php print $path_parent; ?>css/ie6.css" rel="stylesheet"  type="text/css"  media="screen, projection" />
-    <?php $styles_ie_rtl['ie6']; ?>
   <![endif]-->
 </head>
 

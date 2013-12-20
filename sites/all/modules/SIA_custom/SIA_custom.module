@@ -52,6 +52,44 @@ function listMP3s($files, $start, $end) {
   }
 }
 
+function listDir($d) {
+  $getID3 = new getID3;
+  $f1 = preg_replace('/.*\//', '', $d);
+  print("<h3>$f1</h3>\n<ol>\n");
+
+  $filenum = 0;
+  foreach (glob("$d/*.[Mm][Pp]3") as $p) {
+    $f = basename($p);
+    if (!is_file($p)){
+      continue;
+    }
+    $filenum++;
+
+    $mp3info = $getID3->analyze($p);
+    $tags = array_key_exists('tags', $mp3info) ? $mp3info['tags']['id3v2'] : array();
+    $title = (array_key_exists('title',$tags) && $tags['title'][0]) ? $tags['title'][0] : "<i>$f</i>";
+    print("<li> <a href=\"/$p\">$title</a> " .
+            "(".round($mp3info["filesize"]/pow(2,20), 1)."M, ".$mp3info["playtime_string"].")\n");
+  }
+  print("</ol>\n");
+}
+
+function mp3_listing($start, $end, $title, $collapsed=true) {
+  print("<fieldset class=\"collapsible".($collapsed ? " collapsed" : "")."\">\n");
+  print("<legend><span class=\"fieldset-legend\">$title</span></legend>\n");
+  print("<div class=\"fieldset-wrapper\">\n");
+
+  foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {
+    $f1 = preg_replace('/reh\//', '', $d);
+    if (!is_dir($d) || strcmp($f1, $start)<0 || strcmp($f1, $end)>0) {
+      continue;
+    }
+    listDir($d);
+  }
+
+  print("</div></fieldset>\n");
+}
+
 function google_cal_list($start_date) {
   set_include_path('.:/usr/local/php5/lib/php:/usr/local/lib/php:../downloads/ZendGdata-1.9.3PL1/library');
   require_once 'Zend/Loader.php';

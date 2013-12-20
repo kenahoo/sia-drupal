@@ -76,7 +76,8 @@ function listDir($d) {
 
 function mp3_listing($start, $end, $title, $collapsed=true) {
   print("<fieldset class=\"collapsible".($collapsed ? " collapsed" : "")."\">\n");
-  print("<legend><span class=\"fieldset-legend\">$title</span></legend>\n");
+  // print("<legend><span class=\"fieldset-legend\">$title</span></legend>\n");
+  print("<legend>$title</legend>\n");
   print("<div class=\"fieldset-wrapper\">\n");
 
   foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {

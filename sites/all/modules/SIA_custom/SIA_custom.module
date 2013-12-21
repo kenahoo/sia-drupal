@@ -21,22 +21,21 @@ getid3_load();
 
 
 
-function listMP3s($files, $start, $end) {
+function listMP3s($files) {
   $getID3 = new getID3;
 
   foreach ($files as $d) {
     $f1 = preg_replace('/.*\//', '', $d);
-    if (!is_dir($d) || strcmp($f1,$start)<0 || strcmp($f1,$end)>0) {
+    if (!is_dir($d)) {
       continue;
     }
-
     print("<h3>$f1</h3>\n<ol>\n");
 
     $filenum = 0;
     foreach (glob("$d/*.[Mm][Pp]3") as $p) {
       $f = basename($p);
       if (!is_file($p)){
-	continue;
+        continue;
       }
       $filenum++;
 

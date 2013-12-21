@@ -60,7 +60,7 @@
         print '<div id="messages">'. $messages .'</div>';
       }
 
-      if ($image_title != '') {
+      if (isset($image_title)) {
         print '<h1>'. $image_title .'</h1>';
       }
       else if ($title != '') {

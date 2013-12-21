@@ -3,7 +3,7 @@
 <!-- theme: siabp2.node -->
 <?php if ($page == 0): ?>
   <h2><a href="<?php print $node_url ?>" title="<?php print $title ?>"><?php
-     print(($image_title != '') ? theme('image', $image_title, $title, $title, '', FALSE) : $title);
+     print(isset($image_title) ? theme('image', $image_title, $title, $title, '', FALSE) : $title);
   ?></a></h2>
 <?php endif; ?>
 

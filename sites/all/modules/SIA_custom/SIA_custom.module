@@ -41,37 +41,16 @@ function listMP3s($files, $start, $end) {
       $filenum++;
 
       $mp3info = $getID3->analyze($p);
-      $title = $mp3info['tags']['id3v2']['title'][0] ? $mp3info['tags']['id3v2']['title'][0] : "<i>$f</i>";
-      $composer = ($mp3info['tags']['id3v2']['composer'][0] ?
-		   "<span style='font-size:smaller'>[".$mp3info['tags']['id3v2']['composer'][0]."]</span> " :
-		   "");
+      $tags = array_key_exists('tags', $mp3info) ? $mp3info['tags']['id3v2'] : array();
+      $title = (array_key_exists('title',$tags) && $tags['title'][0]) ? $tags['title'][0] : "<i>$f</i>";
+      $composer = (array_key_exists('composer',$tags) && $tags['composer'][0]) ?
+          "<span style='font-size:smaller'>[".$tags['composer'][0]."]</span> " :
+          "";
       print("<li> <a href=\"/$p\">$title</a> $composer" .
             "(".round($mp3info["filesize"]/pow(2,20), 1)."M, ".$mp3info["playtime_string"].")\n");
     }
     print("</ol>\n");
   }
-}
-
-function listDir($d) {
-  $getID3 = new getID3;
-  $f1 = preg_replace('/.*\//', '', $d);
-  print("<h3>$f1</h3>\n<ol>\n");
-
-  $filenum = 0;
-  foreach (glob("$d/*.[Mm][Pp]3") as $p) {
-    $f = basename($p);
-    if (!is_file($p)){
-      continue;
-    }
-    $filenum++;
-
-    $mp3info = $getID3->analyze($p);
-    $tags = array_key_exists('tags', $mp3info) ? $mp3info['tags']['id3v2'] : array();
-    $title = (array_key_exists('title',$tags) && $tags['title'][0]) ? $tags['title'][0] : "<i>$f</i>";
-    print("<li> <a href=\"/$p\">$title</a> " .
-            "(".round($mp3info["filesize"]/pow(2,20), 1)."M, ".$mp3info["playtime_string"].")\n");
-  }
-  print("</ol>\n");
 }
 
 function mp3_listing($start, $end, $title, $collapsed=true) {
@@ -80,13 +59,15 @@ function mp3_listing($start, $end, $title, $collapsed=true) {
   print("<legend>$title</legend>\n");
   print("<div class=\"fieldset-wrapper\">\n");
 
+  $to_list = array();
   foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {
     $f1 = preg_replace('/reh\//', '', $d);
     if (!is_dir($d) || strcmp($f1, $start)<0 || strcmp($f1, $end)>0) {
       continue;
     }
-    listDir($d);
+    $to_list[] = $d;
   }
+  listMP3s($to_list);
 
   print("</div></fieldset>\n");
 }

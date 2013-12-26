@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_Group
+  extends CRM_Contact_Form_Search_Custom_Base
+  implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
 
@@ -91,9 +93,9 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
 
     $groups = CRM_Core_PseudoConstant::group();
 
-    $tags = CRM_Core_PseudoConstant::tag();
+    $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     if (count($groups) == 0 || count($tags) == 0) {
-      CRM_Core_Session::setStatus(ts("Atleast one Group and Tag must be present, for Custom Group / Tag search."));
+      CRM_Core_Session::setStatus(ts("At least one Group and Tag must be present for Custom Group / Tag search."), ts('Missing Group/Tag'));
       $url = CRM_Utils_System::url('civicrm/contact/search/custom/list', 'reset=1');
       CRM_Utils_System::redirect($url);
     }
@@ -120,7 +122,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
       '1' => ts('Show contacts that meet the Groups criteria AND the Tags criteria'),
       '0' => ts('Show contacts that meet the Groups criteria OR  the Tags criteria'),
     );
-    $form->addRadio('andOr', ts('AND/OR'), $andOr, TRUE, '<br />', TRUE);
+    $form->addRadio('andOr', ts('AND/OR'), $andOr, NULL, '<br />', TRUE);
 
     $int = &$form->addElement('advmultiselect', 'includeTags',
       ts('Include Tag(s)') . ' ', $tags,
@@ -163,8 +165,16 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
    * Set search form field defaults here.
    */
   function setDefaultValues() {
-    return
-      array( 'andOr' => '1' );
+    $defaults = array( 'andOr' => '1' );
+
+    if (!empty($this->_formValues)) {
+      $defaults['andOr'] = CRM_Utils_Array::value('andOr', $this->_formValues, '1');
+
+      $defaults['includeGroups'] = CRM_Utils_Array::value('includeGroups', $this->_formValues);
+      $defaults['excludeGroups'] = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
+    }
+
+    return $defaults;
   }
 
   function all(
@@ -220,6 +230,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     if (!$justIDs) {
       if (!empty($sort)) {
         if (is_string($sort)) {
+          $sort = CRM_Utils_Type::escape($sort, 'String');
           $sql .= " ORDER BY $sort ";
         }
         else {
@@ -274,7 +285,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
         $xGroups = 0;
       }
 
-      $sql = "CREATE TEMPORARY TABLE Xg_{$this->_tableName} ( contact_id int primary key) ENGINE=HEAP";
+      $sql = "CREATE TEMPORARY TABLE Xg_{$this->_tableName} ( contact_id int primary key) ENGINE=MyISAM";
       CRM_Core_DAO::executeQuery($sql);
 
       //used only when exclude group is selected
@@ -309,7 +320,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
 
       $sql = "CREATE TEMPORARY TABLE Ig_{$this->_tableName} ( id int PRIMARY KEY AUTO_INCREMENT,
                                                                    contact_id int,
-                                                                   group_names varchar(64)) ENGINE=HEAP";
+                                                                   group_names varchar(64)) ENGINE=MyISAM";
 
       CRM_Core_DAO::executeQuery($sql);
 
@@ -409,7 +420,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
         $xTags = 0;
       }
 
-      $sql = "CREATE TEMPORARY TABLE Xt_{$this->_tableName} ( contact_id int primary key) ENGINE=HEAP";
+      $sql = "CREATE TEMPORARY TABLE Xt_{$this->_tableName} ( contact_id int primary key) ENGINE=MyISAM";
       CRM_Core_DAO::executeQuery($sql);
 
       //used only when exclude tag is selected
@@ -427,7 +438,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
 
       $sql = "CREATE TEMPORARY TABLE It_{$this->_tableName} ( id int PRIMARY KEY AUTO_INCREMENT,
                                                                contact_id int,
-                                                               tag_names varchar(64)) ENGINE=HEAP";
+                                                               tag_names varchar(64)) ENGINE=MyISAM";
 
       CRM_Core_DAO::executeQuery($sql);
 
@@ -477,8 +488,8 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
      */
 
     /*
-     * check the situation and set booleans
-     */
+         * check the situation and set booleans
+         */
 
     $Ig = ($iGroups != 0);
 
@@ -494,8 +505,8 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     }
 
     /*
-     * Set from statement depending on array sel
-     */
+         * Set from statement depending on array sel
+         */
     $whereitems = array();
     foreach (array('Ig', 'It') as $inc) {
       if ($this->_andOr == 1) {
@@ -568,7 +579,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     return $dao->N;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 

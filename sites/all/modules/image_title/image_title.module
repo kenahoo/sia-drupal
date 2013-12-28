@@ -246,8 +246,7 @@ function image_title_theme() {
  * (save, update, delete, etc.) 
  */
 function image_title_nodeapi(&$node, $op, $teaser, $page) {
-  if ($op != "view" && $op != "load" && !user_access('create image titles')) {
-//  || (variable_get('image_title_'. $node->type, 1) == 0) ) {    // KAW not sure what this condition is
+  if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
     return; // do nothing ... 
   }
   switch ($op) {
@@ -361,16 +360,13 @@ function image_title_nodeapi(&$node, $op, $teaser, $page) {
  * offers the form for title image upload as a variable for theming
  */
 function image_title_preprocess_page(&$variables) { 
-  //we set another variable here because some modules may override $title
-  //later on, so you can in turn override their values in your theme
-  //template.php file with an appropriate preprocess containing simply:
-  //  $variables['title'] = $variables['image_title'];
-
+  
   if (arg(0) === 'node' && is_numeric(arg(1))) {
     $thisnode = node_load($variables['node']->nid);
-    if ($thisnode->image_title && $thisnode->image_title_status ) {
-      $variables['title'] =
-      $variables['image_title'] = make_image_html($thisnode->image_title, $thisnode->title);
+    if ($thisnode->image_title && $thisnode->image_title_status ) { 
+      $image = theme('image', $thisnode->image_title, $thisnode->title, $thisnode->title, '', FALSE);
+      $title = '<span class="txt_title">' . $thisnode->title . '</span>' . $image;
+      $variables['title'] = $title;
     }
   } 
   else {
@@ -381,18 +377,17 @@ function image_title_preprocess_page(&$variables) {
     //load menu item page data
     $item = menu_get_item();
     //check for an image for this page
-    if ($image_title = db_fetch_array(
-        db_query('SELECT image FROM {image_title_menu} WHERE path = "%s"', $item['path'])
-       )) {
-      $variables['title'] =
-      $variables['image_title'] = make_image_html($image_title['image'], $item['title']);
+    if ($image_title = db_fetch_array(db_query('SELECT image FROM {image_title_menu} WHERE path = "%s"', $item['path']))) {
+      $image = theme('image', $image_title['image'], $item['title'], $item['title'], '', FALSE);
+      $title = '<span class="txt_title">' . $item['title'] . '</span>' . $image;
+      $variables['title'] = $title;
+      //we set another variable here because some modules may override $title
+      //later on, so you can in turn override their values in your theme
+      //template.php file with an appropriate preprocess containing simply:
+      //  $variables['title'] = $variables['image_title'];
+      $variables['image_title'] = $title;
     }
-  }
-}
-
-function make_image_html($im_path, $orig_title) {
-  $image = theme('image', $im_path, $orig_title, $orig_title, '', FALSE);
-  return '<span class="txt_title">' . $orig_title . '</span>' . $image;
+  }  
 }
 
 /**

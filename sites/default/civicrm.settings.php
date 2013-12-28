@@ -77,7 +77,7 @@ if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in:11362/pantheon?new_link=true' );
+define( 'CIVICRM_UF_DSN'           , 'mysql://ken:***REMOVED***@localhost/pantheon?new_link=true' );
 
 /**
  * CiviCRM Database Settings
@@ -98,7 +98,7 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://pantheon:14a4463ffb7541d49dce98e26
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'          , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in:11362/pantheon?new_link=true' );
+define( 'CIVICRM_DSN'           , 'mysql://ken:***REMOVED***@localhost/pantheon?new_link=true' );
 
 /**
  * File System Paths:
@@ -141,8 +141,8 @@ define( 'CIVICRM_DSN'          , 'mysql://pantheon:14a4463ffb7541d49dce98e269dee
 
 global $civicrm_root;
 
-$civicrm_root = '/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm';
-define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/kenahoo/singersinaccord.org/sites/default/files/civicrm/templates_c/' );
+$civicrm_root = '/Users/ken/Documents/SIA/site-upgrade/sites/all/modules/civicrm';
+define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/Users/ken/Documents/SIA/site-upgrade/sites/default/files/civicrm/templates_c/' );
 
 /**
  * Site URLs:
@@ -175,7 +175,7 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/home/kenahoo/singersinaccord.org/sites/
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/civicrm/standalone/' );
  */
  
-define( 'CIVICRM_UF_BASEURL'      , 'http://www.singersinaccord.org/' );
+define( 'CIVICRM_UF_BASEURL'      , 'http://localhost/' );
 
 /*
  * If you are using any CiviCRM script in the bin directory that

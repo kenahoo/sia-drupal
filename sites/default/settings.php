@@ -89,7 +89,7 @@
  *   $db_url = 'mysqli://username:password@localhost/databasename';
  *   $db_url = 'pgsql://username:password@localhost/databasename';
  */
-$db_url = 'mysqli://pantheon:14a4463ffb7541d49dce98e269dee52a@dbserver.dev.d4eaa9cb-fccf-4898-8bc5-1bbbd8c4428f.drush.in:11362/pantheon';
+$db_url = 'mysqli://ken:***REMOVED***@localhost/pantheon';
 $db_prefix = '';
 
 /**

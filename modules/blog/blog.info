@@ -1,5 +1,12 @@
 name = Blog
-description = Enables keeping easily and regularly updated user web pages or blogs.
-package = Core - optional
+description = Enables multi-user blogs.
+package = Core
 version = VERSION
-core = 6.x
+core = 7.x
+files[] = blog.test
+
+; Information added by  packaging script on 2013-11-20
+version = "7.24"
+project = "drupal"
+datestamp = "1384983240"
+

@@ -1,0 +1,50 @@
+Aug 30 15:25:14  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 30 15:25:14  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(314): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php(106): CRM_Core_Error::fatal("Could not find valid value for ct")
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Contact.php(151): CRM_Utils_Request::retrieve("ct", "String", Object(CRM_Contact_Form_Contact), TRUE, NULL, "REQUEST")
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php(338): CRM_Contact_Form_Contact->preProcess()
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php(121): CRM_Core_Form->buildForm()
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php(203): CRM_Core_QuickForm_Action_Upload->perform(Object(CRM_Contact_Form_Contact), "upload")
+#6 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php(103): HTML_QuickForm_Controller->handle(Object(CRM_Contact_Form_Contact), "upload")
+#7 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php(310): HTML_QuickForm_Page->handle("upload")
+#8 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php(116): CRM_Core_Controller->run()
+#9 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(194): CRM_Utils_Wrapper->run("CRM_Contact_Form_Contact", "New Contact", (Array:1))
+#10 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(51): CRM_Core_Invoke::_invoke((Array:3))
+#11 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(382): CRM_Core_Invoke::invoke((Array:3))
+#12 [internal function](): civicrm_invoke("contact", "add")
+#13 /home/kenahoo/singersinaccord.org/includes/menu.inc(350): call_user_func_array("civicrm_invoke", (Array:2))
+#14 /home/kenahoo/singersinaccord.org/index.php(17): menu_execute_active_handler()
+#15 {main}
+
+
+Aug 30 15:26:49  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 30 15:26:49  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(314): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php(106): CRM_Core_Error::fatal("Could not find valid value for ct")
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Contact.php(151): CRM_Utils_Request::retrieve("ct", "String", Object(CRM_Contact_Form_Contact), TRUE, NULL, "REQUEST")
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php(338): CRM_Contact_Form_Contact->preProcess()
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php(121): CRM_Core_Form->buildForm()
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php(203): CRM_Core_QuickForm_Action_Upload->perform(Object(CRM_Contact_Form_Contact), "upload")
+#6 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php(103): HTML_QuickForm_Controller->handle(Object(CRM_Contact_Form_Contact), "upload")
+#7 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php(310): HTML_QuickForm_Page->handle("upload")
+#8 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php(116): CRM_Core_Controller->run()
+#9 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(194): CRM_Utils_Wrapper->run("CRM_Contact_Form_Contact", "New Contact", (Array:1))
+#10 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(51): CRM_Core_Invoke::_invoke((Array:3))
+#11 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(382): CRM_Core_Invoke::invoke((Array:3))
+#12 [internal function](): civicrm_invoke("contact", "add")
+#13 /home/kenahoo/singersinaccord.org/includes/menu.inc(350): call_user_func_array("civicrm_invoke", (Array:2))
+#14 /home/kenahoo/singersinaccord.org/index.php(17): menu_execute_active_handler()
+#15 {main}
+
+

@@ -225,3 +225,20 @@ ini_set('url_rewriter.tags',        '');
 #   'forum'      => 'Discussion board',
 #   '@count min' => '@count minutes',
 # );
+
+$databases = array (
+  'default' => 
+  array (
+    'default' => 
+    array (
+      'driver' => 'mysql',
+      'database' => 'pantheon',
+      'username' => 'ken',
+      'password' => '***REMOVED***',
+      'host' => 'localhost',
+      'port' => '',
+      'prefix' => '',
+    ),
+  ),
+);
+$drupal_hash_salt = '5P5jMYW_ACDbGDHrQBhF24ya-kTJyraNw8aVXCgQWrE';

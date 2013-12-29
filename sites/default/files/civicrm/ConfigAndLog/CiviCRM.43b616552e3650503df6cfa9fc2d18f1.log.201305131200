@@ -1,0 +1,150 @@
+Mar 16 20:13:02  [info] Ignoring exception thrown by nullHandler: -18, DB Error: no such table
+
+Mar 16 20:13:02  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 547
+, nullHandler, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 931
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 968
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 564
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, query, 2428
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, _query, 1614
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, query, 166
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, query, 903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/BAO/Setting.php, executeQuery, 457
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/BAO/ConfigSetting.php, retrieveDirectoryAndURLPreferences, 334
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php, retrieve, 406
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php, _initVariables, 209
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, singleton, 272
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, civicrm_initialize, 159
+, civicrm_block, 
+/home/kenahoo/singersinaccord.org/includes/module.inc, call_user_func_array, 476
+/home/kenahoo/singersinaccord.org/modules/block/block.module, module_invoke, 252
+/home/kenahoo/singersinaccord.org/modules/block/block.module, _block_rehash, 324
+, block_flush_caches, 
+/home/kenahoo/singersinaccord.org/includes/module.inc, call_user_func_array, 497
+/home/kenahoo/singersinaccord.org/modules/system/system.module, module_invoke_all, 1329
+, system_cron, 
+/home/kenahoo/singersinaccord.org/includes/module.inc, call_user_func_array, 497
+/home/kenahoo/singersinaccord.org/includes/common.inc, module_invoke_all, 2783
+/home/kenahoo/singersinaccord.org/cron.php, drupal_cron_run, 10
+
+Feb 14 12:19:52  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(229): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 [internal function](): CRM_Core_Error::simpleHandler(Object(DB_Error))
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php(931): call_user_func((Array:2), Object(DB_Error))
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php(968): PEAR_Error->PEAR_Error("DB Error: connect failed", -24, 16, (Array:2), " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]")
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php(564): DB_Error->DB_Error(-24, 16, (Array:2), " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]")
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php(1903): PEAR->raiseError(NULL, -24, NULL, NULL, " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]", "DB_Error", TRUE)
+#6 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php(252): DB_common->raiseError(-24, NULL, NULL, NULL, "Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)")
+#7 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php(558): DB_mysql->connect((Array:10), FALSE)
+#8 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(2294): DB::connect((string))
+#9 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(2526): DB_DataObject->_connect()
+#10 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(411): DB_DataObject->_build_condition((Array:8))
+#11 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/BAO/ConfigSetting.php(202): DB_DataObject->find(TRUE)
+#12 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php(404): CRM_Core_BAO_ConfigSetting::retrieve((Array:0))
+#13 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php(197): CRM_Core_Config->_initVariables()
+#14 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(283): CRM_Core_Config::singleton()
+#15 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm_group_roles/civicrm_group_roles.module(53): civicrm_initialize()
+#16 /home/kenahoo/singersinaccord.org/modules/user/user.module(32): civicrm_group_roles_user("load", (Array:1), Object(stdClass), NULL)
+#17 /home/kenahoo/singersinaccord.org/modules/user/user.module(195): user_module_invoke("load", (Array:1), Object(stdClass))
+#18 /home/kenahoo/singersinaccord.org/modules/user/user.module(1171): user_load(0)
+#19 /home/kenahoo/singersinaccord.org/includes/menu.inc(412): user_uid_optional_load(0)
+#20 /home/kenahoo/singersinaccord.org/includes/menu.inc(659): _menu_load_objects((Array:38), (Array:2))
+#21 /home/kenahoo/singersinaccord.org/includes/menu.inc(1028): _menu_link_translate((Array:38))
+#22 /home/kenahoo/singersinaccord.org/includes/menu.inc(1017): _menu_tree_check_access((Array:125))
+#23 /home/kenahoo/singersinaccord.org/includes/menu.inc(955): menu_tree_check_access((Array:125), (Array:6))
+#24 /home/kenahoo/singersinaccord.org/includes/menu.inc(725): menu_tree_page_data("navigation")
+#25 /home/kenahoo/singersinaccord.org/modules/user/user.module(770): menu_tree()
+#26 [internal function](): user_block("view", "1")
+#27 /home/kenahoo/singersinaccord.org/includes/module.inc(476): call_user_func_array("user_block", (Array:2))
+#28 /home/kenahoo/singersinaccord.org/modules/block/block.module(526): module_invoke("user", "block", "view", "1")
+#29 /home/kenahoo/singersinaccord.org/includes/theme.inc(1654): block_list("left")
+#30 [internal function](): theme_blocks("left")
+#31 /home/kenahoo/singersinaccord.org/includes/theme.inc(669): call_user_func_array("theme_blocks", (Array:1))
+#32 /home/kenahoo/singersinaccord.org/includes/theme.inc(1848): theme("blocks", "left")
+#33 [internal function](): template_preprocess_page((Array:12), "page")
+#34 /home/kenahoo/singersinaccord.org/includes/theme.inc(710): call_user_func_array("template_preprocess_page", (Array:2))
+#35 /home/kenahoo/singersinaccord.org/index.php(35): theme("page", "<div class=\"view view-frontpage view-id-frontpage view-display-id-page view-...")
+#36 {main}
+
+
+Feb 14 12:20:53  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(229): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 [internal function](): CRM_Core_Error::simpleHandler(Object(DB_Error))
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php(931): call_user_func((Array:2), Object(DB_Error))
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php(968): PEAR_Error->PEAR_Error("DB Error: connect failed", -24, 16, (Array:2), " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]")
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php(564): DB_Error->DB_Error(-24, 16, (Array:2), " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]")
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php(1903): PEAR->raiseError(NULL, -24, NULL, NULL, " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]", "DB_Error", TRUE)
+#6 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php(252): DB_common->raiseError(-24, NULL, NULL, NULL, "Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)")
+#7 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php(558): DB_mysql->connect((Array:10), FALSE)
+#8 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(2294): DB::connect((string))
+#9 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(2526): DB_DataObject->_connect()
+#10 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(411): DB_DataObject->_build_condition((Array:8))
+#11 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/BAO/ConfigSetting.php(202): DB_DataObject->find(TRUE)
+#12 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php(404): CRM_Core_BAO_ConfigSetting::retrieve((Array:0))
+#13 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php(197): CRM_Core_Config->_initVariables()
+#14 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(283): CRM_Core_Config::singleton()
+#15 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm_group_roles/civicrm_group_roles.module(53): civicrm_initialize()
+#16 /home/kenahoo/singersinaccord.org/modules/user/user.module(32): civicrm_group_roles_user("load", (Array:1), Object(stdClass), NULL)
+#17 /home/kenahoo/singersinaccord.org/modules/user/user.module(195): user_module_invoke("load", (Array:1), Object(stdClass))
+#18 /home/kenahoo/singersinaccord.org/modules/user/user.module(1171): user_load(0)
+#19 /home/kenahoo/singersinaccord.org/includes/menu.inc(412): user_uid_optional_load(0)
+#20 /home/kenahoo/singersinaccord.org/includes/menu.inc(659): _menu_load_objects((Array:38), (Array:2))
+#21 /home/kenahoo/singersinaccord.org/includes/menu.inc(1028): _menu_link_translate((Array:38))
+#22 /home/kenahoo/singersinaccord.org/includes/menu.inc(1017): _menu_tree_check_access((Array:125))
+#23 /home/kenahoo/singersinaccord.org/includes/menu.inc(955): menu_tree_check_access((Array:125), (Array:6))
+#24 /home/kenahoo/singersinaccord.org/includes/menu.inc(725): menu_tree_page_data("navigation")
+#25 /home/kenahoo/singersinaccord.org/modules/user/user.module(770): menu_tree()
+#26 [internal function](): user_block("view", "1")
+#27 /home/kenahoo/singersinaccord.org/includes/module.inc(476): call_user_func_array("user_block", (Array:2))
+#28 /home/kenahoo/singersinaccord.org/modules/block/block.module(526): module_invoke("user", "block", "view", "1")
+#29 /home/kenahoo/singersinaccord.org/includes/theme.inc(1654): block_list("left")
+#30 [internal function](): theme_blocks("left")
+#31 /home/kenahoo/singersinaccord.org/includes/theme.inc(669): call_user_func_array("theme_blocks", (Array:1))
+#32 /home/kenahoo/singersinaccord.org/includes/theme.inc(1848): theme("blocks", "left")
+#33 [internal function](): template_preprocess_page((Array:12), "page")
+#34 /home/kenahoo/singersinaccord.org/includes/theme.inc(710): call_user_func_array("template_preprocess_page", (Array:2))
+#35 /home/kenahoo/singersinaccord.org/index.php(35): theme("page", "<div class=\"view view-frontpage view-id-frontpage view-display-id-page view-...")
+#36 {main}
+
+
+Feb 14 12:31:02  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(229): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 [internal function](): CRM_Core_Error::simpleHandler(Object(DB_Error))
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php(931): call_user_func((Array:2), Object(DB_Error))
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php(968): PEAR_Error->PEAR_Error("DB Error: connect failed", -24, 16, (Array:2), " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]")
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php(564): DB_Error->DB_Error(-24, 16, (Array:2), " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]")
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php(1903): PEAR->raiseError(NULL, -24, NULL, NULL, " [nativecode=Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)]", "DB_Error", TRUE)
+#6 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php(252): DB_common->raiseError(-24, NULL, NULL, NULL, "Can't connect to MySQL server on 'mysql.singersinaccord.org' (4)")
+#7 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php(558): DB_mysql->connect((Array:10), FALSE)
+#8 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(2294): DB::connect((string))
+#9 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(2526): DB_DataObject->_connect()
+#10 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php(411): DB_DataObject->_build_condition((Array:8))
+#11 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/BAO/ConfigSetting.php(202): DB_DataObject->find(TRUE)
+#12 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php(404): CRM_Core_BAO_ConfigSetting::retrieve((Array:0))
+#13 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Config.php(197): CRM_Core_Config->_initVariables()
+#14 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(283): CRM_Core_Config::singleton()
+#15 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm_group_roles/civicrm_group_roles.module(53): civicrm_initialize()
+#16 /home/kenahoo/singersinaccord.org/modules/user/user.module(32): civicrm_group_roles_user("load", (Array:1), Object(stdClass), NULL)
+#17 /home/kenahoo/singersinaccord.org/modules/user/user.module(195): user_module_invoke("load", (Array:1), Object(stdClass))
+#18 /home/kenahoo/singersinaccord.org/modules/user/user.module(1171): user_load(0)
+#19 /home/kenahoo/singersinaccord.org/includes/menu.inc(412): user_uid_optional_load(0)
+#20 /home/kenahoo/singersinaccord.org/includes/menu.inc(659): _menu_load_objects((Array:38), (Array:2))
+#21 /home/kenahoo/singersinaccord.org/includes/menu.inc(1028): _menu_link_translate((Array:38))
+#22 /home/kenahoo/singersinaccord.org/includes/menu.inc(1017): _menu_tree_check_access((Array:125))
+#23 /home/kenahoo/singersinaccord.org/includes/menu.inc(955): menu_tree_check_access((Array:125), (Array:6))
+#24 /home/kenahoo/singersinaccord.org/includes/menu.inc(725): menu_tree_page_data("navigation")
+#25 /home/kenahoo/singersinaccord.org/modules/user/user.module(770): menu_tree()
+#26 [internal function](): user_block("view", "1")
+#27 /home/kenahoo/singersinaccord.org/includes/module.inc(476): call_user_func_array("user_block", (Array:2))
+#28 /home/kenahoo/singersinaccord.org/modules/block/block.module(526): module_invoke("user", "block", "view", "1")
+#29 /home/kenahoo/singersinaccord.org/includes/theme.inc(1654): block_list("left")
+#30 [internal function](): theme_blocks("left")
+#31 /home/kenahoo/singersinaccord.org/includes/theme.inc(669): call_user_func_array("theme_blocks", (Array:1))
+#32 /home/kenahoo/singersinaccord.org/includes/theme.inc(1848): theme("blocks", "left")
+#33 [internal function](): template_preprocess_page((Array:12), "page")
+#34 /home/kenahoo/singersinaccord.org/includes/theme.inc(710): call_user_func_array("template_preprocess_page", (Array:2))
+#35 /home/kenahoo/singersinaccord.org/index.php(35): theme("page", "<div class=\"view view-frontpage view-id-frontpage view-display-id-page view-...")
+#36 {main}
+
+

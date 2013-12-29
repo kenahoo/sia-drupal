@@ -1,0 +1,42 @@
+Mar 05 20:13:27  [info] $Fatal Error Details = Array
+(
+    [message] => The <a href="/civicrm/admin/sms/provider?reset=1">SMS Provider</a> has not been configured or is not active.
+    [code] => 
+)
+
+
+Mar 05 20:13:27  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(314): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/SMS/Form/Group.php(50): CRM_Core_Error::fatal("The <a href=\"/civicrm/admin/sms/provider?reset=1\">SMS Provider</a> has not ...")
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php(338): CRM_SMS_Form_Group->preProcess()
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php(93): CRM_Core_Form->buildForm()
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php(203): CRM_Core_QuickForm_Action_Display->perform(Object(CRM_SMS_Form_Group), "display")
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php(103): HTML_QuickForm_Controller->handle(Object(CRM_SMS_Form_Group), "display")
+#6 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php(289): HTML_QuickForm_Page->handle("display")
+#7 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(220): CRM_Core_Controller->run((Array:3), NULL)
+#8 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(51): CRM_Core_Invoke::_invoke((Array:3))
+#9 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(382): CRM_Core_Invoke::invoke((Array:3))
+#10 [internal function](): civicrm_invoke("sms", "send")
+#11 /home/kenahoo/singersinaccord.org/includes/menu.inc(350): call_user_func_array("civicrm_invoke", (Array:2))
+#12 /home/kenahoo/singersinaccord.org/index.php(17): menu_execute_active_handler()
+#13 {main}
+
+
+Mar 08 04:17:22  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for id
+    [code] => 
+)
+
+
+Mar 08 04:17:22  [info] $backTrace = #0 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php(314): CRM_Core_Error::backtrace("backTrace", TRUE)
+#1 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php(106): CRM_Core_Error::fatal("Could not find valid value for id")
+#2 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Event/Page/EventInfo.php(54): CRM_Utils_Request::retrieve("id", "Positive", Object(CRM_Event_Page_EventInfo), TRUE)
+#3 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(220): CRM_Event_Page_EventInfo->run((Array:5), NULL)
+#4 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php(51): CRM_Core_Invoke::_invoke((Array:5))
+#5 /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module(382): CRM_Core_Invoke::invoke((Array:5))
+#6 [internal function](): civicrm_invoke("event", "info", "key", "value")
+#7 /home/kenahoo/singersinaccord.org/includes/menu.inc(350): call_user_func_array("civicrm_invoke", (Array:4))
+#8 /home/kenahoo/singersinaccord.org/index.php(17): menu_execute_active_handler()
+#9 {main}
+
+

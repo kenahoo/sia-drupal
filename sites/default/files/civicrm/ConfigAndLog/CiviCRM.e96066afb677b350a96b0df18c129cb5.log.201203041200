@@ -1,0 +1,72 @@
+Mar 25 15:26:30  [info] $Fatal Error Details = Array
+(
+    [message] => One of parameters  (value: ) is not of the type Integer
+    [code] => 
+)
+
+
+Mar 25 15:26:30  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 303
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 288
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, validate, 965
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, composeQuery, 889
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/BAO/GroupContact.php, executeQuery, 392
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/api/v2/GroupContact.php, getContactGroup, 66
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm_group_roles/civicrm_group_roles.module, civicrm_group_contact_get, 136
+/home/kenahoo/singersinaccord.org/modules/user/user.module, civicrm_group_roles_user, 32
+/home/kenahoo/singersinaccord.org/modules/user/user.module, user_module_invoke, 1414
+/home/kenahoo/singersinaccord.org/modules/user/user.module, user_authenticate_finalize, 1387
+/home/kenahoo/singersinaccord.org/modules/user/user.module, user_authenticate, 1347
+/home/kenahoo/singersinaccord.org/includes/form.inc, user_login_authenticate_validate, 781
+/home/kenahoo/singersinaccord.org/includes/form.inc, form_execute_handlers, 726
+/home/kenahoo/singersinaccord.org/includes/form.inc, _form_validate, 591
+/home/kenahoo/singersinaccord.org/includes/form.inc, drupal_validate_form, 410
+/home/kenahoo/singersinaccord.org/includes/form.inc, drupal_process_form, 120
+/home/kenahoo/singersinaccord.org/modules/user/user.pages.inc, drupal_get_form, 379
+, user_page, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 350
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 17
+
+Mar 27 11:31:44  [info] $Fatal Error Details = Array
+(
+    [message] => One of parameters  (value: ) is not of the type Integer
+    [code] => 
+)
+
+
+Mar 27 11:31:44  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 303
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 288
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, validate, 965
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, composeQuery, 889
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/BAO/GroupContact.php, executeQuery, 392
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/api/v2/GroupContact.php, getContactGroup, 66
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm_group_roles/civicrm_group_roles.module, civicrm_group_contact_get, 136
+/home/kenahoo/singersinaccord.org/modules/user/user.module, civicrm_group_roles_user, 32
+/home/kenahoo/singersinaccord.org/modules/user/user.module, user_module_invoke, 1414
+/home/kenahoo/singersinaccord.org/modules/user/user.module, user_authenticate_finalize, 1387
+/home/kenahoo/singersinaccord.org/modules/user/user.module, user_authenticate, 1347
+/home/kenahoo/singersinaccord.org/includes/form.inc, user_login_authenticate_validate, 781
+/home/kenahoo/singersinaccord.org/includes/form.inc, form_execute_handlers, 726
+/home/kenahoo/singersinaccord.org/includes/form.inc, _form_validate, 591
+/home/kenahoo/singersinaccord.org/includes/form.inc, drupal_validate_form, 410
+/home/kenahoo/singersinaccord.org/includes/form.inc, drupal_process_form, 120
+/home/kenahoo/singersinaccord.org/modules/user/user.pages.inc, drupal_get_form, 379
+, user_page, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 350
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 17
+
+Mar 31 10:08:57  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for id
+    [code] => 
+)
+
+
+Mar 31 10:08:57  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 303
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 109
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Event/Page/EventInfo.php, retrieve, 59
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 227
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 352
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 350
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 17
+

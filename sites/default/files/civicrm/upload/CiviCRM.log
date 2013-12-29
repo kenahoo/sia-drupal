@@ -1,0 +1,2323 @@
+Jun 02 18:52:40  [info] $Fatal Error Details = Array
+(
+    [message] => A payment processor must be selected for this contribution page (contact the site administrator for assistance).
+    [code] => 
+)
+
+
+Jun 02 18:52:40  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 279
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Jun 02 20:08:57  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -2
+    [message] => DB Error: syntax error
+    [mode] => 16
+    [debug_info] => CREATE TABLE civicrm_import_job_c1ed839966a721042085bc3a01d90d84 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]
+    [type] => DB_Error
+    [user_info] => CREATE TABLE civicrm_import_job_c1ed839966a721042085bc3a01d90d84 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]
+    [to_string] => [db_error: message="DB Error: syntax error" code=-2 mode=callback callback=CRM_Core_Error::handle prefix="" info="CREATE TABLE civicrm_import_job_c1ed839966a721042085bc3a01d90d84 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]"]
+)
+
+
+Jun 02 20:08:57  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, query, 143
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, _CsvToTable, 76
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php(245) : eval()'d code, postProcess, 1
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php, eval, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Jun 02 20:13:02  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -2
+    [message] => DB Error: syntax error
+    [mode] => 16
+    [debug_info] => CREATE TABLE civicrm_import_job_7fb9d15f487006f80d0fea2411f50799 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]
+    [type] => DB_Error
+    [user_info] => CREATE TABLE civicrm_import_job_7fb9d15f487006f80d0fea2411f50799 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]
+    [to_string] => [db_error: message="DB Error: syntax error" code=-2 mode=callback callback=CRM_Core_Error::handle prefix="" info="CREATE TABLE civicrm_import_job_7fb9d15f487006f80d0fea2411f50799 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]"]
+)
+
+
+Jun 02 20:13:02  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, query, 143
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, _CsvToTable, 76
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php(245) : eval()'d code, postProcess, 1
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php, eval, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Jun 02 20:13:31  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -2
+    [message] => DB Error: syntax error
+    [mode] => 16
+    [debug_info] => CREATE TABLE civicrm_import_job_63d7ac31943935604316bfb9c3d682e1 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]
+    [type] => DB_Error
+    [user_info] => CREATE TABLE civicrm_import_job_63d7ac31943935604316bfb9c3d682e1 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]
+    [to_string] => [db_error: message="DB Error: syntax error" code=-2 mode=callback callback=CRM_Core_Error::handle prefix="" info="CREATE TABLE civicrm_import_job_63d7ac31943935604316bfb9c3d682e1 (group text, voice_part text, first_name text, last_name text, street text, city text, state text, zip text, home text, work text, cell text, fax text, email text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text, voice_part text, first_name text, last_name text, street text, city ' at line 1]"]
+)
+
+
+Jun 02 20:13:31  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, query, 143
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, _CsvToTable, 76
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php(245) : eval()'d code, postProcess, 1
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php, eval, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 08 13:15:46  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 08 13:15:46  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 08 13:16:04  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 08 13:16:04  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 09 20:42:34  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 09 20:42:34  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 09 20:42:48  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 09 20:42:48  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 12 19:56:16  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 12 19:56:16  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 13 05:38:24  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 13 05:38:24  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 13 18:58:58  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 13 18:58:58  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 13 20:37:22  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 13 20:37:22  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 14 15:55:23  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 14 15:55:23  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 14 20:32:54  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 14 20:32:54  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 15 18:39:02  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 15 18:39:02  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 16 05:51:16  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 16 05:51:16  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Aug 16 19:54:41  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Aug 16 19:54:41  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Sep 10 12:38:40  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Sep 10 12:38:40  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Oct 15 17:57:11  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -2
+    [message] => DB Error: syntax error
+    [mode] => 16
+    [debug_info] => CREATE TABLE civicrm_import_job_f6ee437080304596184b05b22ba8d194 (last_name text, first_name text, email_address text, email_ text, source text, group text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci' at line 1]
+    [type] => DB_Error
+    [user_info] => CREATE TABLE civicrm_import_job_f6ee437080304596184b05b22ba8d194 (last_name text, first_name text, email_address text, email_ text, source text, group text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci' at line 1]
+    [to_string] => [db_error: message="DB Error: syntax error" code=-2 mode=callback callback=CRM_Core_Error::handle prefix="" info="CREATE TABLE civicrm_import_job_f6ee437080304596184b05b22ba8d194 (last_name text, first_name text, email_address text, email_ text, source text, group text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'group text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci' at line 1]"]
+)
+
+
+Oct 15 17:57:11  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, query, 143
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/CSV.php, _CsvToTable, 76
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php(245) : eval()'d code, postProcess, 1
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php, eval, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Oct 20 12:17:23  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 20 12:17:23  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Oct 21 11:48:22  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 21 11:48:22  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Oct 22 08:13:38  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 22 08:13:38  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Oct 22 08:13:59  [info] $Fatal Error Details = Array
+(
+    [message] => Could not find valid value for ct
+    [code] => 
+)
+
+
+Oct 22 08:13:59  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, fatal, 108
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Form/Edit.php, retrieve, 170
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, buildForm, 122
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Wrapper.php, run, 114
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 177
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Nov 04 17:57:53  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 4, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => luptpltcbohpclqaej7llag4j0
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 04 17:59:52  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 4, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => luptpltcbohpclqaej7llag4j0
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 05 08:18:33  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 5, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => ru98ncqthv28lfv2veielum4j4
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 05 08:19:47  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 5, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => ru98ncqthv28lfv2veielum4j4
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 05 08:23:10  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 5, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => ru98ncqthv28lfv2veielum4j4
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 05 08:28:26  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 5, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => ru98ncqthv28lfv2veielum4j4
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 05 08:29:03  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 5, 2009 - FOR IMMEDIATE RELEASE
+
+Media Contact: Penny Meier
+
+Phone: 612.978.0369
+
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => ru98ncqthv28lfv2veielum4j4
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 05 08:29:51  [info] $IDS Detector Details = Array
+(
+    [0] => Array
+        (
+            [name] => text_message
+            [value] => November 5, 2009 - FOR IMMEDIATE RELEASE
+Media Contact: Penny Meier
+Phone: 612.978.0369
+Penny.Meier@singersinaccord.org 
+
+ 
+
+Singers in Accord with Guest Conductor, Jerry Rubino 
+
+ Present their Inaugural Concert:  "A Grateful Gathering" 
+
+November 21 & 22, 2009
+
+ 
+
+Minneapolis, MN -   Minnesota's newest adult choral ensemble, Singers in
+<http://www.singersinaccord.org/> Accord, announces the first concert series
+of its inaugural season with guest conductor, Jerry Rubino
+<http://www.jerryrubino.com/> , as they present "A Grateful Gathering," 7:30
+p.m. on Saturday November 21, 2009 at MacPhail Center for Music in downtown
+Minneapolis and at 3:30 p.m. on Sunday, November 22, 2009 at Faith Life
+Center in Forest Lake, MN.  
+
+ 
+
+Singers in Accord will capture the essence of the season as they sing an
+incredible array of expressive choral music from Scarlatti to Paulus.  The
+program will feature such pieces as "Te Quiero," based on a poem by the late
+Uruguayan poet, Mario Benedetti, Bernstein's "Make our Garden Grow" from
+Candide, and Gilkyson's touching "Requiem," written after the 2004 Asian
+Tsunami.  The group will also perform an arrangement of "I've Got Rhythm,"
+by guest director Jerry Rubino, who is a Twin Cities based choral director,
+educator and musician. The ensemble is thrilled to collaborate with Rubino
+for their inaugural concert series.  Jerry's passion for expressive singing
+and dedication to the philosophy that successful artistic performance is
+drawn from an integration of mind, body and spirit, blend perfectly with the
+mission of Singers in Accord.    
+
+ 
+
+Join Singers in Accord and be surrounded by the beauty of music that
+connects us all with love, memories, faith and joy:
+
+7:30 pm - Saturday, November 21, 2009
+3:30 pm - Sunday, November 22, 2009
+
+MacPhail Center for <http://www.macphail.org/>  Music (Antonello Hall)
+Faith Life Center <http://www.faithfl.org/> 
+
+501 S. 2nd Street, Minneapolis, MN  55401
+886 N. Shore Drive, Forest Lake, MN  55025 
+
+General Seating - no ticket required
+Tickets will be available at the door:
+
+Free-will donations will be gathered after the concert
+$10 per person / children under 5 are free
+
+ 
+
+Jerry Rubino is available for interviews about this inaugural collaborative
+experience with Singers in Accord.  Dan Digre, Chairman of the Board for
+Singers in Accord is available for interviews regarding this new choral
+ensemble, its mission in the Minnesota choral community and its unique
+organizational structure.  Photos available upon request. 
+
+ 
+
+ 
+
+About Singers in Accord:  
+
+Singers in Accord is uniquely structured as a singer-led organization,
+dedicated to exploring our humanity through performances of culturally
+diverse choral music.  The 34-voice chorale collaborates with a new
+conductor, performing artist or artistic ensemble in each concert, to create
+distinctive concert experiences for its singers and audience members.
+Singers in Accord strives to enrich the cultural life of Minnesota
+communities through outreach, education and innovative performances. It is
+an auditioned chorale, largely made up of singers from the former World
+Voices ensemble which celebrated its 13th and final concert season in the
+spring of 2009.  It is a 501(C)(3) non-profit corporation that does not
+employ any paid staff.  Because of this, all financial support given is
+fully tax deductible and goes directly to supporting its artistic mission
+and community outreach efforts.  To that end, their goal is to make concerts
+free where possible or extremely affordable, so anyone who desires to
+experience a high quality musical performance has the opportunity to do so
+without an economic barrier.  For more information on Singers in Accord and
+their 2009-10 concert season,  please visit:  www.singersinaccord.org
+<http://www.singersinaccord.org/> .  
+
+ 
+
+About Jerry Rubino:
+
+Jerry Rubino holds degrees in piano, music education, and conducting from
+Temple University and the University of Minnesota, and began his teaching
+career at Northwestern College in St. Paul in 1974. A native of
+Philadelphia, he was a charter member of the Philadelphia Singers and
+attended Curtis Institute as a cellist.  He currently serves as Minister of
+Music at Spirit of Hope United Methodist Church in Golden Valley, Minnesota,
+is the artistic director of Jerry Rubino Plus and in winter of 2005, was
+named Visiting Studio Artist at Augsburg College.
+
+ 
+
+Rubino worked for twenty-three seasons with the Dale Warland Singers, as
+associate conductor, director of special projects and music education,
+pianist, singer and arranger.  In 1983, at the request of the Minnesota
+Orchestra and Minnesota Public Radio, Rubino formed what is now known as
+Jerry Rubino Plus. Under his direction, they developed their own sound and
+style and became known for their crossover programming and performance
+practice based educational outreach.
+
+ 
+
+They toured extensively and have recorded a CD of gospel music.  Rubino's
+conducting and teaching credits include honors choirs in Australia, Taiwan,
+Hawaii, and Europe, the Los Angeles Master Chorale, the California State
+Summer Arts Workshops, the Wesley Balk Institute for the Singer/Actor
+process, and the University of Minnesota Jazz Festival.
+
+ 
+
+He was named Distinguished Visiting Professor of Music at Carleton College
+in Northfield, Minnesota in 1999, 2003 and 2004.  He was named an editor for
+the Voices of Distinction series with Hal Leonard in 2005 and edited a new
+Christmas choral collection for Oxford University Press titled A Merry
+Little Christmas in spring, 2006.  He serves as repertoire and standards
+chair for vocal jazz for the North Central Division of the American Choral
+Directors Association, is a member of ASCAP and is requested nationally as a
+choral clinician, music director, pianist and adjudicator.  For more
+information, please visit www.JerryRubino.com <http://www.jerryrubino.com/>
+. 
+
+            [page] => /index.php?q=civicrm/mailing/send
+            [userid] => 102
+            [session] => ru98ncqthv28lfv2veielum4j4
+            [ip] => 69.163.203.64
+            [reaction] => 0
+            [impact] => 40
+        )
+
+)
+
+
+Nov 13 20:38:25  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -2
+    [message] => DB Error: syntax error
+    [mode] => 16
+    [debug_info] => CREATE TABLE civicrm_import_job_f2c0adb1ede779eb8cba3c5e11fe9b90 SELECT c.id
+FROM civicrm_contact c
+WHERE NOT EXISTS (
+SELECT g.contact_id
+FROM civicrm_group_contact g
+WHERE c.id = g.contact_id
+AND g.group_id IN ( 9, 2, 13 )
+)
+ORDER BY c.contact_type, c.id ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci' at line 9]
+    [type] => DB_Error
+    [user_info] => CREATE TABLE civicrm_import_job_f2c0adb1ede779eb8cba3c5e11fe9b90 SELECT c.id
+FROM civicrm_contact c
+WHERE NOT EXISTS (
+SELECT g.contact_id
+FROM civicrm_group_contact g
+WHERE c.id = g.contact_id
+AND g.group_id IN ( 9, 2, 13 )
+)
+ORDER BY c.contact_type, c.id ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci' at line 9]
+    [to_string] => [db_error: message="DB Error: syntax error" code=-2 mode=callback callback=CRM_Core_Error::handle prefix="" info="CREATE TABLE civicrm_import_job_f2c0adb1ede779eb8cba3c5e11fe9b90 SELECT c.id
+FROM civicrm_contact c
+WHERE NOT EXISTS (
+SELECT g.contact_id
+FROM civicrm_group_contact g
+WHERE c.id = g.contact_id
+AND g.group_id IN ( 9, 2, 13 )
+)
+ORDER BY c.contact_type, c.id ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci' at line 9]"]
+)
+
+
+Nov 13 20:38:25  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/ImportJob.php, query, 88
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/DataSource/SQL.php, __construct, 77
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php(245) : eval()'d code, postProcess, 1
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Import/Form/DataSource.php, eval, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Nov 19 13:25:50  [info] $Fatal Error Details = Array
+(
+    [message] => cid (value: ) is not of the type Positive
+    [code] => 
+)
+
+
+Nov 19 13:25:50  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Type.php, fatal, 254
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Utils/Request.php, validate, 99
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Page/View.php, retrieve, 100
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Page/View/Tabbed.php, preProcess, 54
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contact/Page/View/Tabbed.php, preProcess, 79
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:20:54  [info] $Fatal Error Details = Array
+(
+    [message] => The page you requested is currently unavailable.
+    [code] => 
+)
+
+
+Dec 08 20:20:54  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 259
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:21:08  [info] $Fatal Error Details = Array
+(
+    [message] => The page you requested is currently unavailable.
+    [code] => 
+)
+
+
+Dec 08 20:21:08  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 259
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:21:49  [info] $Fatal Error Details = Array
+(
+    [message] => The page you requested is currently unavailable.
+    [code] => 
+)
+
+
+Dec 08 20:21:49  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 259
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:22:25  [info] $Fatal Error Details = Array
+(
+    [message] => APILogin is not set for this payment processor<p>Key is not set for this payment processor
+    [code] => 
+)
+
+
+Dec 08 20:22:25  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 297
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:23:19  [info] $Fatal Error Details = Array
+(
+    [message] => The requested online contribution page is missing a required Contribution Amount section or Membership section. Please check with the site administrator for assistance.
+    [code] => 
+)
+
+
+Dec 08 20:23:19  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 473
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:23:52  [info] $Fatal Error Details = Array
+(
+    [message] => The requested online contribution page is missing a required Contribution Amount section or Membership section. Please check with the site administrator for assistance.
+    [code] => 
+)
+
+
+Dec 08 20:23:52  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 473
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:37:20  [info] $Fatal Error Details = Array
+(
+    [message] => The requested online contribution page is missing a required Contribution Amount section or Membership section. Please check with the site administrator for assistance.
+    [code] => 
+)
+
+
+Dec 08 20:37:20  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 473
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:38:25  [info] $Fatal Error Details = Array
+(
+    [message] => The requested online contribution page is missing a required Contribution Amount section or Membership section. Please check with the site administrator for assistance.
+    [code] => 
+)
+
+
+Dec 08 20:38:25  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 473
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:38:53  [info] $Fatal Error Details = Array
+(
+    [message] => The requested online contribution page is missing a required Contribution Amount section or Membership section. Please check with the site administrator for assistance.
+    [code] => 
+)
+
+
+Dec 08 20:38:53  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 473
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:41:57  [info] $Fatal Error Details = Array
+(
+    [message] => The requested online contribution page is missing a required Contribution Amount section or Membership section. Please check with the site administrator for assistance.
+    [code] => 
+)
+
+
+Dec 08 20:41:57  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 473
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 08 20:54:16  [info] $Fatal Error Details = Array
+(
+    [message] => The page you requested is currently unavailable.
+    [code] => 
+)
+
+
+Dec 08 20:54:16  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 265
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/ContributionBase.php, fatal, 259
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution/Main.php, preProcess, 61
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, preProcess, 312
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Display.php, buildForm, 98
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 15 12:52:37  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -3
+    [message] => DB Error: constraint violation
+    [mode] => 16
+    [debug_info] => INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 2 ,  0 ,  5000.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [type] => DB_Error
+    [user_info] => INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 2 ,  0 ,  5000.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [to_string] => [db_error: message="DB Error: constraint violation" code=-3 mode=callback callback=CRM_Core_Error::handle prefix="" info="INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 2 ,  0 ,  5000.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]"]
+)
+
+
+Dec 15 12:52:38  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, query, 2394
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, _query, 1039
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, insert, 279
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, save, 936
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, addSoftContribution, 260
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution.php, create, 1056
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, run, 197
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, edit, 231
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Dec 15 13:02:17  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -3
+    [message] => DB Error: constraint violation
+    [mode] => 16
+    [debug_info] => INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 3 ,  0 ,  1530.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [type] => DB_Error
+    [user_info] => INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 3 ,  0 ,  1530.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [to_string] => [db_error: message="DB Error: constraint violation" code=-3 mode=callback callback=CRM_Core_Error::handle prefix="" info="INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 3 ,  0 ,  1530.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]"]
+)
+
+
+Dec 15 13:02:17  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, query, 2394
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, _query, 1039
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, insert, 279
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, save, 936
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, addSoftContribution, 260
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution.php, create, 1056
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, run, 197
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, edit, 231
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Jan 16 12:30:44  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -3
+    [message] => DB Error: constraint violation
+    [mode] => 16
+    [debug_info] => UPDATE  civicrm_contribution_soft  SET contribution_id = 51 , contact_id = 0 , amount = 700.00   WHERE (  civicrm_contribution_soft.id = 3 )   [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [type] => DB_Error
+    [user_info] => UPDATE  civicrm_contribution_soft  SET contribution_id = 51 , contact_id = 0 , amount = 700.00   WHERE (  civicrm_contribution_soft.id = 3 )   [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [to_string] => [db_error: message="DB Error: constraint violation" code=-3 mode=callback callback=CRM_Core_Error::handle prefix="" info="UPDATE  civicrm_contribution_soft  SET contribution_id = 51 , contact_id = 0 , amount = 700.00   WHERE (  civicrm_contribution_soft.id = 3 )   [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]"]
+)
+
+
+Jan 16 12:30:44  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, query, 2394
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, _query, 1304
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, update, 277
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, save, 936
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, addSoftContribution, 260
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution.php, create, 1056
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, run, 197
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, edit, 231
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+
+Jan 21 09:02:52  [info] $Fatal Error Details = Array
+(
+    [callback] => Array
+        (
+            [0] => CRM_Core_Error
+            [1] => handle
+        )
+
+    [code] => -3
+    [message] => DB Error: constraint violation
+    [mode] => 16
+    [debug_info] => INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 67 ,  0 ,  75.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [type] => DB_Error
+    [user_info] => INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 67 ,  0 ,  75.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]
+    [to_string] => [db_error: message="DB Error: constraint violation" code=-3 mode=callback callback=CRM_Core_Error::handle prefix="" info="INSERT INTO civicrm_contribution_soft (contribution_id , contact_id , amount ) VALUES ( 67 ,  0 ,  75.00 )  [nativecode=1452 ** Cannot add or update a child row: a foreign key constraint fails (`singersinaccord_crm/civicrm_contribution_soft`, CONSTRAINT `FK_civicrm_contribution_soft_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE)]"]
+)
+
+
+Jan 21 09:02:52  [info] $backTrace = /home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Error.php, backtrace, 192
+, handle, 
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, call_user_func, 912
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB.php, PEAR_Error, 966
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/PEAR.php, DB_Error, 574
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, raiseError, 1903
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, raiseError, 898
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/mysql.php, mysqlRaiseError, 327
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/common.php, simpleQuery, 1216
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, query, 2394
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/DB/DataObject.php, _query, 1039
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/DAO.php, insert, 279
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, save, 936
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/BAO/Contribution.php, addSoftContribution, 260
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Form/Contribution.php, create, 1056
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Form.php, postProcess, 247
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, mainProcess, 152
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/QuickForm/Action/Upload.php, realPerform, 129
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Controller.php, perform, 203
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/packages/HTML/QuickForm/Page.php, handle, 103
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Controller.php, handle, 245
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, run, 197
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Contribute/Page/Tab.php, edit, 231
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/CRM/Core/Invoke.php, run, 205
+/home/kenahoo/singersinaccord.org/sites/all/modules/civicrm/drupal/civicrm.module, invoke, 342
+, civicrm_invoke, 
+/home/kenahoo/singersinaccord.org/includes/menu.inc, call_user_func_array, 348
+/home/kenahoo/singersinaccord.org/index.php, menu_execute_active_handler, 18
+

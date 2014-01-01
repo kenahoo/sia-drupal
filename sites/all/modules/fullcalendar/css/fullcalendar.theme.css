@@ -1,3 +1,7 @@
+/* Force contents to wrap */
+.fc-event {
+  word-wrap: break-word;
+}
 
 /* Undo Drupal default theme link colors */
 .fc-content a:link,
@@ -8,7 +12,8 @@
 
 /* Reset FullCalendar generic style */
 .fc-event,
-.fc-agenda .fc-event-time,
+.fc-event .fc-event-skin,
+.fc-event .fc-event-time,
 .fc-event a {
   border-style: none;
   background-color: transparent;
@@ -17,6 +22,7 @@
 
 /* Set FullCalendar default style */
 .fc-event-default,
+.fc-event-default .fc-event-skin,
 .fc-event-default .fc-event-time,
 .fc-event-default a {
   border-color: #36c;
@@ -47,6 +53,14 @@ table.fc-header {
   margin-bottom: 10px;
 }
 
+.fc-header tr {
+  background-color: transparent;
+}
+
+.fc-header-title {
+  text-align: center;
+}
+
 .fc-header tbody,
 .fc-header th,
 .fc-header td {
@@ -59,6 +73,14 @@ table.fc-header {
 }
 
 /* Hide plain text events when javascript is enabled */
-html.js .fullcalendar-content {
+.js .fullcalendar-content {
   display: none;
+}
+
+/* Reposition the throbber. */
+.fullcalendar .ajax-progress {
+  left: 50%;
+  position: absolute;
+  top: 1.6em;
+  z-index: 1;
 }

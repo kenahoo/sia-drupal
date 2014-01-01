@@ -19,7 +19,6 @@ class fullcalendar_handler_field_gcal extends views_handler_field {
     $options['gcal'] = array('default' => '');
     $options['class'] = array('default' => 'fc-event-default fc-event-gcal');
     $options['timezone'] = array('default' => date_default_timezone_get());
-    $options['editable'] = array('default' => FALSE);
     return $options;
   }
 
@@ -33,24 +32,20 @@ class fullcalendar_handler_field_gcal extends views_handler_field {
     $form['gcal'] = array(
       '#type' => 'textfield',
       '#title' => t('Feed URL'),
+      '#maxlength' => 1024,
       '#default_value' => $this->options['gcal'],
     );
     $form['class'] = array(
       '#type' => 'textfield',
-      '#title' => t('CSS Class'),
+      '#title' => t('CSS class'),
       '#default_value' => $this->options['class'],
     );
     $form['timezone'] = array(
       '#type' => 'select',
       '#title' => t('Time zone'),
       '#default_value' => $this->options['timezone'],
-      '#options' => date_timezone_names(TRUE),
+      '#options' => system_time_zones(),
       '#attributes' => array('class' => array('timezone-detect')),
-    );
-    $form['editable'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Allow editing of events'),
-      '#default_value' => $this->options['editable'],
     );
   }
 
@@ -58,7 +53,7 @@ class fullcalendar_handler_field_gcal extends views_handler_field {
     return array(
       $this->options['gcal'],
       array(
-        'editable' => $this->options['editable'],
+        'editable' => FALSE,
         'className' => $this->options['class'],
         'currentTimezone' => $this->options['timezone'],
       ),

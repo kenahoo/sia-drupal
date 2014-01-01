@@ -5,16 +5,21 @@
 
 (function ($) {
 
-Drupal.behaviors.fullcalendar = function (context) {
-  // Process each view and its settings.
-  for (var dom_id in Drupal.settings.fullcalendar) {
-    if (Drupal.settings.fullcalendar.hasOwnProperty(dom_id)) {
-      var fullcalendar = new Drupal.fullcalendar.fullcalendar(dom_id);
+Drupal.behaviors.fullcalendar = {
+  attach: function (context, settings) {
+    // Process each view and its settings.
+    for (var dom_id in settings.fullcalendar) {
+      if (settings.fullcalendar.hasOwnProperty(dom_id)) {
+        // Create a new fullcalendar object unless one exists.
+        if (typeof Drupal.fullcalendar.cache[dom_id] === "undefined") {
+          Drupal.fullcalendar.cache[dom_id] = new Drupal.fullcalendar.fullcalendar(dom_id);
+        }
+      }
     }
-  }
 
-  // Trigger a window resize so that calendar will redraw itself.
-  $(window).resize();
+    // Trigger a window resize so that calendar will redraw itself.
+    $(window).resize();
+  }
 };
 
 }(jQuery));

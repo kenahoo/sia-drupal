@@ -6,7 +6,7 @@
  */
 
 /**
- * Implementation of hook_requirements().
+ * Implements hook_requirements().
  */
 function fullcalendar_requirements($phase) {
   $requirements = array();
@@ -14,24 +14,6 @@ function fullcalendar_requirements($phase) {
   if ($phase == 'runtime') {
     $t = get_t();
     $status = _fullcalendar_status();
-
-    if (!$status['jquery_version']) {
-      $requirements['fullcalendar_jquery_version'] = array(
-        'title' => $t('FullCalendar required jQuery version'),
-        'value' => $t('Between @a and @b', array('@a' => FULLCALENDAR_MIN_JQUERY_VERSION, '@b' => FULLCALENDAR_MAX_JQUERY_VERSION)),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('You need to download and install a 6.x-2.x version of the !jquery_update module.', array('!jquery_update' => l(t('jQuery Update'), 'http://drupal.org/project/jquery_update'))),
-      );
-    }
-
-    if (!$status['jqueryui_version']) {
-      $requirements['fullcalendar_jqueryui_version'] = array(
-        'title' => $t('FullCalendar required jQuery UI version'),
-        'value' => $t('Between @a and @b', array('@a' => FULLCALENDAR_MIN_JQUERYUI_VERSION, '@b' => FULLCALENDAR_MAX_JQUERYUI_VERSION)),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('You need to download and install a 6.x-1.x version of the !jquery_ui module.', array('!jquery_ui' => l(t('jQuery UI'), 'http://drupal.org/project/jquery_ui'))),
-      );
-    }
 
     if (!$status['fullcalendar_plugin']) {
       $requirements['fullcalendar_plugin'] = array(
@@ -42,10 +24,15 @@ function fullcalendar_requirements($phase) {
       );
     }
     else {
+      $plugin_version = fullcalendar_get_version();
+      if (version_compare(FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION, $plugin_version) > 0) {
+        $plugin_version .= ' (Recommended version: ' . FULLCALENDAR_RECOMMENDED_PLUGIN_VERSION . ')';
+      }
+
       $requirements['fullcalendar_plugin'] = array(
         'title' => $t('FullCalendar plugin'),
         'severity' => REQUIREMENT_OK,
-        'value' => fullcalendar_get_version(),
+        'value' => $plugin_version,
       );
     }
   }
@@ -54,9 +41,16 @@ function fullcalendar_requirements($phase) {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function fullcalendar_uninstall() {
   variable_del('fullcalendar_path');
   variable_del('fullcalendar_compression_type');
+}
+
+/**
+ * Force full cache clear to forget about old handlers and plugins.
+ */
+function fullcalendar_update_7200(&$sandbox) {
+  drupal_flush_all_caches();
 }

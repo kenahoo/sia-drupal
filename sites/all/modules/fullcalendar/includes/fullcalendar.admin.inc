@@ -9,7 +9,7 @@
  * General configuration form for controlling the FullCalendar behaviour.
  */
 function fullcalendar_admin_settings() {
-  $fullcalendar_path = variable_get('fullcalendar_path', FULLCALENDAR_PATH);
+  $fullcalendar_path = variable_get('fullcalendar_path', fullcalendar_default_path());
 
   $form['fullcalendar_path'] = array(
     '#type' => 'textfield',
@@ -22,7 +22,7 @@ function fullcalendar_admin_settings() {
     '#title' => t('Choose FullCalendar compression level'),
     '#options' => array(
       'min' => t('Production (Minified)'),
-      'none' => t('Development (Uncompressed Code)'),
+      'none' => t('Development (Uncompressed code)'),
     ),
     '#default_value' => variable_get('fullcalendar_compression_type', 'min'),
   );
@@ -30,6 +30,9 @@ function fullcalendar_admin_settings() {
   return system_settings_form($form);
 }
 
+/**
+ * Form validation handler for fullcalendar_admin_settings().
+ */
 function fullcalendar_admin_settings_validate($form, &$form_state) {
   form_set_value($form['fullcalendar_path'], rtrim($form['fullcalendar_path']['#value'], "/"), $form_state);
 }

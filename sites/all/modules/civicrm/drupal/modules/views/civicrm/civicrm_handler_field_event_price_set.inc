@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -69,12 +67,12 @@ class civicrm_handler_field_event_price_set extends views_handler_field_prerende
 
 
         if (isset($eventPageID)) {
-          if (!CRM_Price_BAO_Set::getFor('civicrm_event_page', $eventPageID)) {
+          if (!CRM_Price_BAO_PriceSet::getFor('civicrm_event_page', $eventPageID)) {
             //retrieve event fees.
             $discountId = CRM_Core_BAO_Discount::findSet($eventPageID, 'civicrm_event');
             if ($discountId) {
               CRM_Core_OptionGroup::getAssoc(
-                CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount',
+                CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Discount',
                   $discountId,
                   'option_group_id'
                 ),
@@ -88,8 +86,8 @@ class civicrm_handler_field_event_price_set extends views_handler_field_prerende
         }
 
 
-        for ($i = 1; $i <= count($priceSet['label']); $i++) {
-          $this->items[$eventPageID][] = $priceSet['label'][$i] . " " . CRM_Utils_Money::format($priceSet['value'][$i]);
+        for ($i = 1; $i <= count($priceSet[label]); $i++) {
+          $this->items[$eventPageID][] = $priceSet[label][$i] . " " . CRM_Utils_Money::format($priceSet[value][$i]);
         }
       }
     }

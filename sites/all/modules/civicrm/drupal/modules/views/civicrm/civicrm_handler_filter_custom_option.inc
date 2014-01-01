@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
    +--------------------------------------------------------------------+
    | CiviCRM version 4.4                                                |
@@ -52,6 +50,20 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
     }
   }
 
+  function operators() {
+    $operators = parent::operators();
+    $operators += array(
+      'all' => array(
+        'title' => t('Is all of'),
+        'short' => t('all'),
+        'method' => 'op_simple',
+        'values' => 1,
+        ),
+      );
+    
+    return $operators;
+  }
+
   function op_simple() {
     if (empty($this->value)) {
       return;
@@ -62,15 +74,13 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
 
     // negated operator uses AND, positive uses OR
-    $op = ($this->operator == 'in') ? 'LIKE' : 'NOT LIKE';
+    $op = ($this->operator == 'in' || $this->operator == 'all') ? 'LIKE' : 'NOT LIKE';
     $glue = ($this->operator == 'in') ? 'OR ' : 'AND ';
-
     foreach ($this->value as $value) {
       $clauses[] = "$this->table_alias.$this->real_field " . $op . " '%" . $sep . $value . $sep . "%' ";
     }
-
     $clause = implode($glue, $clauses);
-    $this->query->add_where($this->options['group'], $clause);
+    $this->query->add_where_expression($this->options['group'], $clause);
   }
 }
 

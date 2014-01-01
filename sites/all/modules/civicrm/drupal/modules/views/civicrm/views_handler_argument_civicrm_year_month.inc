@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -37,22 +35,28 @@ class views_handler_argument_civicrm_year_month extends views_handler_argument_d
     parent::construct();
     $this->format     = 'F Y';
     $this->arg_format = 'Ym';
-    $this->formula    = views_date_sql_format($this->arg_format, "***table***.$this->real_field", "datetime", '0');
+    $this->formula    = views_date_sql_format($this->arg_format, "***table***.$this->real_field");
   }
 
   /**
    * Provide a link to the next level of the view
    */
   function summary_name($data) {
-    $created = $data->{$this->name_alias};
-    return format_date(strtotime($created . "15"), 'custom', $this->format, 0);
+    $timestamp = $data->{$this->name_alias};
+    $timestamp = strtotime($timestamp . " UTC");
+    if ($timestamp !== FALSE) {
+      return format_date($timestamp, 'custom', $this->format, 'UTC');
+    }
   }
 
   /**
    * Provide a link to the next level of the view
    */
   function title() {
-    return format_date(strtotime($this->argument . "15"), 'custom', $this->format, 0);
+    $timestamp = strtotime($this->argument . " UTC");
+    if ($timestamp !== FALSE) {
+      return format_date($timestamp, 'custom', $this->format, 'UTC');
+    }
   }
 }
 

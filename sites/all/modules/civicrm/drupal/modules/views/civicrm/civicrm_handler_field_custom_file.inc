@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -40,6 +38,7 @@
  */
 class civicrm_handler_field_custom_file extends views_handler_field {
   function construct() {
+    parent::construct();
     civicrm_initialize();
     $this->additional_fields['entity_id'] = 'entity_id';
   }
@@ -52,7 +51,8 @@ class civicrm_handler_field_custom_file extends views_handler_field {
         'mime_type'
       );
 
-      if ($fileType && in_array($fileType, array("image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png"))) {
+      if ($fileType && in_array($fileType, array(
+        "image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png"))) {
         $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
           $value,
           'uri'

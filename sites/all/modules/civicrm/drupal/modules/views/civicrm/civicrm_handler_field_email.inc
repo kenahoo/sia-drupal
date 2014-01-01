@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -38,7 +36,7 @@
  *
  * @ingroup civicrm_field_handlers
  */
-class civicrm_handler_field_email extends views_handler_field {
+class civicrm_handler_field_email extends civicrm_handler_field_location {
   function option_definition() {
     $options = parent::option_definition();
     $options['link_to_user'] = array('default' => 'mailto');

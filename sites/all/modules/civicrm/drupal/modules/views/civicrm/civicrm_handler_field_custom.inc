@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -32,6 +30,7 @@
  */
 class civicrm_handler_field_custom extends views_handler_field {
   function construct() {
+    parent::construct();
     civicrm_initialize();
   }
 

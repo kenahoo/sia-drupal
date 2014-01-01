@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 function civicrm_rules_admin_settings($form_state = NULL) {
 
   $form['civicrm_rules_post_entities'] = array(

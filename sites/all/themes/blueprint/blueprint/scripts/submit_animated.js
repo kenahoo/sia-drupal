@@ -2,8 +2,7 @@
 var Blueprint = {};
 
 // prevent users from clicking a submit button twice
-Drupal.behaviors.blueprint = function() {
-  
+Blueprint.formCheck = function() {
   // only apply this to node and comment and new user registration forms
   var forms = $("#node-form>div>div>#edit-submit,#comment-form>div>#edit-submit,#user-register>div>#edit-submit");
 
@@ -11,10 +10,6 @@ Drupal.behaviors.blueprint = function() {
   $('<div id="saving"><p class="saving">Saving&hellip;</p></div>').insertAfter(forms);
 
   forms.click(function() {
-    // When the user hits enter to select the term in the autocomplete field do nothing
-    if ($('#autocomplete').each(function () { this.owner.hidePopup();}).size() != 0) {
-      return;
-    }
     $(this).siblings("input:submit").hide();
     $(this).hide();
     $("#saving").show();
@@ -27,4 +22,9 @@ Drupal.behaviors.blueprint = function() {
     setTimeout(notice, 24000);
   });
 };
+
+// Global Killswitch.
+if (Drupal.jsEnabled) {
+  $(document).ready(Blueprint.formCheck);
+}
 

@@ -1,7 +1,7 @@
 name = Blueprint
 description = Drupal base theme built with Blueprint CSS framework.
 
-core = 6.x
+core = 7.x
 engine = phptemplate
 
 stylesheets[screen,projection][] = css/blueprint.css
@@ -11,10 +11,15 @@ scripts[] = scripts/general.js
 
 screenshot = screenshot.png
 
-regions[left] = First sidebar
-regions[right] = Second sidebar
-regions[content] = Content
+
 regions[header] = Header
+regions[help] = Help
+regions[highlight] = Highlight
+regions[content] = Content
+regions[sidebar_first] = First sidebar
+regions[sidebar_second] = Second sidebar
+regions[page_bottom] = Page Bottom
+regions[page_top] = Page Top
 regions[footer] = Footer
 
 ; Let's enable some features
@@ -35,9 +40,9 @@ settings[blueprint_rebuild_registry]        = 0
 settings[blueprint_showgrid]                = 0
 settings[blueprint_animated_submit]         = 1
 
-; Information added by drupal.org packaging script on 2011-09-21
-version = "6.x-2.1"
-core = "6.x"
+; Information added by drupal.org packaging script on 2013-09-30
+version = "7.x-2.x-dev"
+core = "7.x"
 project = "blueprint"
-datestamp = "1316633800"
+datestamp = "1380556516"
 

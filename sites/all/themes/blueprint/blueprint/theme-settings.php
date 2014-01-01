@@ -36,10 +36,10 @@ function blueprint_settings($saved_settings, $subtheme_defaults = array()) {
   $settings = array_merge($defaults, $saved_settings);
 
   $form['blueprint_dev'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Development Settings'),
-    '#weight' => 5,
-    '#collapsible' => TRUE,
+    '#type' => 'fieldset', 
+    '#title' => t('Development Settings'), 
+    '#weight' => 5, 
+    '#collapsible' => TRUE, 
     '#collapsed' => FALSE,
   );
 
@@ -54,9 +54,9 @@ function blueprint_settings($saved_settings, $subtheme_defaults = array()) {
   // Setting for flush all caches
   $form['blueprint_dev']['blueprint_rebuild_registry'] = array(
      '#type'          => 'checkbox',
-     '#title'         => t('Rebuild theme registry on every page.'),
+     '#title'         => t('Rebuild the theme registry on every page.'),
      '#default_value' => $settings['blueprint_rebuild_registry'],
-     '#description'   => t('During theme development, it can be very useful to continuously <a href="!link">rebuild theme registry</a>. WARNING: this is a huge performance penalty and must be turned off on production websites.', array('!link' => 'http://drupal.org/node/173880#theme-registry')),
+     '#description'   => t('During theme development, it can be very useful to continuously <a href="!link">rebuild the theme registry</a>. WARNING: this is a huge performance penalty and must be turned off on production websites.', array('!link' => 'http://drupal.org/node/173880#theme-registry')),
     );
 
   // Setting to add the showgrid class
@@ -70,7 +70,7 @@ function blueprint_settings($saved_settings, $subtheme_defaults = array()) {
     '#type'          => 'checkbox',
     '#title'         => t('Prevent Duplicate Submits'),
     '#default_value' => $settings['blueprint_animated_submit'],
-    '#description'   => t('This can be helpful to prevent users from hitting the submit button twice.'),
+    '#description'   => t('This can be helpful to prevent users from hitting the submit button twice, however the autocomplete can interfere with this and cause it not to work. <a href="!link">More Information</a>', array('!link' => 'http://drupal.org/node/579070')),
     );
 
   // Return the additional form widgets

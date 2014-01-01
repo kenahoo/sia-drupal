@@ -29,7 +29,7 @@ Requirements: Drupal 6.x, Blueprint Framework downloaded from blueprintcss.org
 2. Download Blueprint http://www.blueprintcss.org/
    a. Extract folder, creating something like "joshuaclayton-blueprint-css-28c8aa9ae2686442e00a5c7f46dfe2de76b3bd83"
    b. Move folder to /sites/all/libraries and rename to "blueprint".
-   c. Ensure your path looks like /sites/all/libraries/blueprint/blueprint/screen.css
+   c. Ensure your path looks like /sites/all/libraries/blueprint/screen.css
    
    * Optionally, Blueprint now also supports the Libraries module (http://drupal.org/project/libraries) so you can put your Blueprint framework files in any of the locations that libraries supports. 
       - sites/default/libraries

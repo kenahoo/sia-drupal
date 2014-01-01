@@ -1,0 +1,14 @@
+--- CHANGELOG --------------------------------------------------------
+Blueprint 7.0 2.x:
+
+2.x, 2010-07-26
+----------------------
+by designerBrent - Removed blueprint_username as it is no longer needed in d7
+  to remove the "Not Verified".
+
+
+
+2.x, 2010-07-22
+----------------------
+- Added: Created the initial tag for the Drupal 7 version. This is still VERY EARLY. It is basically not functional.
+

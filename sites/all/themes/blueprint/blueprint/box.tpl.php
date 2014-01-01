@@ -1,3 +1,4 @@
+<?php
 <div class="box">
 
 <?php if ($title): ?>

@@ -1,6 +1,8 @@
 name = SIA Custom Function Library
 description = This module contains my PHP helper functions.
-core = 6.x
+core = 7.x
 package = "SIA Custom Function Library"
+dependencies[] = fullcalendar
+dependencies[] = getid3
 
-version = "6.x-0.1"
+version = "7.x-0.1"

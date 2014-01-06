@@ -1,20 +1,9 @@
 <?php #>
 
-drupal_add_js('misc/collapse.js');
-drupal_add_js('misc/form.js');
-
-function treatTable($title, $class, $tab) {
-
-    echo <<<EOS
-<fieldset class="collapsible $class">
-<legend>$title</legend>
-EOS;
-
-    echo theme_table( array("Date", "Bringer"), $tab);
-
-    echo <<<EOS
-</fieldset>
-EOS;
+function treatTable($title, $collapsed, $tab) {
+    $content = theme('table', array('header'=> array("Date", "Bringer"), 'rows'=>$tab));
+    print( theme('ctools_collapsible', array('handle'=>$title, 'content'=>$content, 'collapsed'=>$collapsed)) );
+    print( '<br clear="both" />' );
 }
 
 getid3_load();

@@ -21,7 +21,7 @@
  * to update the CiviCRM Resource URL field (in Administer CRM: Global
  * Settings: Resource URLS) to your CiviCRM root directory.
  */
-define( 'CIVICRM_UF'               , 'Drupal6'        );
+define( 'CIVICRM_UF'               , 'Drupal'        );
 
 /**
  * Pantheon Systems:

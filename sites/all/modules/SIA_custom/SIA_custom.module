@@ -1,4 +1,6 @@
-<?php #>
+<?php
+
+require_once 'sites/all/modules/civicrm/api/class.api.php';
 
 function treatTable($title, $collapsed, $tab) {
     $content = theme('table', array('header'=> array("Date", "Bringer"), 'rows'=>$tab));

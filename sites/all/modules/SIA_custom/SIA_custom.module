@@ -10,6 +10,20 @@ function treatTable($title, $collapsed, $tab) {
 
 getid3_load();
 
+## Voice-part index
+function vp_index($a) {
+    $vp_order = array('soprano' => 1, 'alto' => 2, 'tenor' => 3, 'bass' => 4);
+    $a = preg_replace("/ .*/", "", $a);
+    $out = $vp_order[ strtolower($a) ];
+    return $out;
+}
+
+## Voice-part sort
+function vp_sort($a, $b) {
+    $res = vp_index($a) - vp_index($b);
+    if ($res) return $res;
+    return strcmp($a, $b);
+}
 
 
 function listMP3s($files) {

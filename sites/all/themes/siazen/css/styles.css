@@ -20,3 +20,63 @@
 /* SMACSS theme rules */
 /* @import "theme-A.css"; */
 /* @import "theme-B.css"; */
+
+body {
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, arial, sans-serif;
+        font-size: 0.85em;
+        margin: 0;
+        padding: 0;
+        background-color: #4c0000;
+        background-image: url(images/sia_bg.jpg);
+        background-repeat: repeat-x;
+        background-position: left top;
+}
+
+#page {
+	background-color: #FFF2DB;
+	margin-top: 30px;
+	padding-top: 0px;
+	width: 950px;
+}
+
+#header {
+	margin-top: 0px;
+	padding-top: 0px;
+	background-image: url(images/corners.jpg);
+	background-repeat: no-repeat;
+}
+
+a:link, a:visited {
+	color: #666;
+}
+
+a:hover {
+	color: #999;
+}
+
+#navigation {
+	font-size: 1.2em;
+	margin-left: 195px;
+	margin-top: -60px;
+	margin-bottom: 20px;
+}
+
+#navigation a:link, #navigation a:visited {
+	color: #5C694E;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #5C694E;
+	text-decoration: none;
+}
+
+#navigation a:hover {
+	color: #849771;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #849771;
+	text-decoration: none;
+}
+
+h2 {
+	font-size: 2em;
+}

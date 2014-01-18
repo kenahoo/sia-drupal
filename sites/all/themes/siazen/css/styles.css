@@ -54,6 +54,10 @@ a:hover {
 	color: #999;
 }
 
+#site-slogan {
+	font-style: italic;
+}
+
 #navigation {
 	font-size: 1.2em;
 	margin-left: 195px;

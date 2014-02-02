@@ -2,10 +2,13 @@ name = Image Title
 description = Allows you to upload images to replace text versions of page titles
 package = Other
 version = VERSION
-core = 6.x
+core = 7.x
+
+configure = admin/config/media/image-title
+
 ; Information added by drupal.org packaging script on 2013-09-30
-version = "6.x-2.x-dev"
-core = "6.x"
+version = "7.x-1.x-dev"
+core = "7.x"
 project = "image_title"
-datestamp = "1380583006"
+datestamp = "1380583003"
 

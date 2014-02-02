@@ -23,11 +23,7 @@ to display only the image on screen but allow the node title to be indexed by se
 The title image upload form is also presented as a template variable, $image_title_form, available to all page.tpl.php files if you want to place it in a template.
 
 
- if you have any problem with this module contact developer at oscoder.com
+ if you have any problem with this module contact dksdeveloper at gmail dot com
  
 Alternate -- explained here http://drupal.org/node/221854
 Alternative approach for Drupal 5.x can be found here -- http://drupal.org/node/221854
- 
-Drupal 6.x port and additional Drupal 6.x development done by:
-tayzlor -- http://drupal.org/user/274980
-greg.harvey -- http://drupal.org/user/130383

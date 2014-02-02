@@ -1,24 +1,33 @@
 <?php
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_permission().
  */
-function image_title_perm() {
-  return array('create image titles', 'administer image titles');
+function image_title_permission() {
+  return array(
+    'create image titles' => array(
+      'title' => t('create image titles'),
+      'description' => t('TODO Add a description for \'create image titles\''),
+    ),
+    'administer image titles' => array(
+      'title' => t('administer image titles'),
+      'description' => t('TODO Add a description for \'administer image titles\''),
+    ),
+  );
 }
 
 /**
  * Title image upload form for pages that are not nodes
- * 
+ *
  * @return
  * array containing the form
  */
-function image_title_menu_router_form() {
+function image_title_menu_router_form($form) {
   $item = menu_get_item();
   
   //load any existing file data
-  $image_title = db_fetch_array(db_query('SELECT image FROM {image_title_menu} WHERE path = "%s"', $item['path']));   
-  $picture = theme('image_title', $image_title['image']);
+  $image_title = db_query('SELECT image FROM {image_title_menu} WHERE path = :path', array(':path' => $item['path']))->fetchAssoc(); 
+  $picture = theme('image_title', array('node' => $image_title['image']));
   
   $collapsed = TRUE;
   if ($picture) {
@@ -31,7 +40,7 @@ function image_title_menu_router_form() {
     '#value' => $item,
   );
   $form['#attributes']['enctype'] = 'multipart/form-data';
-  
+
   $form['image_title_upload'] = array(
     '#type' => 'fieldset',
     '#title' => t('Title image'),
@@ -41,7 +50,7 @@ function image_title_menu_router_form() {
   $form['image_title_upload']['image_title_upload'] = array(
     '#type' => 'file',
     '#title' => t('Attach title image'),
-  '#size' => 40,
+    '#size' => 40,
   );
 
   if ($picture) {
@@ -52,49 +61,49 @@ function image_title_menu_router_form() {
       '#type' => 'checkbox',
       '#default_value' => 0,
       '#title' => t('Delete title image.'),
-    ); 
+    );
   }
   
   $form['image_title_upload']['submit'] = array(
     '#value' => t('Save title image settings'),
     '#type' => 'submit',
   );
-  
+
   return $form;
 }
 
 /**
  * Validation for title image upload form on pages that are not nodes
  */
-function image_title_menu_router_form_validate($form, &$form_state) { 
-  
+function image_title_menu_router_form_validate($form, &$form_state) {
+
   if (!empty($_FILES['files']['name']['image_title_upload'])) {
-    $fullpath = file_directory_path() . '/' . variable_get('image_title_directory', 'img-title');
-        
-    if (!file_exists($fullpath)) {  
+    $fullpath = variable_get('file_public_path', conf_path() . '/files') . '/' . variable_get('image_title_directory', 'img-title');
+
+    if (!file_exists($fullpath)) {
       if (@mkdir($fullpath, intval("00", 8))) {
-        $mod = fileperms($fullpath) & 0777;  
+        $mod = fileperms($fullpath) & 0777;
         // update permission 
-        @chmod($fullpath, $mod);      
-      } 
-      if (!file_exists($fullpath)) {  
+        @chmod($fullpath, $mod);
+      }
+      if (!file_exists($fullpath)) {
         //file_check_directory() creates a form error automatically 
-        file_check_directory($fullpath, 0, 'image_title_upload'); 
-      } 
-      
-    }  
-    
+        file_prepare_directory($fullpath, 0, 'image_title_upload');
+      }
+
+    }
+
     // check if not writable .. 
-    if( file_exists($fullpath) && !is_writable($fullpath) ) { 
-      $mod = fileperms($fullpath) & 0777;  
+    if ( file_exists($fullpath) && !is_writable($fullpath) ) {
+      $mod = fileperms($fullpath) & 0777;
       // attempt to update permission 
-      @chmod($fullpath, $mod);  
-      if( !is_writable($fullpath) ) { 
-        form_set_error('image_title_upload', t("Directory is not writable")); 
-      } 
-    } 
-    
-  } 
+      @chmod($fullpath, $mod);
+      if ( !is_writable($fullpath) ) {
+        form_set_error('image_title_upload', t("Directory is not writable"));
+      }
+    }
+
+  }
 }
 
 /**
@@ -102,39 +111,51 @@ function image_title_menu_router_form_validate($form, &$form_state) {
  */
 function image_title_menu_router_form_submit($form, &$form_state) {
   //load any existing file data
-  $image_title = db_fetch_array(db_query('SELECT image FROM {image_title_menu} WHERE path = "%s"', $form_state['values']['menu_router_item']['path']));
+  $image_title = db_query('SELECT image FROM {image_title_menu} WHERE path = :path', array(':path' => $form_state['values']['menu_router_item']['path']))->fetchAssoc();
   
   //set delete flag according to form entry
-  $delete = $form_state['values']['image_title_delete'];
+  $delete = isset($form_state['values']['image_title_delete']) ? $form_state['values']['image_title_delete'] : 0;
   //if delete is requested, delete the unwanted image
   if ($delete == 1) {
-    if (file_delete($image_title['image'])) {
+    if (file_unmanaged_delete($image_title['image'])) {
       drupal_set_message(t('Title image deleted.'));
     }
     //we don't want the database record either
-    db_query('DELETE FROM {image_title_menu} WHERE path = "%s"', $form_state['values']['menu_router_item']['path']);
+    db_delete('image_title_menu')
+  ->condition('path', $form_state['values']['menu_router_item']['path'])
+  ->execute();
   }
   //print_r($_FILES);
   //now handle the upload
-  if (!empty($_FILES['files']['name']['image_title_upload'])) {    
+  if (!empty($_FILES['files']['name']['image_title_upload'])) {
     //set upload parameters  
-    $fullpath = file_directory_path() . '/' . variable_get('image_title_directory', 'img-title');
+    $fullpath = ('public://') . '/' . variable_get('image_title_directory', 'img-title');
     $validators = array(
       'file_validate_is_image' => array(),
     );
-
+    
     $overwrite = 0;
     if ($file = file_save_upload('image_title_upload', $validators, $fullpath, $overwrite)) {
-      file_set_status($file, FILE_STATUS_PERMANENT);
+      $file->status &= FILE_STATUS_PERMANENT;
+      $file = file_save($file);
       //we don't want the old image - delete it
       //but make sure we don't delete the image we just uploaded
-      if (!($file->filepath === $image_title['image'])) {
-        file_delete($image_title['image']);
+      if (!($file->uri === $image_title['image'])) {
+        file_unmanaged_delete($image_title['image']);
       }
-      db_query('DELETE FROM {image_title_menu} WHERE path = "%s"', $form_state['values']['menu_router_item']['path']);  
-      db_query('INSERT INTO {image_title_menu} (path, image) VALUES ("%s", "%s")', $form_state['values']['menu_router_item']['path'], $file->filepath);
+      
+      db_delete('image_title_menu')
+  ->condition('path', $form_state['values']['menu_router_item']['path'])
+  ->execute();
+      
+      $id = db_insert('image_title_menu')
+  ->fields(array(
+        'path' => $form_state['values']['menu_router_item']['path'],
+        'image' => $file->uri,
+      ))
+  ->execute();
       drupal_set_message(t('Title image saved.'));
-    } 
+    }
     else {
       drupal_set_message(t('Failed to upload the title image.'), 'error');
     }
@@ -142,23 +163,24 @@ function image_title_menu_router_form_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of hook_form_alter() to add title image field to node forms 
+ * Implements hook_form_alter() to add title image field to node forms 
  */
-function image_title_form_alter(&$form, $form_state, $form_id) {  
+function image_title_form_alter(&$form, $form_state, $form_id) {
   // alter workflow to have image title settings
-  if ($form_id == 'node_type_form' && isset($form['identity']['type'])) {
+  if ($form_id == 'node_type_form' && isset($form['#node_type'])) {
+    
     $form['workflow']['image_title'] = array(
       '#type' => 'radios',
       '#title' => t('Default image title'),
-      '#default_value' => variable_get('image_title_'. $form['#node_type']->type, 1),
+      '#default_value' => variable_get('image_title_' . $form['#node_type']->type, 1),
       '#options' => array(t('Disabled'), t('Enabled')),
       '#description' => t('Enable this to have image title for this content type.'),
     );
   }
-
+  
   // We're only modifying node forms, if the type field isn't set we don't need
   // to bother; otherwise, store it for later retrieval.
-  if (isset($form['type'])) {
+  if ( isset($form['type']) && isset($form['type']['#value']) ) {
     $type = $form['type']['#value'];
   }
   elseif (isset($form['orig_type'])) {
@@ -169,49 +191,52 @@ function image_title_form_alter(&$form, $form_state, $form_id) {
   }
   
   //check user is permitted to create image titles
-  if (user_access('create image titles') && (variable_get('image_title_'. $type, 1) == 1)) {
-    
-    //load an existing picture
-    $node =  $form['#node'];
-    $picture = theme('image_title', $node->image_title);
-    
-    $collapsed = TRUE;
-    if ($picture) {
-      $collapsed = FALSE;
-    }
+  if (user_access('create image titles') && (variable_get('image_title_' . $type, 1) == 1)) {
     
     // check node type and match settings
     if ($form_id == $type . '_node_form' ) {
+      //load an existing picture
+      $node =  $form['#node'];
+      
+      $picture = theme('image_title', array('node' => $node));
+      
+      $collapsed = TRUE;
+      if ($picture) {
+        $collapsed = FALSE;
+      }
+      
       $form['image_title'] = array(
         '#type' => 'fieldset',
         '#title' => t('Title image'),
         '#weight' => 40,
         '#collapsible' => TRUE,
-        '#collapsed' => $collapsed,  
+        '#collapsed' => $collapsed,
       );
       $form['image_title']['image_title_upload'] = array(
         '#type' => 'file',
         '#title' => t('Attach title image'),
         '#size' => 40,
       );
-      if ($picture) {
-        //show the image
-        $form['image_title']['current_title_image'] = array('#value' => $picture);
-        // set the delete flag
+      if ($picture) { 
+        //show the image 
+        $form['image_title']['current_title_image'] = array('#markup' => $picture);
+        // set the delete flag 
         $form['image_title']['image_title_delete'] = array(
-            '#type' => 'checkbox',
-            '#default_value' => 0,
-            '#title' => t('Delete title image.'),
-          ); 
-      } 
+          '#type' => 'checkbox',
+          '#default_value' => 0,
+          '#title' => t('Delete title image.'),
+        );
+      }
+      
       // status for ability to hide for specific content 
-      $form['image_title']['current_title_image_status'] = array('#type' => 'checkbox', 
-                                                     '#default_value' => isset($node->image_title_status) ? $node->image_title_status : 1 ,  
-                                                     '#title' => t('Show this image in place of title'), 
-                                                     '#description' => t('Check this box to override title with image uploaded.'),
-                                                     ); 
+      $form['image_title']['current_title_image_status'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => isset($node->image_title_status) ? $node->image_title_status : 1,
+        '#title' => t('Show this image in place of title'),
+        '#description' => t('Check this box to override title with image uploaded.'),
+      );
 
-       $form['#attributes']['enctype'] = 'multipart/form-data';
+      $form['#attributes']['enctype'] = 'multipart/form-data';
     }
   }
 }
@@ -219,156 +244,264 @@ function image_title_form_alter(&$form, $form_state, $form_id) {
 
 /**
  * theming image field for title for node form ..
- * 
+ *
  * @param $path
  * a string representing the full Drupal path to the image
  */
-function theme_image_title($path) {
-  if ($path && file_exists($path)) {
-    $picture = theme('image', $path, t('Title image preview.'), t('Title image preview.'), '', FALSE); 
+function theme_image_title($variables) {
+  
+  $node = $variables['node']; 
+  
+  if (isset($node->image_title) && $path = $node->image_title) { //TODO file_exists($path)
+    $picture = theme('image', array('path' => $path, 'width' => '', 'height' => '', 'alt' => t('Title image preview.'), 'title' => t('Title image preview.'), 'attributes' => ''));
     return "<div class=\"img_title\">$picture</div>";
   }
 }
 
 /**
- * Implementation of hook_theme()
+ * Implements hook_theme().
  */
 function image_title_theme() {
   return array(
     'image_title' => array(
-      'arguments' => array('node' => NULL),
+      'variables' => array('node' => NULL),
     ),
-  );  
+  );
 }
 
 /**
- * Implementation of hook_nodeapi() to manage title images on nodes
- * (save, update, delete, etc.) 
+ * Implements hook_node_validate().
  */
-function image_title_nodeapi(&$node, $op, $teaser, $page) {
+function image_title_node_validate($node, $form, &$form_state) {
   if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
     return; // do nothing ... 
   }
-  switch ($op) {
-    case 'validate':
-      if (!empty($_FILES['files']['name']['image_title_upload'])) {
-        $path = file_directory_path(); 
-        $fullpath = $path . '/' . variable_get('image_title_directory', 'img-title');  
-        if (!file_check_directory($fullpath)) {  
-          if (!file_exists($fullpath)) {  
-            if (@mkdir($fullpath, intval("00", 8))) {
-              $mod = fileperms($fullpath) & 0777;  
-              // update permission 
-              @chmod($fullpath, $mod);      
-            } 
-            if (!file_exists($fullpath)) {  
-              //file_check_directory() creates a form error automatically 
-              file_check_directory($fullpath, 0, 'image_title_upload'); 
-            }              
-          }  
-          
-          // check if not writable .. 
-          if( !is_writable($fullpath) ) { 
-            $mod = fileperms($fullpath) & 0777;  
-            // attempt to update permission 
-            @chmod($fullpath, $mod);  
-            if( !is_writable($fullpath) ) {  
-              form_set_error('image_title_upload', t('Failed to upload the image title; the %directory directory doesn\'t exist or is not writable.', array('%directory' => $fullpath)));  
-            } 
-          } 
-           
-        }
-      }
-      break;
+  
+  if (!empty($_FILES['files']['name']['image_title_upload'])) {
+    $path = variable_get('file_public_path', conf_path() . '/files'); 
 
-    case 'update':
-    case 'insert':
-      //load any existing file data
-      $image_title = db_fetch_array(db_query('SELECT image FROM {image_title_node} WHERE nid = %d', $node->nid));
-      
-      //set delete flag according to node form entry
-      $delete = 0;
-      if ($node->image_title_delete) {  
-        $delete = $node->image_title_delete;  
-      }
-      //if delete is requested, delete the unwanted image
-      if ($delete == 1) {
-        if (file_delete($image_title['image'])) {
-          drupal_set_message(t('Title image deleted.'));
+    $fullpath = $path . '/' . variable_get('image_title_directory', 'img-title');
+    if (!file_prepare_directory($fullpath)) {
+      if (!file_exists($fullpath)) {
+        if (@mkdir($fullpath, intval("00", 8))) {
+          $mod = fileperms($fullpath) & 0777;
+          // update permission 
+          @chmod($fullpath, $mod);
         }
-        //we don't want the database record either
-        db_query('DELETE FROM {image_title_node} WHERE nid = %d', $node->nid);
-      }
-      
-      if ( $node->current_title_image_status ) {  
-        $status = $node->current_title_image_status;  
-      }
-      else {  
-        $status = 0; 
-      }
-      
-      //now handle the upload
-      if (!empty($_FILES['files']['name']['image_title_upload'])) {    
-        //set upload parameters  
-        $fullpath = file_directory_path() . '/' . variable_get('image_title_directory', 'img-title');
-        $validators = array(
-          'file_validate_is_image' => array(),
-        );
-        $overwrite = 0;
-        if ($file = file_save_upload('image_title_upload', $validators, $fullpath, $overwrite)) {
-          file_set_status($file, FILE_STATUS_PERMANENT);
-          //we don't want the old image - delete it
-            if (!($file->filepath === $image_title['image'])) {
-              file_delete($image_title['image']);
-            }
-            db_query('DELETE FROM {image_title_node} WHERE nid = %d', $node->nid);  
-            db_query('INSERT INTO {image_title_node} (nid, image, status) VALUES (%d, "%s", %d)', $node->nid, $file->filepath, $status);
-        } 
-        else {
-          drupal_set_message(t('Failed to upload the title image.'), 'error');
+        if (!file_exists($fullpath)) {
+          //file_check_directory() creates a form error automatically 
+          file_prepare_directory($fullpath, 0, 'image_title_upload');
         }
       }
-      else {
-        db_query('update {image_title_node} set status = %d WHERE nid = %d', $status, $node->nid); 
+
+      // check if not writable .. 
+      if ( !is_writable($fullpath) ) {
+        $mod = fileperms($fullpath) & 0777;
+        // attempt to update permission 
+        @chmod($fullpath, $mod);
+        if ( !is_writable($fullpath) ) {
+          form_set_error('image_title_upload', t('Failed to upload the image title; the %directory directory doesn\'t exist or is not writable.', array('%directory' => $fullpath)));
+        }
       }
-    break; 
-    
-    case 'load':
-      $image_title = db_fetch_array(db_query('SELECT image, status FROM {image_title_node} WHERE nid = %d', $node->nid));
-      return array('image_title' => $image_title['image'], 'image_title_status' => $image_title['status'] ); 
-    break;
-    case 'view':
-      drupal_add_css( drupal_get_path('module', 'image_title') .'/image_title.css');  
-      
-      break;
-    case 'delete':
-      //clean up any orphan title images
-      $image_title = db_fetch_array(db_query('SELECT image  FROM {image_title_node} WHERE nid = %d', $node->nid));
-      if (file_exists($image_title['image'])) {
-        file_delete($image_title['image']);
-      }
-      //delete the record
-      db_query('DELETE FROM {image_title_node} WHERE nid = %d', $node->nid);
-    break; 
+
+    }
   }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function image_title_node_update($node) {
+  if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+    return; // do nothing ... 
+  }
+  
+  //load any existing file data
+  $image_title = db_query('SELECT image FROM {image_title_node} WHERE nid = :nid', array(':nid' => $node->nid))->fetchAssoc();
+  
+  //set delete flag according to node form entry
+  $delete = 0;
+  if (isset($node->image_title_delete) && $node->image_title_delete) {
+    $delete = $node->image_title_delete;
+  }
+  //if delete is requested, delete the unwanted image
+  if ($delete == 1) {
+    if (file_unmanaged_delete($image_title['image'])) {
+      drupal_set_message(t('Title image deleted.'));
+    }
+    //we don't want the database record either
+    db_delete('image_title_node')->condition('nid', $node->nid)->execute();
+  }
+  
+  if ( $node->current_title_image_status ) {
+    $status = $node->current_title_image_status;
+  }
+  else {
+    $status = 0;
+  }
+
+  //now handle the upload
+  if (!empty($_FILES['files']['name']['image_title_upload'])) {
+    //set upload parameters  
+    $fullpath = ('public://') . '/' . variable_get('image_title_directory', 'img-title');
+    $validators = array(
+      'file_validate_is_image' => array(),
+    );
+    $overwrite = 0;
+    if ($file = file_save_upload('image_title_upload', $validators, $fullpath, $overwrite)) {
+      $file->status &= FILE_STATUS_PERMANENT;
+      $file = file_save($file); 
+      //we don't want the old image - delete it
+      if (!($file->uri === $image_title['image'])) {
+        file_unmanaged_delete($image_title['image']);
+      } 
+      
+      db_delete('image_title_node')->condition('nid', $node->nid)->execute();
+      if(isset($file->uri) && $file->uri != '' ) { 
+        $id = db_insert('image_title_node')
+  ->fields(array(
+        'nid' => $node->nid,
+        'image' => $file->uri,
+        'status' => $status,
+      ))->execute();
+      } 
+    }
+    else {
+      drupal_set_message(t('Failed to upload the title image.'), 'error');
+    }
+  }
+  else {
+    db_query('update {image_title_node} set status = :status WHERE nid = :nid', array(':status'=>$status, ':nid'=>$node->nid));
+  } 
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function image_title_node_insert($node) {
+  if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+    return; // do nothing ... 
+  }
+  
+  //load any existing file data
+  $image_title = db_query('SELECT image FROM {image_title_node} WHERE nid = :nid', array(':nid' => $node->nid))->fetchAssoc();
+
+  //set delete flag according to node form entry
+  $delete = 0;
+  if (isset($node->image_title_delete) && $node->image_title_delete) {
+    $delete = $node->image_title_delete;
+  }
+  //if delete is requested, delete the unwanted image
+  if ($delete == 1) {
+    if (file_unmanaged_delete($image_title['image'])) {
+      drupal_set_message(t('Title image deleted.'));
+    }
+    //we don't want the database record either
+    db_delete('image_title_node')->condition('nid', $node->nid)->execute();
+  }
+
+  if ( $node->current_title_image_status ) {
+    $status = $node->current_title_image_status;
+  }
+  else {
+    $status = 0;
+  }
+
+  //now handle the upload
+  if (!empty($_FILES['files']['name']['image_title_upload'])) {
+    //set upload parameters  
+    $fullpath = ('public://') . '/' . variable_get('image_title_directory', 'img-title');
+    $validators = array(
+      'file_validate_is_image' => array(),
+    );
+    $overwrite = 0;
+    if ($file = file_save_upload('image_title_upload', $validators, $fullpath, $overwrite)) {
+      $file->status &= FILE_STATUS_PERMANENT;
+      $file = file_save($file);
+      //we don't want the old image - delete it
+      if (!($file->uri === $image_title['image'])) {
+        file_unmanaged_delete($image_title['image']);
+      }
+
+      db_delete('image_title_node')->condition('nid', $node->nid)->execute();
+      
+      $id = db_insert('image_title_node')->fields(array(
+        'nid' => $node->nid,
+        'image' => $file->uri,
+        'status' => $status,
+      ))->execute();
+    }
+    else {
+      drupal_set_message(t('Failed to upload the title image.'), 'error');
+    }
+  }
+  else {
+    db_query('update {image_title_node} set status = :status WHERE nid = :nid', array(':status'=>$status, ':nid'=>$node->nid));
+  }
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function image_title_node_load($nodes, $types) {
+  foreach($nodes as $node) { 
+    if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+      return; // do nothing ... 
+    }
+    
+    $image_title = db_query('SELECT image, status FROM {image_title_node} WHERE nid = :nid', array(':nid' => $node->nid))->fetchAssoc();
+    
+    $nodes[$node->nid]->image_title = isset($image_title['image']) ? $image_title['image'] : ''; 
+    $nodes[$node->nid]->image_title_status = isset($image_title['status']) ? $image_title['status'] : ''; 
+    
+  } 
+  
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function image_title_node_view($node, $view_mode = 'full') {
+  if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+    return; // do nothing ... 
+  }
+  
+  drupal_add_css( drupal_get_path('module', 'image_title') . '/image_title.css');
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function image_title_node_delete($node) {
+  if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+    return; // do nothing ... 
+  }
+
+  //clean up any orphan title images
+  $image_title = db_query('SELECT image  FROM {image_title_node} WHERE nid = :nid', array(':nid' => $node->nid))->fetchAssoc();
+  if (file_exists($image_title['image'])) {
+    file_unmanaged_delete($image_title['image']);
+  }
+  //delete the record
+  db_delete('image_title_node')->condition('nid', $node->nid)->execute();
 }
 
 /**
  * function extending the available page variables
- * 
+ *
  * replaces the text title with the title image, where available, and
  * offers the form for title image upload as a variable for theming
  */
-function image_title_preprocess_page(&$variables) { 
+function image_title_preprocess_page(&$variables) {
   
   if (arg(0) === 'node' && is_numeric(arg(1))) {
-    $thisnode = node_load($variables['node']->nid);
-    if ($thisnode->image_title && $thisnode->image_title_status ) { 
-      $image = theme('image', $thisnode->image_title, $thisnode->title, $thisnode->title, '', FALSE);
+    $thisnode = node_load($variables['node']->nid); 
+    if (isset($thisnode->image_title) && $thisnode->image_title && $thisnode->image_title_status ) {
+      $image = theme('image', array('path' => $thisnode->image_title, 'width' => '', 'height' => '', 'alt' => $thisnode->title, 'title' => $thisnode->title, 'attributes' => ''));
       $title = '<span class="txt_title">' . $thisnode->title . '</span>' . $image;
       $variables['title'] = $title;
     }
-  } 
+  }
   else {
     if (user_access('create image titles')) {
       //form for title image upload optionally available in a variable
@@ -377,49 +510,53 @@ function image_title_preprocess_page(&$variables) {
     //load menu item page data
     $item = menu_get_item();
     //check for an image for this page
-    if ($image_title = db_fetch_array(db_query('SELECT image FROM {image_title_menu} WHERE path = "%s"', $item['path']))) {
-      $image = theme('image', $image_title['image'], $item['title'], $item['title'], '', FALSE);
+    if ($image_title = db_query('SELECT image FROM {image_title_menu} WHERE path = :path', array(':path' => $item['path']))->fetchAssoc()) {
+      $image = theme('image', array('path' => $image_title['image'], 'width' => '', 'height' => '', 'alt' => $item['title'], 'title' => $item['title'], 'attributes' => ''));
       $title = '<span class="txt_title">' . $item['title'] . '</span>' . $image;
       $variables['title'] = $title;
       //we set another variable here because some modules may override $title
       //later on, so you can in turn override their values in your theme
       //template.php file with an appropriate preprocess containing simply:
-      //  $variables['title'] = $variables['image_title'];
+//  $variables['title'] = $variables['image_title'];
       $variables['image_title'] = $title;
     }
-  }  
-}
-
-/**
- * Implementation of hook_block.
- *
- * offers title image upload form as a block
- */
-function image_title_block($op = 'list', $delta = 0) {
-  switch ($op) {
-    case 'list':
-      $block[0]['info'] = t('Title image upload');
-
-      return $block;
-    case 'view':
-      if (user_access('create image titles')) {
-        switch ($delta) {
-          case 0:
-            $block['subject'] = t('Title image upload');
-            $block['content'] = drupal_get_form('image_title_menu_router_form');
-          break;
-        }
-      }
-      return $block;
   }
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_block_info().
+ */
+function image_title_block_info() {
+  $block['image_title_upload']['info'] = t('Title image upload');
+  
+  return $block;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function image_title_block_view($delta) { 
+  
+  if (user_access('create image titles')) {
+    $block = array();
+
+    switch ($delta) {
+      case 'image_title_upload':
+        $block['subject'] = t('Title image upload');
+        $block['content'] = drupal_get_form('image_title_menu_router_form');
+        break;
+    }
+    
+    return $block;
+  }  
+}
+
+/**
+ * Implements hook_menu().
  */
 function image_title_menu() {
   //the admin settings page
-  $items['admin/settings/image-title'] = array(
+  $items['admin/config/media/image-title'] = array(
     'title' => t('Image title'),
     'description' => t('Settings for Image title module.'),
     'page callback' => 'drupal_get_form',
@@ -432,16 +569,19 @@ function image_title_menu() {
 }
 
 /**
- * Implementation of hook_cron()
+ * Implements hook_cron()
  * cron tasks to tidy up images for deleted pages outside the scope of nodeapi
  */
 function image_title_cron() {
-  $images = db_fetch_array(db_query('SELECT * FROM {image_title_menu}'));
+  $images = db_query('SELECT * FROM {image_title_menu}')->fetchAssoc();
   if (is_array($images)) {
     foreach ($images as $image) {
-      if (!$menu_path = db_fetch_array(db_query('SELECT path FROM {menu_router} WHERE path = "%s"', $image['path']))) {
-        file_delete($image['image']);
-        db_query('DELETE FROM {image_title_menu} WHERE path = "%s"', $image['path']);
+      if (!$menu_path = db_query('SELECT path FROM {menu_router} WHERE path = :path', array(':path' => $image['path']))->fetchAssoc()) {
+        file_unmanaged_delete($image['image']);
+        
+        db_delete('image_title_menu')
+  ->condition('path', $image['path'])
+  ->execute();
       }
     }
   }

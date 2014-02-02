@@ -1,49 +1,54 @@
-// $Id: CHANGELOG.txt,v 1.1.2.27 2011/02/07 18:27:46 xjm Exp $
-
-Taxonomy Access 6.x-1.x-dev, xxxx-xx-xx
+Taxonomy Access 7.x-1.x-dev, xxxx-xx-xx
 ---------------------------------------
+For complete changelog, see:
+http://drupalcode.org/project/taxonomy_access.git/log/refs/heads/7.x-1.x
 
-Taxonomy Access 6.x-1.3, 2011-02-07
+Taxonomy Access 7.x-1.x-rc1, 2011-09-09
 ---------------------------------------
-o #1050982 by mula: Fix 5.x to 6.x upgrade bug.
-o #902858 by xjm: Prevent corrupted node access records when $node->taxonomy 
-   is not consistent with the actual {term_node} data.
-o #902458 by xjm: Remove old, unneeded code from hook_nodeapi() presave op.
-o #786360 by mr.andrey, lhristov: Provide views filters for TAC grants.
-o #818212 by ayalon: Do not alter queries for the {node_revisions} table.
-o #339366 by xjm: Initial commit of tac_fields, an experimental submodule to 
-   apply taxonomy access to specific fields.
-o #728406 by xjm: hook_form_alter() expects a plain object for $form_state, 
-   not a reference.
-o #785060 by alexb: Fixed bug with argument identification in admin/ paths.
+o Administrative paths have changed.
 
-Taxonomy Access 6.x-1.2, 2010-03-18
----------------------------------------
-o #746548 by xjm: Fixed critical bug in hook_db_rewrite_sql() that prevented 
-    create/list permissions from functioning properly.
+o Renamed grant realm from 'term_access' to 'taxonomy_access_role'.
 
-Taxonomy Access 6.x-1.1, 2010-03-17
----------------------------------------
-o #742336 by xjm: Comment cleanup & trailing whitespace removal.
-o #742072 by xjm: Changed submit handler to skip node updates if only create 
-    or list permissions have changed for the row.
-o #732844 by xjm: Refactored submit handler to process nodes all at once 
-    (rather than per row).
-o #739874 by xjm: Fixed role handling to update nodes that are controlled by 
-    a role's global or vocabulary defaults when the role is disabled.
-o #739732 by xjm: Fixed _taxonomy_access_get_nodes_for_vocabulary() so that
-    node access is properly updated when a vocab default is added.
-o #727648 by xjm: Fixed admin form to insert global default on role enable.
-    (See comment #10.)
-o by xjm: Properly escape data in queries.
-o #727648 by xjm: Fixed admin submit handler for default changes.
-    Changed submit handler to only process updates for changed rows.
-o #488436 by dman, LUTi, xjm: Code cleanup.
-o #729644 by halcyonCorsair: Check for variables correctly before use.
-o #730258 by xjm: Improve help page, add documentation to configuration forms.
-o #723898 by xjm, keve: Update nodes properly on term or vocabulary deletion.
-o #727648 by xjm: Whitespace cleanup in taxonomy_access_admin_form_submit().
-o #256669 by xjm: Renamed _user_roles() to _taxonomy_access_user_roles().
-o #689668 by mr.andrey, xjm: New feature: Option to add child terms with 
-    parent term on administration form.
-o #723668 by xjm: Added implementation of hook_schema().
+o Field widgets are now automatically hidden if the user cannot add any terms.
+
+o The vocabulary default for the "Add tag" grant (create op) now controls
+  whether new terms can be created in the vocabulary in autocomplete fields.
+
+o Moved "Add tag" (create op) functionality from hook_form_alter() to
+  hook_field_widget_form_alter().
+
+o Terms disallowed by "Add tag" (create op) are disabled rather than removed.
+  This may be a configurable setting in the future.
+
+o "Add tag" (create op) now allows selection of allowed child terms when
+  the parent term is disabled.
+
+o Optimized grant update functionality to reduce queries.
+
+o Renamed several API functions:
+
+  - from: taxonomy_access_grant_update()
+    to:   taxonomy_access_set_term_grants()
+
+  - from: taxonomy_access_defaults_update()
+    to:   taxonomy_access_set_default_grants()
+
+  - form: taxonomy_access_recursive_grant_update()
+    to:   taxonomy_access_set_recursive_grants()
+
+  - from: taxonomy_access_delete_roles()
+    to:   taxonomy_access_delete_role_grants()
+
+  - from: taxonomy_access_delete_terms()
+    to:   taxonomy_access_delete_term_grants()
+
+  - from: taxonomy_access_delete_defaults()
+    to:   taxonomy_access_delete_default_grants()
+
+o Renamed "List" and "Create" grants to "View tag" and "Add tag" for clarity.
+
+o Automatically update node access as needed on shutdown.  
+  Hooks should merely add their list of nodes to 
+  taxonomy_access_affected_nodes() to be processed at the end of the request.
+
+o Provide record deletion API.

@@ -1,11 +1,13 @@
-; $Id: private.info,v 1.1.2.1.2.1 2008/07/26 05:56:49 eaton Exp $
 name = Private
 description = Allows users to mark content as private, and hide that content from visitors.
-core = 6.x
+core = 7.x
+package = Node Access
 
-; Information added by drupal.org packaging script on 2009-07-09
-version = "6.x-1.1"
-core = "6.x"
+files[] = private_handler_filter_private.inc
+
+; Information added by drupal.org packaging script on 2012-08-27
+version = "7.x-1.1"
+core = "7.x"
 project = "private"
-datestamp = "1247164896"
+datestamp = "1346091455"
 

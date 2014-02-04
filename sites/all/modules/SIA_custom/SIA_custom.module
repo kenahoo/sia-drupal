@@ -2,9 +2,13 @@
 
 require_once 'sites/all/modules/civicrm/api/class.api.php';
 
+function collapsible($title, $content, $collapsed=true) {
+    return theme('ctools_collapsible', array('handle'=>$title, 'content'=>$content, 'collapsed'=>$collapsed));
+}
+
 function treatTable($title, $collapsed, $tab) {
     $content = theme('table', array('header'=> array("Date", "Bringer"), 'rows'=>$tab));
-    print( theme('ctools_collapsible', array('handle'=>$title, 'content'=>$content, 'collapsed'=>$collapsed)) );
+    print( collapsible($title, $content, $collapsed) );
     print( '<br clear="both" />' );
 }
 
@@ -26,15 +30,17 @@ function vp_sort($a, $b) {
 }
 
 
-function listMP3s($files) {
+function listMP3s($files, $print=true) {
   $getID3 = new getID3;
+
+  $result = '';
 
   foreach ($files as $d) {
     $f1 = preg_replace('/.*\//', '', $d);
     if (!is_dir($d)) {
       continue;
     }
-    print("<h3>$f1</h3>\n<ol>\n");
+    $result .= "<h3>$f1</h3>\n<ol>\n";
 
     $filenum = 0;
     foreach (glob("$d/*.[Mm][Pp]3") as $p) {
@@ -50,18 +56,19 @@ function listMP3s($files) {
       $composer = (array_key_exists('composer',$tags) && $tags['composer'][0]) ?
           "<span style='font-size:smaller'>[".$tags['composer'][0]."]</span> " :
           "";
-      print("<li> <a href=\"/$p\">$title</a> $composer" .
-            "(".round($mp3info["filesize"]/pow(2,20), 1)."M, ".$mp3info["playtime_string"].")\n");
+      $result .= ("<li> <a href=\"/$p\">$title</a> $composer" .
+        "(".round($mp3info["filesize"]/pow(2,20), 1)."M, ".$mp3info["playtime_string"].")\n");
     }
-    print("</ol>\n");
+    $result .= "</ol>\n";
+  }
+  if ($print) {
+      print($result);
+  } else {
+      return($result);
   }
 }
 
 function mp3_listing($start, $end, $title, $collapsed=true) {
-  print("<fieldset class=\"collapsible".($collapsed ? " collapsed" : "")."\">\n");
-  // print("<legend><span class=\"fieldset-legend\">$title</span></legend>\n");
-  print("<legend>$title</legend>\n");
-  print("<div class=\"fieldset-wrapper\">\n");
 
   $to_list = array();
   foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {
@@ -71,9 +78,9 @@ function mp3_listing($start, $end, $title, $collapsed=true) {
     }
     $to_list[] = $d;
   }
-  listMP3s($to_list);
+  $content = listMP3s($to_list, false);
 
-  print("</div></fieldset>\n");
+  print( collapsible($title, $content, $collapsed) );
 }
 
 

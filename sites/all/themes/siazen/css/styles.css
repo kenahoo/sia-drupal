@@ -90,3 +90,17 @@ a:hover {
 h2 {
 	font-size: 2em;
 }
+
+.ctools-collapsible-content {
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+}
+
+.ctools-collapsible-handle {
+    background: #ffffff;
+    border: 1px solid #ccc;
+}
+
+.ctools-collapsible-container {
+    padding: 0.3em;
+}

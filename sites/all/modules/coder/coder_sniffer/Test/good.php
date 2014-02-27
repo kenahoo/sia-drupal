@@ -253,6 +253,7 @@ do {
  * @see example_reference()
  * @see Example::exampleMethod()
  * @see http://drupal.org
+ * @see http://example.com/see/documentation/is/allowed/to/exceed/eighty/characters
  */
 function foo_bar($field1, $field2, $field3 = NULL, &$field4 = NULL) {
   $system["description"] = t("This module inserts funny text into posts randomly.");
@@ -296,7 +297,10 @@ $var = foo(
  */
 class Bar {
 
-  // Public properties don't have a prefix.
+  // Private properties have no prefix.
+  private $secret = 1;
+
+  // Protected properties also don't have a prefix.
   protected $foo = 1;
 
   // Longer properties use camelCase naming.
@@ -531,6 +535,13 @@ function mymodule_foo_some_type_bar() {
  * Implements hook_foo_bar() for foo_bar.tpl.php.
  */
 function mymodule_foo_bar() {
+
+}
+
+/**
+ * Implements drush_hook_foo_bar().
+ */
+function drush_mymodule_foo_bar() {
 
 }
 

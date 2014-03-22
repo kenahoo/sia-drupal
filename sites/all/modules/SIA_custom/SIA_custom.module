@@ -12,6 +12,15 @@ function treatTable($title, $collapsed, $tab) {
     print( '<br clear="both" />' );
 }
 
+function ticketLine($desc, $node, $reserved) {
+  $content = '<td style="text-align:right">'.$desc.'<br><span style="font-size:smaller">';
+  $content .= $reserved ? 'Seats front &amp; center, held until showtime' : 'General admission';
+  $content .= "</span></td>\n";
+  $content .= '<td><a href="/cart/add/p'.$node.'?destination=cart"><img src="/graphics/add-to-cart.png"></a></td>';
+  return $content;
+}
+
+
 getid3_load();
 
 ## Voice-part index

@@ -9,13 +9,16 @@
 ?>
 <article class="node-<?php print $node->nid; ?> <?php print $classes; ?> clearfix"<?php print $attributes; ?>>
 
-  <?php if (isset($image_title)) { $title = $image_title; } ?>
+  <?php if (isset($image_title) && strlen($image_title)>0) {
+    $title = theme('image', array('path' => $image_title, 'width' => '', 'height' => '',
+    	    'alt' => $title, 'title' => $title, 'attributes' => ''));
+   } ?>
 
   <?php if ($title_prefix || $title_suffix || $display_submitted || $unpublished || !$page && $title): ?>
     <header>
       <?php print render($title_prefix); ?>
       <?php if (!$page && $title): ?>
-        <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?>foo</a></h2>
+        <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
       <?php endif; ?>
       <?php print render($title_suffix); ?>
 

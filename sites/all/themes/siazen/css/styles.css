@@ -32,6 +32,10 @@ body {
         background-position: left top;
 }
 
+#content {
+    padding-left: 30px;
+}
+
 #page {
 	background-color: #FFF2DB;
 	margin-top: 30px;

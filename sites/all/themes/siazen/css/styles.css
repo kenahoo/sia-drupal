@@ -111,3 +111,19 @@ h2 {
 .ctools-collapsible-container {
     padding: 0.3em;
 }
+
+.concert-listing dt {
+    font-weight: bold;
+    width: 150px;
+    text-align: right;
+}
+
+.concert-listing dt, .concert-listing dd {
+    display: block;
+    float: left;
+}
+.concert-listing dt {
+    clear: both;
+}
+
+

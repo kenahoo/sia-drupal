@@ -89,7 +89,9 @@
  *   $db_url = 'mysqli://username:password@localhost/databasename';
  *   $db_url = 'pgsql://username:password@localhost/databasename';
  */
-$db_url = 'mysqli://ken:***REMOVED***@localhost/pantheon';
+include 'db.php';
+$d = $databases['default']['default'];
+$db_url = "mysqli://$d[username]:$d[password]@$d[host]/$d[database]";
 $db_prefix = '';
 
 /**
@@ -228,19 +230,4 @@ ini_set('max_execution_time',       120);
 #   '@count min' => '@count minutes',
 # );
 
-$databases = array (
-  'default' => 
-  array (
-    'default' => 
-    array (
-      'driver' => 'mysql',
-      'database' => 'pantheon',
-      'username' => 'ken',
-      'password' => '***REMOVED***',
-      'host' => 'localhost',
-      'port' => '',
-      'prefix' => '',
-    ),
-  ),
-);
 $drupal_hash_salt = '5P5jMYW_ACDbGDHrQBhF24ya-kTJyraNw8aVXCgQWrE';

@@ -77,7 +77,10 @@ if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , 'mysql://ken:***REMOVED***@localhost/pantheon?new_link=true' );
+
+include 'db.php';
+$d = $databases['default']['default'];
+define( 'CIVICRM_UF_DSN'           , "mysql://$d[username]:$d[password]@$d[host]/$d[database]?new_link=true" );
 
 /**
  * CiviCRM Database Settings
@@ -98,7 +101,7 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://ken:***REMOVED***@localhost/panthe
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'           , 'mysql://ken:***REMOVED***@localhost/pantheon?new_link=true' );
+define( 'CIVICRM_DSN'           , "mysql://$d[username]:$d[password]@$d[host]/$d[database]?new_link=true" );
 
 /**
  * File System Paths:

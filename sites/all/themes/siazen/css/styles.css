@@ -141,3 +141,9 @@ th, td, caption {
     padding: 4px 10px 4px 5px;
 }
 
+#block-menu-accountmenu {
+    position: absolute;
+    right: -120px;
+    top: -30px;
+    font-size: smaller;
+}

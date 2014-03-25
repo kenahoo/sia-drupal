@@ -1,9 +1,12 @@
 <?php
 
 global $databases;
+global $site_root;
 
-if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_ROOT"])) {
+if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_ROOT"])
+ || preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_ENV["PWD"])) {
 
+    $site_root = '/Users/ken/Documents/SIA/site-upgrade';
     $databases = array (
         'default' =>
         array (
@@ -22,6 +25,7 @@ if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_RO
 
 } else {
 
+    $site_root = '/home/kenahoo/dev.singersinaccord.org';
     $databases = array (
         'default' =>
         array (

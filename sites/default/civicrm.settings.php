@@ -144,7 +144,6 @@ define( 'CIVICRM_DSN'           , "mysql://$d[username]:$d[password]@$d[host]/$d
 
 global $civicrm_root;
 
-$site_root = '/home/kenahoo/dev.singersinaccord.org';
 $civicrm_root = $site_root . '/sites/all/modules/civicrm';
 define( 'CIVICRM_TEMPLATE_COMPILEDIR', $site_root . '/sites/default/files/civicrm/templates_c/' );
 

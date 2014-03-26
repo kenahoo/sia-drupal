@@ -43,6 +43,7 @@ function commerce_donate_install() {
  */
 function commerce_donate_uninstall() {
   variable_del('commerce_donate_checkout_pane_title');
+  variable_del('commerce_donate_checkout_pane_description');
   variable_del('commerce_donate_checkout_pane_product_id');
   variable_del('commerce_donate_checkout_pane_override_options');
   variable_del('commerce_donate_checkout_pane_donate_amounts');

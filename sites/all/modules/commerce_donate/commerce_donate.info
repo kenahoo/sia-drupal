@@ -6,7 +6,7 @@ php = 5.2.4
 
 files[] = includes/commerce_donate.field.inc
 files[] = includes/commerce_donate.checkout_pane.inc
-files[] = includes/commerce_donate.rules_defaults.inc
+files[] = commerce_donate.rules_defaults.inc
 
 dependencies[] = commerce
 dependencies[] = commerce_cart
@@ -16,14 +16,15 @@ dependencies[] = commerce_product
 dependencies[] = commerce_product_reference
 dependencies[] = entity
 dependencies[] = field
+dependencies[] = number
 dependencies[] = options
 dependencies[] = rules
 dependencies[] = select_or_other
 
 
-; Information added by drupal.org packaging script on 2012-07-08
-version = "7.x-1.0-beta1"
+; Information added by drupal.org packaging script on 2013-09-30
+version = "7.x-1.0-beta1+12-dev"
 core = "7.x"
 project = "commerce_donate"
-datestamp = "1341785785"
+datestamp = "1380560140"
 

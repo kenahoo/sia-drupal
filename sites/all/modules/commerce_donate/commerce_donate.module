@@ -14,7 +14,7 @@ function commerce_donate_commerce_product_type_info() {
     'donation' => array(
       'type' => 'donation',
       'name' => 'Donation',
-      'description' => 'Variable price product foo',
+      'description' => 'Variable price product',
       'help' => '',
       'revision' => '1',
       'module' => 'commerce_donate',
@@ -63,7 +63,7 @@ function commerce_donate_commerce_donate_line_item_configuration($line_item_type
 
   commerce_product_line_item_configuration($line_item_type);
 
-  // Look for or add a donation amount integer textfield to the commerce_donate line item type.
+  // Look for or add a donation amount decimal textfield to the commerce_donate line item type.
   $field_name = 'commerce_donate_amount';
   $field = field_info_field($field_name);
   $instance = field_info_instance('commerce_line_item', $field_name, $type);
@@ -71,7 +71,7 @@ function commerce_donate_commerce_donate_line_item_configuration($line_item_type
   if (empty($field)) {
     $field = array(
       'field_name' => $field_name,
-      'type' => 'number_integer',
+      'type' => 'number_decimal',
       'cardinality' => 1,
       'entity_types' => array('commerce_line_item'),
       'translatable' => FALSE,
@@ -123,7 +123,7 @@ function commerce_donate_commerce_donate_line_item_configuration($line_item_type
  * Returns a title for this line item.
  */
 function commerce_donate_commerce_donate_line_item_title($line_item) {
-  return t(ucfirst($line_item->line_item_label));
+  return commerce_product_line_item_title($line_item);
 }
 
 /**

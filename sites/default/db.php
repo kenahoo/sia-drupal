@@ -3,8 +3,11 @@
 global $databases;
 global $site_root;
 
-if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_ROOT"])
- || preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_ENV["PWD"])) {
+if ((isset($_SERVER["DOCUMENT_ROOT"])
+     && preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_ROOT"]))
+    ||
+    (isset($_ENV["PWD"])
+     && preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_ENV["PWD"]))) {
 
     $site_root = '/Users/ken/Documents/SIA/site-upgrade';
     $databases = array (

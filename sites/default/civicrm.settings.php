@@ -178,7 +178,7 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', $site_root . '/sites/default/files/civicr
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/civicrm/standalone/' );
  */
  
-define( 'CIVICRM_UF_BASEURL'      , 'http://localhost/' );
+define( 'CIVICRM_UF_BASEURL'      , 'http://'.$host.'/' );
 
 /*
  * If you are using any CiviCRM script in the bin directory that

@@ -2,6 +2,7 @@
 
 global $databases;
 global $site_root;
+global $host;
 
 if ((isset($_SERVER["DOCUMENT_ROOT"])
      && preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_ROOT"]))
@@ -9,6 +10,7 @@ if ((isset($_SERVER["DOCUMENT_ROOT"])
     (isset($_ENV["PWD"])
      && preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_ENV["PWD"]))) {
 
+    $host = 'localhost';
     $site_root = '/Users/ken/Documents/SIA/site-upgrade';
     $databases = array (
         'default' =>
@@ -28,6 +30,7 @@ if ((isset($_SERVER["DOCUMENT_ROOT"])
 
 } else {
 
+    $host = 'dev.singersinaccord.org';
     $site_root = '/home/kenahoo/dev.singersinaccord.org';
     $databases = array (
         'default' =>

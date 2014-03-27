@@ -5,3 +5,6 @@ sites/*/settings*.php
 sites/*/files
 sites/*/private
 .htpasswd
+rec
+recordings
+reh

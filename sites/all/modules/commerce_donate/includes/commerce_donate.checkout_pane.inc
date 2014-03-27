@@ -88,7 +88,7 @@ function commerce_donate_checkout_pane_checkout_form($form, &$form_state, $check
       elseif ($field_name == 'commerce_donate_amount') {
         $language = $pane_form[$pane_id][$field_name]['#language'];
         $form_state['language'] = $language;
-        $pane_form[$pane_id][$field_name][$language]['#default_value']['value'] = '';
+        $pane_form[$pane_id][$field_name][$language]['#default_value'] = '';
         $default_options = $pane_form[$pane_id][$field_name][$language]['#options'];
         // Override default field available options.
         if (variable_get('commerce_donate_checkout_pane_override_options', FALSE)) {

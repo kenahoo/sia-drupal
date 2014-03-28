@@ -28,10 +28,34 @@ if ((isset($_SERVER["DOCUMENT_ROOT"])
         ),
     );
 
-} else {
+} else if ((isset($_SERVER["DOCUMENT_ROOT"])
+     && preg_match("{dev.singersinaccord.org}", $_SERVER["DOCUMENT_ROOT"]))
+    ||
+    (isset($_ENV["PWD"])
+     && preg_match("{dev.singersinaccord.org}", $_ENV["PWD"]))) {
 
     $host = 'dev.singersinaccord.org';
     $site_root = '/home/kenahoo/dev.singersinaccord.org';
+    $databases = array (
+        'default' =>
+        array (
+            'default' =>
+            array (
+                'driver' => 'mysql',
+                'database' => 'dev_sia',
+                'username' => 'kenahoo',
+                'password' => '***REMOVED***',
+                'host' => 'mysql.singersinaccord.org',
+                'port' => '',
+                'prefix' => '',
+            ),
+        ),
+    );
+
+} else {
+
+    $host = 'www.singersinaccord.org';
+    $site_root = '/home/kenahoo/www.singersinaccord.org';
     $databases = array (
         'default' =>
         array (

@@ -55,7 +55,7 @@ if ((isset($_SERVER["DOCUMENT_ROOT"])
 } else {
 
     $host = 'www.singersinaccord.org';
-    $site_root = '/home/kenahoo/www.singersinaccord.org';
+    $site_root = '/home/kenahoo/singersinaccord.org';
     $databases = array (
         'default' =>
         array (

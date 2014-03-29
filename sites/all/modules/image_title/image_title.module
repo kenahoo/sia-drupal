@@ -445,7 +445,7 @@ function image_title_node_insert($node) {
  */
 function image_title_node_load($nodes, $types) {
   foreach($nodes as $node) { 
-    if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+    if ( variable_get('image_title_'. $node->type, 1) == 0 ) {
       return; // do nothing ... 
     }
     
@@ -462,7 +462,7 @@ function image_title_node_load($nodes, $types) {
  * Implements hook_node_view().
  */
 function image_title_node_view($node, $view_mode = 'full') {
-  if ( !user_access('create image titles') || (variable_get('image_title_'. $node->type, 1) == 0) ) {    
+  if ( variable_get('image_title_'. $node->type, 1) == 0 ) {
     return; // do nothing ... 
   }
   

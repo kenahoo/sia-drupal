@@ -4,7 +4,7 @@
 
 #AuthType Basic
 #AuthName "Restricted Files"
-#AuthUserFile /home/kenahoo/dev.singersinaccord.org/.htpasswd
+#AuthUserFile /home/ken/Documents/SIA/site-upgrade/.htpasswd
 #Require user sia
 
 

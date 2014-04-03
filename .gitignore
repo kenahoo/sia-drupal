@@ -8,3 +8,4 @@ sites/*/private
 rec
 recordings
 reh
+.htaccess

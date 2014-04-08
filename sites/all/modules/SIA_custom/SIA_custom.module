@@ -10,11 +10,38 @@ function SIA_custom_menu() {
   $items['product/add/%/%'] =
     array(
 	  'page callback' => 'SIA_custom_product_add',
-	  'page arguments' => array(2,3),
+	  'page arguments' => array(2,3),  # items 2 & 3 of the path, which come from the '%' components.
 	  'access arguments' => array('access content'),
 	  'type' => MENU_CALLBACK,
 	 );
+
+  $items['donation/add'] =
+    array(
+	  'page callback' => 'SIA_custom_donation_add',
+	  #'page arguments' => array(2),  # item 2 of the path, which comes from the '%' components.
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	 );
+
   return $items;
+}
+
+/**
+ * Custom function to add donation to a cart
+ */
+function SIA_custom_donation_add($amount=1, $tribute='') {
+  $product = commerce_product_load(9);
+  $line_item = commerce_product_line_item_new($product, 1);
+
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  $line_item_wrapper->commerce_unit_price->amount = 100*$amount; #$amount;
+  commerce_line_item_rebase_unit_price($line_item_wrapper->value());
+  commerce_line_item_save($line_item_wrapper->value());
+  $line_item->field_donation_is_a_tribute_t[] = $tribute;
+
+  global $user;
+  $line_item = commerce_cart_product_add($user->uid, $line_item, FALSE);
+  drupal_goto('cart');
 }
 
 /**

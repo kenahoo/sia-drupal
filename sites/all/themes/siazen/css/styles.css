@@ -108,12 +108,15 @@ a:hover {
     padding: 0.3em;
 }
 
+.field-name-field-program-listing {
+    clear: both;
+    float: left;
+}
 .concert-listing dt {
     font-weight: bold;
     width: 150px;
     text-align: right;
 }
-
 .concert-listing dt, .concert-listing dd {
     display: block;
     float: left;

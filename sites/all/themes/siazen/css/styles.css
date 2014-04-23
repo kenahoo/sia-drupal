@@ -114,7 +114,7 @@ a:hover {
 }
 .concert-listing dt {
     font-weight: bold;
-    width: 150px;
+    width: 50%;
     text-align: right;
 }
 .concert-listing dt, .concert-listing dd {

@@ -111,6 +111,7 @@ a:hover {
 .field-name-field-program-listing {
     clear: both;
     float: left;
+    width: 100%;
 }
 .concert-listing dt {
     font-weight: bold;

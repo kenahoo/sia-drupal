@@ -123,15 +123,23 @@ function listMP3s($files, $print=true) {
 
 function mp3_listing($start, $end, $title, $collapsed=true) {
 
-  $to_list = array();
-  foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {
-    $f1 = preg_replace('/reh\//', '', $d);
-    if (!is_dir($d) || strcmp($f1, $start)<0 || strcmp($f1, $end)>0) {
-      continue;
+  $cache_key = 'mp3_listing'.$start.$end;
+  if ($cache = cache_get($cache_key)) {
+    $content = $cache->data;
+
+  } else {
+
+    $to_list = array();
+    foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {
+      $f1 = preg_replace('/reh\//', '', $d);
+      if (!is_dir($d) || strcmp($f1, $start)<0 || strcmp($f1, $end)>0) {
+        continue;
+      }
+      $to_list[] = $d;
     }
-    $to_list[] = $d;
+    $content = listMP3s($to_list, false);
+    cache_set($cache_key, $content, 'cache', time()+60*60); // 1 hour
   }
-  $content = listMP3s($to_list, false);
 
   print( collapsible($title, $content, $collapsed) );
 }

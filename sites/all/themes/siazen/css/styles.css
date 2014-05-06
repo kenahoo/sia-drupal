@@ -142,7 +142,7 @@ thead th, th {
 }
 
 tbody tr:nth-child(even) td, tbody tr.even td {
-    background: #e5ecf9;
+//    background: #e5ecf9;
 }
 
 th, td, caption {

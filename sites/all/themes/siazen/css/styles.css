@@ -169,3 +169,36 @@ th, td, caption {
     top: -30px;
     font-size: smaller;
 }
+
+blockquote {
+    font-family: Helvetica, sans-serif;
+    font-size: larger;
+    font-style: italic;
+    margin: 0.25em 0;
+    padding: 0.25em 40px;
+    line-height: 1.45;
+    position: relative;
+    color: #383838;
+}
+
+blockquote:before {
+    display: block;
+    content: "\201C";
+    font-size: 80px;
+    position: absolute;
+    left: -5px;
+    top: -25px;
+    color: #7a7a7a;
+}
+
+blockquote cite {
+    color: #999999;
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
+    margin-left: 15px;
+}
+
+blockquote cite:before {
+    content: "\2014 \2009";
+}

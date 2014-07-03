@@ -119,6 +119,15 @@ td.composer {
     width: 100%;
 }
 
+.node-concert .field-name-field-location p {
+    font-weight: bold;
+    margin: 0px;
+}
+
+.node-concert .field-name-body p {
+    margin-left: 20px;
+}
+
 dl.concert-listing {
     float: left;
     width: 520px;

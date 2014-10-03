@@ -78,7 +78,11 @@ if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
 
-include 'db.php';
+global $databases;
+global $site_root;
+global $civicrm_root;
+global $host;
+require_once 'db.php';
 $d = $databases['default']['default'];
 define( 'CIVICRM_UF_DSN'           , "mysql://$d[username]:$d[password]@$d[host]/$d[database]?new_link=true" );
 

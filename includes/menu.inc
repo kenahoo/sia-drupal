@@ -1856,7 +1856,7 @@ function menu_navigation_links($menu_name, $level = 0) {
   $router_item = menu_get_item();
   $links = array();
   foreach ($tree as $item) {
-    if ($item['link']['access'] && !$item['link']['hidden']) {
+    if (!$item['link']['hidden']) {
       $class = '';
       $l = $item['link']['localized_options'];
       $l['href'] = $item['link']['href'];
@@ -2495,6 +2495,7 @@ function menu_link_get_preferred($path = NULL, $selected_menu = NULL) {
     $query->addField('ml', 'weight', 'link_weight');
     $query->fields('m');
     $query->condition('ml.link_path', $path_candidates, 'IN');
+    $query->addTag('preferred_menu_links');
 
     // Sort candidates by link path and menu name.
     $candidates = array();

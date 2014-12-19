@@ -455,6 +455,9 @@ class CRM_Utils_Date {
 
   /**
    * converts the date/datetime from ISO format to MySQL format
+   * Note that until CRM-14986/ 4.4.7 this was required whenever the pattern $dao->find(TRUE): $dao->save(); was
+   * used to update an object with a date field was used. The DAO now checks for a '-' in date field strings
+   * & runs this function if the - appears - meaning it is likely redundant in the form & BAO layers
    *
    * @param string $iso  date/datetime in ISO format
    *
@@ -1067,6 +1070,7 @@ class CRM_Utils_Date {
             $difference = 2;
             $quarter    = ceil($now['mon'] / 3);
             $quarter    = $quarter - $difference;
+            $subtractYear = 0;  
             if ($quarter <= 0) {
               $subtractYear = 1;
               $quarter += 4;
@@ -1117,6 +1121,7 @@ class CRM_Utils_Date {
 
           case 'earlier':
             $quarter = ceil($now['mon'] / 3) - 1;
+            $subtractYear = 0;  
             if ($quarter <= 0) {
               $subtractYear = 1;
               $quarter += 4;

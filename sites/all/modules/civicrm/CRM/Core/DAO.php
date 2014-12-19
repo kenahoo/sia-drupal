@@ -1341,7 +1341,13 @@ SELECT contact_id
             case CRM_Utils_Type::T_INT:
             case CRM_Utils_Type::T_FLOAT:
             case CRM_Utils_Type::T_MONEY:
-              $object->$dbName = $counter;
+              //4.4 hack do not merge
+              if ($dbName == 'tax_rate') {
+                $object->$dbName = 10;
+              }
+              else {
+                $object->$dbName = $counter;
+              }
               break;
 
             case CRM_Utils_Type::T_BOOLEAN:
@@ -1562,7 +1568,7 @@ SELECT contact_id
     $logging->dropTriggers($tableName);
 
     // now create the set of new triggers
-    self::createTriggers($info);
+    self::createTriggers($info, $tableName);
   }
 
   /**

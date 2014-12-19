@@ -134,15 +134,23 @@
 {crmRegion name="contribution-thankyou-recur-membership"}
                     <br />
                     <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
-                    <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renwal option.{/ts})</div>
+                    <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
 {/crmRegion}
                 {else}
 {crmRegion name="contribution-thankyou-recur"}
-                    {if $installments}
-                 <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2(s) for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {if $installments > 1}
+                    {if $frequency_interval > 1}
+                      <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2s for a total %3 installments (including this initial contribution).{/ts}</strong></p>
                     {else}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2(s).{/ts}</strong></p>
+                      <p><strong>{ts 1=$frequency_unit 2=$installments}This recurring contribution will be automatically processed every %1 for a total %2 installments (including this initial contribution).{/ts}</strong></p>
                     {/if}
+                  {else}
+                    {if $frequency_interval > 1}
+                      <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2s.{/ts}</strong></p>
+                    {else}
+                      <p><strong>{ts 1=$frequency_unit}This recurring contribution will be automatically processed every %1.{/ts}</strong></p>
+                    {/if}
+                  {/if}
                     <p>
                     {if $is_email_receipt}
                         {ts}You will receive an email receipt which includes information about how to update or cancel this recurring contribution.{/ts}

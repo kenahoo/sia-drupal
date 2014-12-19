@@ -518,7 +518,8 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
   $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
-    FALSE, FALSE, $mode
+    FALSE, FALSE, $mode,
+    empty($params['check_permissions'])
   );
   list($select, $from, $where, $having) = $query->query();
 
@@ -920,8 +921,9 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       if ($checkCheckBoxField && !empty($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
+      
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
-        $value, $extends, $customValueID, $entityId, FALSE, FALSE
+        $value, $extends, $customValueID, $entityId, FALSE, FALSE, TRUE
       );
     }
   }

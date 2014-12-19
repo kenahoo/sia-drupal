@@ -627,7 +627,9 @@ function drush_civicrm_cacheclear() {
   variable_del('civicrm_class_loader');
 
   // Flush all caches using the API
-  $params = array();
+  $params = array(
+    'version' => 3,
+  );
 
   if (drush_get_option('triggers', FALSE)) {
     $params['triggers'] = 1;
@@ -637,6 +639,8 @@ function drush_civicrm_cacheclear() {
     $params['session'] = 1;
   }
 
+  // Need to set API version or drush cc civicrm fails
+  $params['version'] = 3;
   $result = civicrm_api('System', 'flush', $params);
 
   if ($result['is_error']) {

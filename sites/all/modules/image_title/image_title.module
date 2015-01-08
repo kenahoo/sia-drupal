@@ -495,7 +495,7 @@ function image_title_node_delete($node) {
 function image_title_preprocess_page(&$variables) {
   
   if (arg(0) === 'node' && is_numeric(arg(1))) {
-    $thisnode = node_load($variables['node']->nid); 
+    $thisnode = array_key_exists('node', $variables) ? node_load($variables['node']->nid) : new stdClass();
     if (isset($thisnode->image_title) && $thisnode->image_title && $thisnode->image_title_status ) {
       $image = theme('image', array('path' => $thisnode->image_title, 'width' => '', 'height' => '', 'alt' => $thisnode->title, 'title' => $thisnode->title, 'attributes' => ''));
       $title = '<span class="txt_title">' . $thisnode->title . '</span>' . $image;

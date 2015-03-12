@@ -6,9 +6,9 @@ core = 7.x
 
 configure = admin/config/media/image-title
 
-; Information added by Drupal.org packaging script on 2014-10-24
-version = "7.x-1.0"
+; Information added by Drupal.org packaging script on 2015-03-11
+version = "7.x-1.1"
 core = "7.x"
 project = "image_title"
-datestamp = "1414173229"
+datestamp = "1426056487"
 

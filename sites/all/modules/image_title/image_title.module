@@ -498,7 +498,7 @@ function image_title_preprocess_page(&$variables) {
     $thisnode = array_key_exists('node', $variables) ? node_load($variables['node']->nid) : new stdClass();
     if (isset($thisnode->image_title) && $thisnode->image_title && $thisnode->image_title_status ) {
       $image = theme('image', array('path' => $thisnode->image_title, 'width' => '', 'height' => '', 'alt' => $thisnode->title, 'title' => $thisnode->title, 'attributes' => ''));
-      $title = '<span class="txt_title">' . $thisnode->title . '</span>' . $image;
+      $title = '<span class="txt_title">' . filter_xss($thisnode->title) . '</span>' . $image;
       $variables['title'] = $title;
     }
   }
@@ -512,7 +512,7 @@ function image_title_preprocess_page(&$variables) {
     //check for an image for this page
     if ($image_title = db_query('SELECT image FROM {image_title_menu} WHERE path = :path', array(':path' => $item['path']))->fetchAssoc()) {
       $image = theme('image', array('path' => $image_title['image'], 'width' => '', 'height' => '', 'alt' => $item['title'], 'title' => $item['title'], 'attributes' => ''));
-      $title = '<span class="txt_title">' . $item['title'] . '</span>' . $image;
+      $title = '<span class="txt_title">' . filter_xss($item['title']) . '</span>' . $image;
       $variables['title'] = $title;
       //we set another variable here because some modules may override $title
       //later on, so you can in turn override their values in your theme

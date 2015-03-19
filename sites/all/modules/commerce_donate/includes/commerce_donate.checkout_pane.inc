@@ -10,7 +10,7 @@
  */
 function commerce_donate_checkout_pane_settings_form($checkout_pane) {
   $options = array();
-  $products = commerce_product_load_multiple(array(), array('type' => 'donation'));
+  $products = commerce_product_load_multiple(array(), array('type' => 'donation', 'status' => 1));
   if (empty($products)) {
     drupal_set_message(t('You must configure at least one donation product in order to accept donations during checkout.'), 'error');
   }
@@ -76,6 +76,23 @@ function commerce_donate_checkout_pane_checkout_form($form, &$form_state, $check
       '#weight' => 10,
       '#tree' => TRUE,
     );
+
+    // Check if donation has already been added.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+      if (!in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+        continue;
+      }
+      $id = (int) $line_item_wrapper->commerce_product->product_id->value();
+      if ($id == $product_id) {
+        $pane_form[$pane_id]['already_added'] = array(
+          '#markup' => t('A donation has already been added to your order. You can remove this donation by editing your <a href="@url">shopping cart</a>.', array('@url' => url('cart'))),
+        );
+        // Return without additional fields.
+        return $pane_form;
+      }
+    }
+
     field_attach_form('commerce_line_item', $line_item, $pane_form[$pane_id], $form_state);
     foreach (element_children($pane_form[$pane_id]) as $field_name) {
       $info = field_info_instance('commerce_line_item', $field_name, $line_item->type);
@@ -89,31 +106,34 @@ function commerce_donate_checkout_pane_checkout_form($form, &$form_state, $check
         $language = $pane_form[$pane_id][$field_name]['#language'];
         $form_state['language'] = $language;
         $pane_form[$pane_id][$field_name][$language]['#default_value'] = '';
-        $default_options = $pane_form[$pane_id][$field_name][$language]['#options'];
-        // Override default field available options.
-        if (variable_get('commerce_donate_checkout_pane_override_options', FALSE)) {
-          $overridden_options_string = variable_get('commerce_donate_checkout_pane_donate_amounts', '');
-          if (!empty($overridden_options_string)) {
-            $line_options = explode("\n", $overridden_options_string);
-            $pos = strpos($overridden_options_string, '|');
+        $pane_form[$pane_id][$field_name][$language]['#required'] = FALSE;
+        // Allow for people changing the select to a text field.
+        if (!empty($pane_form[$pane_id][$field_name][$language]['#options'])) {
+          $default_options = $pane_form[$pane_id][$field_name][$language]['#options'];
+          // Override default field available options.
+          if (variable_get('commerce_donate_checkout_pane_override_options', FALSE)) {
+            $overridden_options_string = variable_get('commerce_donate_checkout_pane_donate_amounts', '');
+            if (!empty($overridden_options_string)) {
+              $line_options = explode("\n", $overridden_options_string);
+              $pos = strpos($overridden_options_string, '|');
 
-            if ($pos !== FALSE) {
-              // There are keys.
-              foreach ($line_options as $line) {
-                $exploded = explode('|', $line);
-                $temp_options[$exploded[0]] = $exploded[1];
+              if ($pos !== FALSE) {
+                // There are keys.
+                foreach ($line_options as $line) {
+                  $exploded = explode('|', $line);
+                  $temp_options[$exploded[0]] = $exploded[1];
+                }
+                $default_options = $temp_options;
               }
-              $default_options = $temp_options;
             }
           }
+          // Add in 'none' option.
+          $options = array('' => t('None'));
+          foreach ($default_options as $key => $label) {
+            $options[$key] = $label;
+          }
+          $pane_form[$pane_id][$field_name][$language]['#options'] = $options;
         }
-        // Add in 'none' option.
-        $options = array('' => t('None'));
-        foreach ($default_options as $key => $label) {
-          $options[$key] = $label;
-        }
-        $pane_form[$pane_id][$field_name][$language]['#options'] = $options;
-        $pane_form[$pane_id][$field_name][$language]['#required'] = FALSE;
 
         $description = variable_get('commerce_donate_checkout_pane_description', '');
         if (!empty($description)) {
@@ -130,9 +150,9 @@ function commerce_donate_checkout_pane_checkout_form($form, &$form_state, $check
  * Validate the donation amount entered, if any.
  */
 function commerce_donate_checkout_pane_checkout_form_validate($form, &$form_state, $checkout_pane, $order) {
-  $pane_id = $checkout_pane['pane_id'];
 
-  if (!empty($form[$pane_id]) && !empty($form_state['values'])) {
+  $pane_id = $checkout_pane['pane_id'];
+  if (!empty($form[$pane_id]) && !empty($form_state['values']) && !empty($form_state['values'][$pane_id])) {
     $pane_form = $form[$pane_id];
     $pane_values = $form_state['values'][$pane_id];
     $language = $form_state['language'];
@@ -154,12 +174,14 @@ function commerce_donate_checkout_pane_checkout_form_validate($form, &$form_stat
  * Add the additional donation as a line item to the cart.
  */
 function commerce_donate_checkout_pane_checkout_form_submit($form, &$form_state, $checkout_pane, $order) {
-  // No donation pane, or perhaps product, available.
-  if (empty($form_state['donate_line_item'])) {
-    return;
-  }
   $pane_id = $checkout_pane['pane_id'];
   $pane_values = $form_state['values'];
+
+  // No donation pane, or perhaps product, available.
+  if (empty($form_state['donate_line_item']) || empty($pane_values[$pane_id])) {
+    return;
+  }
+
   $line_item = $form_state['donate_line_item'];
   $language = $form_state['language'];
   $amount = (!empty($pane_values[$pane_id]['commerce_donate_amount'][$language][0]['value'])) ? $pane_values[$pane_id]['commerce_donate_amount'][$language][0]['value'] : 0;
@@ -177,4 +199,3 @@ function commerce_donate_checkout_pane_checkout_form_submit($form, &$form_state,
     }
   }
 }
-

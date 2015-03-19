@@ -140,6 +140,7 @@ function commerce_donate_commerce_checkout_pane_info() {
     'page' => 'checkout',
     'fieldset' => TRUE,
     'locked' => FALSE,
+    'enabled' => FALSE,
   );
 
   return $checkout_panes;

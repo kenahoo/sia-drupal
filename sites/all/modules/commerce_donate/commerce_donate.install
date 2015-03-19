@@ -15,12 +15,10 @@ function commerce_donate_install() {
     field_info_cache_clear();
 
     foreach ($fields as $field) {
-      // Create or update field.
+      // Create field if required.
       $field_config = $field['field_config'];
-      if ($existing_field = field_info_field($field_config['field_name'])) {
-        field_update_field($field_config);
-      }
-      else {
+      $existing_field = field_info_field($field_config['field_name']);
+      if (empty($existing_field)) {
         field_create_field($field_config);
       }
 
@@ -47,5 +45,21 @@ function commerce_donate_uninstall() {
   variable_del('commerce_donate_checkout_pane_product_id');
   variable_del('commerce_donate_checkout_pane_override_options');
   variable_del('commerce_donate_checkout_pane_donate_amounts');
+}
+
+/**
+ * Change integer amount field to decimal.
+ */
+function commerce_donate_update_7001() {
+  db_change_field('field_data_commerce_donate_amount', 'commerce_donate_amount_value', 'commerce_donate_amount_value', array('type' => 'float', 'size' => 'big'));
+  db_change_field('field_revision_commerce_donate_amount', 'commerce_donate_amount_value', 'commerce_donate_amount_value', array('type' => 'float', 'size' => 'big'));
+
+  $serialized = db_query("SELECT data FROM {field_config} WHERE field_name = 'commerce_donate_amount'")->fetchField();
+  $data = unserialize($serialized);
+  $data['settings']['precision'] = 10;
+  $data['settings']['scale'] = 2;
+  $data['settings']['decimal_separator'] = '.';
+  $serialized = serialize($data);
+  db_query("UPDATE {field_config} SET type = 'number_decimal', data = :data WHERE field_name = 'commerce_donate_amount'", array(':data' => $serialized));
 }
 

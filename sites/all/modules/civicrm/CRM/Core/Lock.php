@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Core_Lock {
 
   // lets have a 3 second timeout for now
-  CONST TIMEOUT = 3;
+  const TIMEOUT = 3;
 
   protected $_hasLock = FALSE;
 
@@ -44,18 +44,20 @@ class CRM_Core_Lock {
   /**
    * Initialize the constants used during lock acquire / release
    *
-   * @param string  $name name of the lock. Please prefix with component / functionality
+   * @param string $name
+   *   Name of the lock. Please prefix with component / functionality.
    *                      e.g. civimail.cronjob.JOB_ID
-   * @param int     $timeout the number of seconds to wait to get the lock. 1 if not set
-   * @param boolean $serverWideLock should this lock be applicable across your entire mysql server
-   *                                this is useful if you have mutliple sites running on the same
+   * @param int $timeout
+   *   The number of seconds to wait to get the lock. 1 if not set.
+   * @param bool $serverWideLock
+   *   Should this lock be applicable across your entire mysql server.
+   *                                this is useful if you have multiple sites running on the same
    *                                mysql server and you want to limit the number of parallel cron
    *                                jobs - CRM-91XX
    *
-   * @return object the lock object
-   *
+   * @return \CRM_Core_Lock the lock object
    */
-  function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
+  public function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
     $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->dsn);
     $database = $dsnArray['database'];
@@ -76,19 +78,19 @@ class CRM_Core_Lock {
     if (stristr($name, 'civimail.job.')) {
       $jobLog = $this->_name;
     }
-    //if (defined('CIVICRM_LOCK_DEBUG')) {
-    //CRM_Core_Error::debug_var('backtrace', debug_backtrace());
-    //}
     $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
 
     $this->acquire();
   }
 
-  function __destruct() {
+  public function __destruct() {
     $this->release();
   }
 
-  function acquire() {
+  /**
+   * @return bool
+   */
+  public function acquire() {
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('acquire lock for ' . $this->_name);
     }
@@ -106,7 +108,10 @@ class CRM_Core_Lock {
     return $this->_hasLock;
   }
 
-  function release() {
+  /**
+   * @return null|string
+   */
+  public function release() {
     if ($this->_hasLock) {
       $this->_hasLock = FALSE;
 
@@ -116,13 +121,19 @@ class CRM_Core_Lock {
     }
   }
 
-  function isFree() {
+  /**
+   * @return null|string
+   */
+  public function isFree() {
     $query = "SELECT IS_FREE_LOCK( %1 )";
     $params = array(1 => array($this->_name, 'String'));
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
-  function isAcquired() {
+  /**
+   * @return bool
+   */
+  public function isAcquired() {
     return $this->_hasLock;
   }
 
@@ -137,9 +148,9 @@ class CRM_Core_Lock {
    *
    * @param string $jobLog
    * @throws CRM_Core_Exception
-   * @return boolean
+   * @return bool
    */
-  function hackyHandleBrokenCode($jobLog) {
+  public function hackyHandleBrokenCode($jobLog) {
     if (stristr($this->_name, 'job')) {
       throw new CRM_Core_Exception('lock aquisition for ' . $this->_name . 'attempted when ' . $jobLog . 'is not released');
     }
@@ -149,5 +160,5 @@ class CRM_Core_Lock {
     $this->_hasLock = TRUE;
     return TRUE;
   }
-}
 
+}

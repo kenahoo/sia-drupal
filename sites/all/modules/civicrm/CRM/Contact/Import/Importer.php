@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -38,10 +38,15 @@
  *  via a form post) and asynchronously (i.e. by the workflow system)
  */
 class CRM_Contact_Import_Importer {
+  /**
+   */
   public function __construct() {
     // may not need this
   }
 
+  /**
+   * @param int $timeout
+   */
   public function runIncompleteImportJobs($timeout = 55) {
     $startTime = time();
     $incompleteImportTables = CRM_Contact_Import_ImportJob::getIncompleteImportTables();
@@ -54,5 +59,5 @@ class CRM_Contact_Import_Importer {
       }
     }
   }
-}
 
+}

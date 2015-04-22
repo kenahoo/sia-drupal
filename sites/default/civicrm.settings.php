@@ -82,7 +82,7 @@ global $databases;
 global $site_root;
 global $civicrm_root;
 global $host;
-require_once 'db.php';
+require_once 'db-settings.php';
 $d = $databases['default']['default'];
 define( 'CIVICRM_UF_DSN'           , "mysql://$d[username]:$d[password]@$d[host]/$d[database]?new_link=true" );
 

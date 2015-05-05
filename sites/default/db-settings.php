@@ -4,11 +4,9 @@ global $databases;
 global $site_root;
 global $host;
 
-if ((isset($_SERVER["DOCUMENT_ROOT"])
-     && preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_SERVER["DOCUMENT_ROOT"]))
+if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", getenv("DOCUMENT_ROOT"))
     ||
-    (isset($_ENV["PWD"])
-     && preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", $_ENV["PWD"]))) {
+    preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", getenv("PWD"))) {
 
     $host = 'localhost';
     $site_root = '/Users/ken/Documents/SIA/site-upgrade';
@@ -28,11 +26,9 @@ if ((isset($_SERVER["DOCUMENT_ROOT"])
         ),
     );
 
-} else if ((isset($_SERVER["DOCUMENT_ROOT"])
-     && preg_match("{dev.singersinaccord.org}", $_SERVER["DOCUMENT_ROOT"]))
-    ||
-    (isset($_ENV["PWD"])
-     && preg_match("{dev.singersinaccord.org}", $_ENV["PWD"]))) {
+} else if (preg_match("{dev.singersinaccord.org}", getenv("DOCUMENT_ROOT"))
+           ||
+           preg_match("{dev.singersinaccord.org}", getenv("PWD"))) {
 
     $host = 'dev.singersinaccord.org';
     $site_root = '/home/kenahoo/dev.singersinaccord.org';

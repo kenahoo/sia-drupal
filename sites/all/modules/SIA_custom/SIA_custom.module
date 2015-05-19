@@ -26,6 +26,15 @@ function SIA_custom_menu() {
   return $items;
 }
 
+function render_concert($nid, $tix=true) {
+ $c = node_view(node_load($nid));
+ hide( $c["field_performance_date"] );
+ if (!$tix) {
+   hide( $c["field_ticket_info"] );
+ }
+ return render($c);
+}
+
 /**
  * Custom function to add donation to a cart
  */

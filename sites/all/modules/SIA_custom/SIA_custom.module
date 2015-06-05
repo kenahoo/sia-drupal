@@ -2,6 +2,24 @@
 
 require_once 'sites/all/modules/civicrm/api/class.api.php';
 
+function e($errno, $msg, $file, $line, $vars) {
+    if(!($errno & error_reporting())) return FALSE;
+    if (preg_match("/use mysqli or PDO instead/", $msg)) return FALSE;
+
+    print "\n\n-----------------------------------------------------------------\n";
+    print "Error $errno: $msg<br>\n";
+    print "<pre>\n";
+    $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 0);
+    foreach ($bt as $stack_obj) {
+        $l = array_key_exists('line', $stack_obj) ? $stack_obj['line'] : "?";
+        $f = array_key_exists('file', $stack_obj) ? $stack_obj['file'] : "?";
+        print "$f ($l; $stack_obj[function])\n";
+    }
+    print "</pre>";
+    die();
+}
+#set_error_handler('e', E_ERROR);
+
 /**
  * Implements hook_menu().
  * See http://realtidings.com/blog/12/Apr/26/drupal-commerce-custom-add-cart-link .

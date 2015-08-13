@@ -22,9 +22,9 @@ dependencies[] = rules
 dependencies[] = select_or_other
 
 
-; Information added by Drupal.org packaging script on 2015-03-12
-version = "7.x-1.0-beta1+18-dev"
+; Information added by Drupal.org packaging script on 2015-07-19
+version = "7.x-1.0"
 core = "7.x"
 project = "commerce_donate"
-datestamp = "1426203482"
+datestamp = "1437349740"
 

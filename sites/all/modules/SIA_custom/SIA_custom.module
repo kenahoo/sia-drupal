@@ -148,7 +148,7 @@ function listMP3s($files, $print=true) {
   }
 }
 
-function mp3_listing($start, $end, $title, $collapsed=true) {
+function mp3_listing($start, $end, $title, $collapsed=true, $dir='sites/default/files/reh') {
 
   $cache_key = 'mp3_listing'.$start.$end;
   if ($cache = cache_get($cache_key)) {
@@ -157,8 +157,8 @@ function mp3_listing($start, $end, $title, $collapsed=true) {
   } else {
 
     $to_list = array();
-    foreach (array_reverse(glob('reh/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')) as $d) {
-      $f1 = preg_replace('/reh\//', '', $d);
+    foreach (array_reverse(glob("$dir/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")) as $d) {
+      $f1 = substr($d, strlen($dir)+1);
       if (!is_dir($d) || strcmp($f1, $start)<0 || strcmp($f1, $end)>0) {
         continue;
       }

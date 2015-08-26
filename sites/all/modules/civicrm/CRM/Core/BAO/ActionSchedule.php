@@ -3,9 +3,8 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
-  | Copyright (C) 2011 Marty Wright                                    |
-  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
-  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2015                                |
+   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
   | CiviCRM is free software; you can copy, modify, and distribute it  |
@@ -1049,7 +1048,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           );
           $rList = implode(',', $rList);
 
-          switch ($recipientOptions[$actionSchedule->recipient]) {
+          switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
             case 'participant_role':
               $where[] = "e.role_id IN ({$rList})";
               break;

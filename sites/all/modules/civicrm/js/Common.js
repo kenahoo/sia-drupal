@@ -158,11 +158,11 @@ var submitcount = 0;
 function submitOnce(obj, formId, procText) {
   // if named button clicked, change text
   if (obj.value != null) {
-    obj.value = procText + " ...";
+    cj('input[name=' + obj.name + ']').val(procText + " ...");
   }
   cj(obj).closest('form').attr('data-warn-changes', 'false');
   if (document.getElementById) { // disable submit button for newer browsers
-    obj.disabled = true;
+    cj('input[name=' + obj.name + ']').attr("disabled", true);
     document.getElementById(formId).submit();
     return true;
   }
@@ -362,6 +362,13 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmSelect2 = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        $(this)
+          .removeClass('crm-ajax-select')
+          .select2('destroy');
+      });
+    }
     return $(this).each(function () {
       var
         $el = $(this),
@@ -396,6 +403,15 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmEntityRef = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        var entity = $(this).data('api-entity') || '';
+        $(this)
+          .off('.crmEntity')
+          .removeClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref')
+          .crmSelect2('destroy');
+      });
+    }
     options = options || {};
     options.select = options.select || {};
     return $(this).each(function() {
@@ -429,7 +445,7 @@ CRM.strings = CRM.strings || {};
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: function(row) {
-          return row.label;
+          return (row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '');
         },
         escapeMarkup: function (m) {return m;},
         initSelection: function($el, callback) {
@@ -670,8 +686,10 @@ CRM.strings = CRM.strings || {};
     else if (row.icon_class) {
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' + row.label + '</div>';
-    markup += '<div class="crm-select2-row-description">';
+    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
+      (row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '') +
+      '</div>' +
+      '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
       markup += '<p>' + text + '</p>';
     });
@@ -1267,6 +1285,9 @@ CRM.strings = CRM.strings || {};
         CRM.confirm({
           title: ts('Preview'),
           resizable: true,
+          // Prevent overlap with the menubar
+          maxHeight: $(window).height() - 30,
+          position: {my: 'center', at: 'center center+15', of: window},
           message: '<div class="crm-custom-image-popup"><img style="max-width: 100%" src="' + $(this).attr('href') + '"></div>',
           options: null
         });
@@ -1377,5 +1398,12 @@ CRM.strings = CRM.strings || {};
   // @see CRM_Core_Resources::addPermissions
   CRM.checkPerm = function(perm) {
     return CRM.permissions[perm];
+  };
+
+  // Round while preserving sigfigs
+  CRM.utils.sigfig = function(n, digits) {
+    var len = ("" + n).length;
+    var scale = Math.pow(10.0, len-digits);
+    return Math.round(n / scale) * scale;
   };
 })(jQuery, _);

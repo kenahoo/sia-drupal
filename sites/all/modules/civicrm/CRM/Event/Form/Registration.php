@@ -674,12 +674,20 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (property_exists($form, '_discountId') && $form->_discountId) {
       $discountId = $form->_discountId;
     }
+
+    //CRM-16456 get all price field including expired one.
+    $getAllPriceField = TRUE;
+    $className = CRM_Utils_System::getClassName($form);
+    if ($className == 'CRM_Event_Form_ParticipantFeeSelection' && $form->_action == CRM_Core_Action::UPDATE) {
+      $getAllPriceField = FALSE;
+    }
+
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE, $priceSetId);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField, $priceSetId);
     }
     else {
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField);
     }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
@@ -1503,18 +1511,16 @@ WHERE  v.option_group_id = g.id
       CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_start_date', $this->_values['event'])))), $redirect);
     }
 
-    $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
+    $regEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
       $this->_values['event']
     ));
     $eventEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
-    if (
-      $endDate &&
-      $endDate < $now
-    ) {
-      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_end_date', $this->_values['event'])))), $redirect);
-    }
-    if (!empty($eventEndDate) && $eventEndDate < $now) {
-      CRM_Core_Error::statusBounce(ts('Event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event'])))), $redirect);
+    if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && ($eventEndDate < $now))) {
+      $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_end_date', $this->_values['event']));
+      if (empty($regEndDate)) {
+        $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
+      }
+      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => $endDate)), $redirect);
     }
   }
 

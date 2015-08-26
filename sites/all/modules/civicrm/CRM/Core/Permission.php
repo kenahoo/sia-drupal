@@ -120,6 +120,8 @@ class CRM_Core_Permission {
   public static function check($permissions) {
     $permissions = (array) $permissions;
 
+    $tempPerm = CRM_Core_Config::singleton()->userPermissionTemp;
+
     foreach ($permissions as $permission) {
       if (is_array($permission)) {
         foreach ($permission as $orPerm) {
@@ -132,7 +134,10 @@ class CRM_Core_Permission {
         return FALSE;
       }
       else {
-        if (!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
+        if (
+          !CRM_Core_Config::singleton()->userPermissionClass->check($permission)
+          && !($tempPerm && $tempPerm->check($permission))
+        ) {
           //one of our 'and' conditions has not been met
           return FALSE;
         }
@@ -586,7 +591,7 @@ class CRM_Core_Permission {
     $permissions = self::getCorePermissions($descriptions);
 
     if (self::isMultisiteEnabled()) {
-      $permissions['administer Multiple Organizations'] = $prefix . ts('administer Multiple Organizations');
+      $permissions['administer Multiple Organizations'] = array($prefix . ts('administer Multiple Organizations'));
     }
 
     if (!$all) {
@@ -600,16 +605,19 @@ class CRM_Core_Permission {
       $perm = $comp->getPermissions(FALSE, $descriptions);
       if ($perm) {
         $info = $comp->getInfo();
-        if ($descriptions) {
-          foreach ($perm as $p => $attr) {
-            $title = $info['translatedName'] . ': ' . array_shift($attr);
-            array_unshift($attr, $title);
+        foreach ($perm as $p => $attr) {
+
+          if (!is_array($attr)) {
+            $attr = array($attr);
+          }
+
+          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
+
+          if ($descriptions) {
             $permissions[$p] = $attr;
           }
-        }
-        else {
-          foreach ($perm as $p) {
-            $permissions[$p] = $info['translatedName'] . ': ' . $p;
+          else {
+            $permissions[$p] = $attr[0];
           }
         }
       }
@@ -822,6 +830,10 @@ class CRM_Core_Permission {
       'edit message templates' => array(
         $prefix . ts('edit message templates'),
       ),
+      'view my invoices' => array(
+        $prefix . ts('view my invoices'),
+        ts('Allow users to view/ download their own invoices'),
+      ),
     );
 
     if (!$descriptions) {
@@ -897,7 +909,7 @@ class CRM_Core_Permission {
 
     if (is_array($allCompPermissions)) {
       foreach ($allCompPermissions as $name => $permissions) {
-        if (in_array($permission, $permissions)) {
+        if (array_key_exists($permission, $permissions)) {
           $componentName = $name;
           break;
         }
@@ -942,6 +954,24 @@ class CRM_Core_Permission {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
       'is_enabled'
     ) ? TRUE : FALSE;
+  }
+
+  /**
+   * Verify if the user has permission to get the invoice.
+   *
+   * @return bool
+   *   TRUE if the user has download all invoices permission or download my
+   *   invoices permission and the invoice author is the current user.
+   */
+  public static function checkDownloadInvoice() {
+    global $user;
+    $cid = CRM_Core_BAO_UFMatch::getContactId($user->uid);
+    if (CRM_Core_Permission::check('access CiviContribute') ||
+      (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)
+    ) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

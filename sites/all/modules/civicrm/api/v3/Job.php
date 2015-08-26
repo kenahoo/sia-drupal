@@ -140,12 +140,12 @@ function civicrm_api3_job_geocode($params) {
  */
 function _civicrm_api3_job_geocode_spec(&$params) {
   $params['start'] = array(
-    'title' => 'Start Date',
-    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    'title' => 'Starting Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['end'] = array(
-    'title' => 'End Date',
-    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    'title' => 'Ending Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['geocoding'] = array(
     'title' => 'Geocode address?',
@@ -178,9 +178,9 @@ function civicrm_api3_job_send_reminder($params) {
   // in that case (ie. makes it non-configurable via the UI). Another approach would be to set a default of 0
   // in the _spec function - but since that is a deprecated value it seems more contentious than this approach
   $params['rowCount'] = 0;
-  $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
+  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.core.ActionSchedule');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
+    return civicrm_api3_create_error('Could not acquire lock, another ActionSchedule process is running');
   }
 
   $result = CRM_Core_BAO_ActionSchedule::processQueue(CRM_Utils_Array::value('now', $params), $params);
@@ -312,12 +312,15 @@ function civicrm_api3_job_process_pledge($params) {
  * @return array
  */
 function civicrm_api3_job_process_mailing($params) {
+  $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
 
   if (!CRM_Mailing_BAO_Mailing::processQueue()) {
     return civicrm_api3_create_error('Process Queue failed');
   }
   else {
-    $values = array();
+    $values = array(
+      'processed' => CRM_Mailing_BAO_MailingJob::$mailsProcessed - $mailsProcessedOrig,
+    );
     return civicrm_api3_create_success($values, $params, 'Job', 'process_mailing');
   }
 }
@@ -330,11 +333,15 @@ function civicrm_api3_job_process_mailing($params) {
  * @return array
  */
 function civicrm_api3_job_process_sms($params) {
+  $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
+
   if (!CRM_Mailing_BAO_Mailing::processQueue('sms')) {
     return civicrm_api3_create_error('Process Queue failed');
   }
   else {
-    $values = array();
+    $values = array(
+      'processed' => CRM_Mailing_BAO_MailingJob::$mailsProcessed - $mailsProcessedOrig,
+    );
     return civicrm_api3_create_success($values, $params, 'Job', 'process_sms');
   }
 }
@@ -347,7 +354,7 @@ function civicrm_api3_job_process_sms($params) {
  * @return array
  */
 function civicrm_api3_job_fetch_bounces($params) {
-  $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
+  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.mailing.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
   }
@@ -370,7 +377,7 @@ function civicrm_api3_job_fetch_bounces($params) {
  * @return array
  */
 function civicrm_api3_job_fetch_activities($params) {
-  $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
+  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.mailing.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
   }
@@ -423,7 +430,7 @@ function civicrm_api3_job_process_participant($params) {
  *   true if success, else false
  */
 function civicrm_api3_job_process_membership($params) {
-  $lock = new CRM_Core_Lock('civimail.job.updateMembership');
+  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.member.UpdateMembership');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
   }
@@ -609,7 +616,7 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_job_group_rebuild($params) {
-  $lock = new CRM_Core_Lock('civimail.job.groupRebuild');
+  $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.core.GroupRebuild');
   if (!$lock->isAcquired()) {
     throw new API_Exception('Could not acquire lock, another EmailProcessor process is running');
   }

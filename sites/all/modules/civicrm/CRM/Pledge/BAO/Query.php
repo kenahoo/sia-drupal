@@ -49,6 +49,7 @@ class CRM_Pledge_BAO_Query {
    * @return void
    */
   public static function select(&$query) {
+    $statusId = implode(',', array_keys(CRM_Core_PseudoConstant::accountOptionValues("contribution_status", NULL, " AND v.name IN  ('Pending', 'Overdue')")));
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_PLEDGE) || !empty($query->_returnProperties['pledge_id'])) {
       $query->_select['pledge_id'] = 'civicrm_pledge.id as pledge_id';
       $query->_element['pledge_id'] = 1;
@@ -88,12 +89,12 @@ class CRM_Pledge_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['pledge_next_pay_date'])) {
-      $query->_select['pledge_next_pay_date'] = " (SELECT civicrm_pledge_payment.scheduled_date FROM civicrm_pledge_payment WHERE civicrm_pledge_payment.pledge_id = civicrm_pledge.id AND civicrm_pledge_payment.status_id IN ( 2, 6 ) ORDER BY civicrm_pledge_payment.scheduled_date ASC LIMIT 0, 1) as pledge_next_pay_date";
+      $query->_select['pledge_next_pay_date'] = " (SELECT civicrm_pledge_payment.scheduled_date FROM civicrm_pledge_payment WHERE civicrm_pledge_payment.pledge_id = civicrm_pledge.id AND civicrm_pledge_payment.status_id IN ({$statusId}) ORDER BY civicrm_pledge_payment.scheduled_date ASC LIMIT 0, 1) as pledge_next_pay_date";
       $query->_element['pledge_next_pay_date'] = 1;
     }
 
     if (!empty($query->_returnProperties['pledge_next_pay_amount'])) {
-      $query->_select['pledge_next_pay_amount'] = " (SELECT civicrm_pledge_payment.scheduled_amount FROM civicrm_pledge_payment WHERE civicrm_pledge_payment.pledge_id = civicrm_pledge.id AND civicrm_pledge_payment.status_id = 2 ORDER BY civicrm_pledge_payment.scheduled_date ASC LIMIT 0, 1) as pledge_next_pay_amount";
+      $query->_select['pledge_next_pay_amount'] = " (SELECT civicrm_pledge_payment.scheduled_amount FROM civicrm_pledge_payment WHERE civicrm_pledge_payment.pledge_id = civicrm_pledge.id AND civicrm_pledge_payment.status_id IN ({$statusId}) ORDER BY civicrm_pledge_payment.scheduled_date ASC LIMIT 0, 1) as pledge_next_pay_amount";
       $query->_element['pledge_next_pay_amount'] = 1;
 
       $query->_select['pledge_outstanding_amount'] = " (SELECT sum(civicrm_pledge_payment.scheduled_amount) FROM civicrm_pledge_payment WHERE civicrm_pledge_payment.pledge_id = civicrm_pledge.id AND civicrm_pledge_payment.status_id = 6 ) as pledge_outstanding_amount";
@@ -265,88 +266,30 @@ class CRM_Pledge_BAO_Query {
         );
         return;
 
-      case 'pledge_status_id':
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($v) {
-              $val[$k] = $k;
-            }
-          }
-
-          $status = implode(',', $val);
-
-          if (count($val) > 0) {
-            $op = 'IN';
-            $status = "({$status})";
-          }
-        }
-        else {
-          $status = $value;
-        }
-
-        $statusValues = CRM_Core_OptionGroup::values('contribution_status');
-
-        $names = array();
-        if (isset($val) && is_array($val)) {
-          foreach ($val as $id => $dontCare) {
-            $names[] = $statusValues[$id];
-          }
-        }
-        else {
-          if (!empty($value)) {
-            $names[] = $statusValues[$value];
-          }
-        }
-
-        $query->_qill[$grouping][] = ts('Pledge Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_pledge.status_id',
-          $op,
-          $status,
-          'Integer'
-        );
-        $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
-        return;
-
       case 'pledge_payment_status_id':
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($v) {
-              $val[$k] = $k;
-            }
-          }
-
-          $status = implode(',', $val);
-
-          if (count($val) > 1) {
-            $op = 'IN';
-            $status = "({$status})";
-          }
+      case 'pledge_status_id':
+        if ($name == 'pledge_status_id') {
+          $tableName = 'civicrm_pledge';
+          $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+          $label = "Pledge Status";
         }
         else {
-          $status = $value;
+          $tableName = 'civicrm_pledge_payment';
+          $query->_tables['civicrm_pledge_payment'] = $query->_whereTables['civicrm_pledge_payment'] = 1;
+          $label = "Pledge Payment Status";
+        }
+        $name = 'status_id';
+        if (!empty($value) && is_array($value) && !in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $value = array('IN' => $value);
         }
 
-        $statusValues = CRM_Core_OptionGroup::values('contribution_status');
-
-        $names = array();
-        if (is_array($val)) {
-          foreach ($val as $id => $dontCare) {
-            $names[] = $statusValues[$id];
-          }
-        }
-        else {
-          if (!empty($value)) {
-            $names[] = $statusValues[$value];
-          }
-        }
-
-        $query->_qill[$grouping][] = ts('Pledge Payment Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_pledge_payment.status_id',
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name",
           $op,
-          $status,
+          $value,
           'Integer'
         );
-        $query->_tables['civicrm_pledge_payment'] = $query->_whereTables['civicrm_pledge_payment'] = 1;
+        list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', 'contribution_status_id', $value, $op);
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $label, 2 => $qillop, 3 => $qillVal));
         return;
 
       case 'pledge_test':
@@ -414,6 +357,14 @@ class CRM_Pledge_BAO_Query {
           'tableName' => 'civicrm_pledge',
         );
         CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
+        return;
+
+      case 'pledge_contact_id':
+        $name = str_replace('pledge_', '', $name);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_pledge.$name", $op, $value, 'Integer');
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Pledge_DAO_Pledge', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('Contact ID %1 %2', array(1 => $op, 2 => $value));
+        $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
     }
   }
@@ -558,20 +509,18 @@ class CRM_Pledge_BAO_Query {
     // Remove status values that are only used for recurring contributions for now (Failed and In Progress).
     unset($statusValues['4']);
 
-    foreach ($statusValues as $key => $val) {
-      $status[] = $form->createElement('advcheckbox', $key, NULL, $val);
-    }
-
-    $form->addGroup($status, 'pledge_status_id', ts('Pledge Status'));
+    $form->add('select', 'pledge_status_id',
+      ts('Pledge Status'), $statusValues,
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
+    );
 
     //unset in progress for payment
     unset($statusValues['5']);
 
-    foreach ($statusValues as $key => $val) {
-      $paymentStatus[] = $form->createElement('advcheckbox', $key, NULL, $val);
-    }
-
-    $form->addGroup($paymentStatus, 'pledge_payment_status_id', ts('Pledge Payment Status'));
+    $form->add('select', 'pledge_payment_status_id',
+      ts('Pledge Payment Status'), $statusValues,
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
+    );
 
     $form->add('select', 'pledge_financial_type_id',
       ts('Financial Type'),

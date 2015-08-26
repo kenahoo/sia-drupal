@@ -313,6 +313,17 @@ SELECT id
       if ($membershipBlock->is_separate_payment && empty($fields['amount_block_is_active'])) {
         $errors['amount_block_is_active'] = ts('To disable Contribution Amounts section you need to first disable Separate Membership Payment option from Membership Settings.');
       }
+
+      //CRM-16165, Don't allow reccuring contribution if membership block contain any renewable membership option
+      $membershipTypes = unserialize($membershipBlock->membership_types);
+      if (!empty($fields['is_recur']) && !empty($membershipTypes)) {
+        if (!$membershipBlock->is_separate_payment) {
+          $errors['is_recur'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution.');
+        }
+        elseif (count(array_filter($membershipTypes)) != 0) {
+          $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
+        }
+      }
     }
 
     //check for the amount label (mandatory)
@@ -641,7 +652,7 @@ SELECT id
               if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
                 $fieldParams = array(
                   'name' => 'other_amount',
-                  'label' => 'Other Amount',
+                  'label' => ts('Other Amount'),
                   'price_set_id' => $priceSetId,
                   'html_type' => 'Text',
                   'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $this->_values),
@@ -656,7 +667,7 @@ SELECT id
                 }
                 else {
                   $fieldParams['is_required'] = 0;
-                  $fieldParams['option_label'][1] = $fieldParams['label'] = 'Other Amount';
+                  $fieldParams['option_label'][1] = $fieldParams['label'] = ts('Other Amount');
                 }
 
                 $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
@@ -694,7 +705,7 @@ SELECT id
               }
               else {
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $priceFieldID, 'is_required', 0);
-                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', 'Other Amount');
+                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', ts('Other Amount'));
               }
             }
           }

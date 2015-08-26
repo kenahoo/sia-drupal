@@ -735,14 +735,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $deleteExtra = ts('Are you sure you want to delete contact image.');
+      $deleteExtra = json_encode(ts('Are you sure you want to delete contact image.'));
       $deleteURL = array(
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
           'qs' => 'reset=1&cid=%%id%%&action=delete',
-          'extra' =>
-          'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
         ),
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
@@ -1037,8 +1036,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // here we replace the user context with the url to view this contact
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
+      $contactSubTypes = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_contactSubType));
       $resetStr = "reset=1&ct={$contact->contact_type}";
-      $resetStr .= $this->_contactSubType ? "&cst={$this->_contactSubType}" : '';
+      $resetStr .= (count($contactSubTypes) == 1) ? "&cst=" . array_pop($contactSubTypes) : '';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/add', $resetStr));
     }
     else {

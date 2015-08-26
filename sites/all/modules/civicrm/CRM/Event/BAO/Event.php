@@ -252,27 +252,35 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   0 returns current and future events.
    *                                  1 if events all are required
    *                                  2 returns events since 3 months ago
-   * @param bool|int $id int id of a specific event to return
+   * @param int|array $id single int event id or array of multiple event ids to return
    * @param bool $isActive
    *   true if you need only active events.
    * @param bool $checkPermission
    *   true if you need to check permission else false.
+   * @param bool $titleOnly
+   *   true if you need only title not appended with start date
    *
    * @return array
    */
   public static function getEvents(
     $all = 0,
-    $id = FALSE,
+    $id = NULL,
     $isActive = TRUE,
-    $checkPermission = TRUE
+    $checkPermission = TRUE,
+    $titleOnly = FALSE
   ) {
     $query = "
 SELECT `id`, `title`, `start_date`
 FROM   `civicrm_event`
 WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
-    if ($id) {
-      $query .= " AND `id` = {$id}";
+    if (!empty($id)) {
+      if (is_array($id)) {
+        $query .= " AND `id` IN (" . implode(',', $id) . ")";
+      }
+      else {
+        $query .= " AND `id` = {$id}";
+      }
     }
     elseif ($all == 0) {
       // find only events ending in the future
@@ -303,7 +311,10 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
         ) &&
         $dao->title
       ) {
-        $events[$dao->id] = $dao->title . ' - ' . CRM_Utils_Date::customFormat($dao->start_date);
+        $events[$dao->id] = $dao->title;
+        if (!$titleOnly) {
+          $events[$dao->id] .= ' - ' . CRM_Utils_Date::customFormat($dao->start_date);
+        }
       }
     }
 
@@ -1235,7 +1246,7 @@ WHERE civicrm_event.is_active = 1
           $taxAmt = $template->get_template_vars('totalTaxAmount');
           $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-          if ($taxAmt && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+          if (isset($invoicing) && isset($prefixValue['is_email_pdf'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
             $sendTemplateParams['contributionId'] = $values['contributionId'];
           }
@@ -1282,6 +1293,7 @@ WHERE civicrm_event.is_active = 1
       $profileIds = $id;
     }
 
+    $val = $groupTitles = NULL;
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = array();
@@ -1696,7 +1708,7 @@ WHERE  id = $cfID
               $values[$index] = CRM_Utils_Date::customFormat(CRM_Utils_Date::format($params[$name]));
             }
             else {
-              $values[$index] = $params[$name];
+              $values[$index] = CRM_Utils_Array::value($name, $params);
             }
           }
         }
@@ -1911,10 +1923,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     if ($startDate && $startDate >= $now) {
       $validDate = FALSE;
     }
-    if ($endDate && $endDate < $now) {
-      $validDate = FALSE;
-    }
-    if ($eventEnd && $eventEnd < $now) {
+    if ($endDate && $endDate < $now && $eventEnd && $eventEnd < $now) {
       $validDate = FALSE;
     }
 
@@ -2018,7 +2027,7 @@ WHERE  ce.loc_block_id = $locBlockId";
         $permissions[CRM_Core_Permission::EDIT] = array_keys($allEvents);
       }
       else {
-        $permissions[CRM_Core_Permission::EDIT] = &CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents);
+        $permissions[CRM_Core_Permission::EDIT] = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents);
       }
 
       if (CRM_Core_Permission::check('edit all events')) {
@@ -2033,7 +2042,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           // at the same time also allow any hook to override if needed.
           $createdEvents = array_keys($allEvents);
         }
-        $permissions[CRM_Core_Permission::VIEW] = &CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, $createdEvents);
+        $permissions[CRM_Core_Permission::VIEW] = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, $createdEvents);
       }
 
       $permissions[CRM_Core_Permission::DELETE] = array();

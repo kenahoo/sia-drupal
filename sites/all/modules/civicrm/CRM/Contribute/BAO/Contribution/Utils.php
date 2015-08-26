@@ -98,8 +98,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
     }
 
     //fix for CRM-2062
-    $now = date('YmdHis');
+    //fix for CRM-16317
 
+    $now = $form->_params['receive_date'] = date('YmdHis');
+    $form->assign('receive_date',
+      CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
+    );
     $result = NULL;
     if ($form->_contributeMode == 'notify' ||
       $isPayLater
@@ -125,7 +129,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       $form->_params['contributionTypeID'] = $contributionTypeId;
       $form->_params['item_name'] = $form->_params['description'];
-      $form->_params['receive_date'] = $now;
 
       if ($contribution && $form->_values['is_recur'] &&
         $contribution->contribution_recur_id
@@ -222,11 +225,17 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // (i.e., the amount NOT associated with the membership). Temporarily
         // cache the is_recur values so we can process the additional gift as a
         // one-off payment.
-        if ($form->_membershipBlock['is_separate_payment']) {
-          $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
-          unset($form->_values['is_recur']);
-          $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
-          unset($paymentParams['is_recur']);
+        $pending = FALSE;
+        if (!empty($form->_values['is_recur'])) {
+          if ($form->_membershipBlock['is_separate_payment'] && !empty($form->_params['auto_renew'])) {
+            $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
+            $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
+            unset($form->_values['is_recur']);
+            unset($paymentParams['is_recur']);
+          }
+          else {
+            $pending = TRUE;
+          }
         }
 
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
@@ -235,13 +244,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
           NULL,
           $contactID,
           $contributionType,
-          TRUE, TRUE,
+          $pending, TRUE,
           $isTest,
           $lineItems
         );
 
         // restore cached values (part of fix for CRM-14354)
-        if ($form->_membershipBlock['is_separate_payment']) {
+        if (!empty($cachedFormValue)) {
           $form->_values['is_recur'] = $cachedFormValue;
           $paymentParams['is_recur'] = $cachedParamValue;
         }
@@ -255,11 +264,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         }
       }
-      if (is_object($payment)) {
-        $result = $payment->doDirectPayment($paymentParams);
-      }
-      else {
-        CRM_Core_Error::fatal($paymentObjError);
+      if ($form->_amount > 0.0) {
+        if (is_object($payment)) {
+          $result = $payment->doDirectPayment($paymentParams);
+        }
+        else {
+          CRM_Core_Error::fatal($paymentObjError);
+        }
       }
     }
 
@@ -290,12 +301,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if ($result) {
         $form->_params = array_merge($form->_params, $result);
       }
-      $form->_params['receive_date'] = $now;
       $form->set('params', $form->_params);
       $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
-      $form->assign('receive_date',
-        CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
-      );
 
       // result has all the stuff we need
       // lets archive it to a financial transaction
@@ -325,8 +332,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);
-      if (is_array($result) && !empty($result['trxn_id'])) {
-        $contribution->trxn_id = $result['trxn_id'];
+      if (is_array($result)) {
+        if (!empty($result['trxn_id'])) {
+          $contribution->trxn_id = $result['trxn_id'];
+        }
+        if (!empty($result['payment_status_id'])) {
+          $contribution->payment_status_id = $result['payment_status_id'];
+        }
       }
       $membershipResult[1] = $contribution;
     }
@@ -335,9 +347,24 @@ class CRM_Contribute_BAO_Contribution_Utils {
       return $membershipResult;
     }
 
-    //Do not send an email if Recurring contribution is done via Direct Mode
-    //We will send email once the IPN is received.
+    //  Email is done when the payment is completed (now or later)
+    // by completetransaction, rather than the form.
+    // We are moving towards it being done for all payment methods in completetransaction.
     if (!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct') {
+      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+        try {
+          civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $contribution->id,
+            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+            'is_transactional' => FALSE,
+          ));
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          if ($e->getErrorCode() != 'contribution_completed') {
+            throw new CRM_Core_Exception('Failed to update contribution in database');
+          }
+        }
+      }
       return TRUE;
     }
 

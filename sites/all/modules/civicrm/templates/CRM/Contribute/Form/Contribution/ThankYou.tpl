@@ -90,7 +90,7 @@
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="thankContribution"}
 
-  {if $amount GT 0 OR $minimum_fee GT 0 OR ( $priceSetID and $lineItem ) }
+  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">
       {if !$useForMember}
         <div class="header-dark">
@@ -133,7 +133,7 @@
 
         {* Recurring contribution / pledge information *}
         {if $is_recur}
-          {if $membershipBlock} {* Auto-renew membership confirmation *}
+          {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
               {if $frequency_interval > 1}

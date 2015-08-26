@@ -478,13 +478,13 @@ ORDER BY parent_id, weight";
     $i18n = CRM_Core_I18n::singleton();
 
     $name = $i18n->crm_translate($value['attributes']['label'], array('context' => 'menu'));
-    $url = $value['attributes']['url'];
-    $permission = $value['attributes']['permission'];
-    $operator = $value['attributes']['operator'];
-    $parentID = $value['attributes']['parentID'];
-    $navID = $value['attributes']['navID'];
-    $active = $value['attributes']['active'];
-    $menuName = $value['attributes']['name'];
+    $url = CRM_Utils_Array::value('url', $value['attributes']);
+    $permission = CRM_Utils_Array::value('permission', $value['attributes']);
+    $operator = CRM_Utils_Array::value('operator', $value['attributes']);
+    $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
+    $navID = CRM_Utils_Array::value('navID', $value['attributes']);
+    $active = CRM_Utils_Array::value('active', $value['attributes']);
+    $menuName = CRM_Utils_Array::value('name', $value['attributes']);
     $target = CRM_Utils_Array::value('target', $value['attributes']);
 
     if (in_array($parentID, $skipMenuItems) || !$active) {
@@ -748,13 +748,19 @@ ORDER BY parent_id, weight";
 
     // this means node is moved to last position, so you need to get the weight of last element + 1
     if (!$newWeight) {
-      $lastPosition = $position - 1;
-      $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
-      $params = array(1 => array($lastPosition, 'Positive'));
-      $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
+      // If this is not the first item being added to a parent
+      if ($position) {
+        $lastPosition = $position - 1;
+        $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
+        $params = array(1 => array($lastPosition, 'Positive'));
+        $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
-      // since last node increment + 1
-      $newWeight = $newWeight + 1;
+        // since last node increment + 1
+        $newWeight = $newWeight + 1;
+      }
+      else {
+        $newWeight = '0';
+      }
 
       // since this is a last node we don't need to increment other nodes
       $incrementOtherNodes = FALSE;

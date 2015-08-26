@@ -420,7 +420,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     //only valid processors get display to user
 
     if ($this->_mode) {
-      $this->assign('processorSupportsFutureStartDate', CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')));
+      $this->assign('processorSupportsFutureStartDate', CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('FutureRecurStartDate')));
       $this->_paymentProcessors = $this->getValidProcessors();
       if (!isset($this->_paymentProcessor['id'])) {
         // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
@@ -439,7 +439,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       //get the valid recurring processors.
       $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_assoc($this->_processors, $recurring);
+      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -625,7 +625,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         $this->assignBillingType();
 
         $this->_fields = array();
-        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
+        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE);
       }
     }
     catch (CRM_Core_Exception $e) {

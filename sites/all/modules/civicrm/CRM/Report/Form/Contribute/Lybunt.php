@@ -34,11 +34,16 @@
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
-
   protected $_charts = array(
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
+  );
+
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Contribution',
   );
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
@@ -48,9 +53,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
   /**
    */
-  /**
-   */
   public function __construct() {
+    $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $yearsInPast = 10;
     $yearsInFuture = 1;
     $date = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, $yearsInFuture);
@@ -82,8 +86,52 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
           ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
           'last_name' => array(
             'title' => ts('Last Name'),
+          ),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
+        ),
+        'grouping' => 'contact-fields',
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC',
+          ),
+          'first_name' => array(
+            'name' => 'first_name',
+            'title' => ts('First Name'),
+          ),
+          'gender_id' => array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
           ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
@@ -96,6 +144,25 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           'sort_name' => array(
             'title' => ts('Donor Name'),
             'operator' => 'like',
+          ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'no_display' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
       ),
@@ -267,7 +334,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if ($fieldName == 'yid') {
-            $clause = self::fiscalYearOffset('contribution_civireport.receive_date') . " = $previous_year";
+            $clause = "contribution_civireport.contact_id NOT IN
+(SELECT distinct contri.contact_id FROM civicrm_contribution contri
+ WHERE contri.is_test = 0 AND " .
+              self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri
+ WHERE " . self::fiscalYearOffset('contri.receive_date') .
+              " = $previous_year AND contri.is_test = 0) AND " . self::fiscalYearOffset('contribution_civireport.receive_date') . " = $previous_year";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
@@ -325,11 +397,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     if (!empty($rows)) {
-      $select = "
-                      SELECT
-                            SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
+      $select = "SELECT SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
+      $where = "WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
+        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause}";
 
-      $sql = "{$select} {$this->_from} {$this->_where}";
+      $sql = "{$select} {$this->_from} {$where}";
       $dao = CRM_Core_DAO::executeQuery($sql);
       if ($dao->fetch()) {
         $statistics['counts']['amount'] = array(
@@ -355,29 +427,23 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->where();
     $this->groupBy();
 
-    $rows = $contactIds = array();
+    $rows = $this->_contactIds = array();
+    $this->limit();
+    $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}  GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
+
+    $dao = CRM_Core_DAO::executeQuery($getContacts);
+
+    while ($dao->fetch()) {
+      $this->_contactIds[] = $dao->cid;
+    }
+    $dao->free();
     if (empty($this->_params['charts'])) {
-      $this->limit();
-      $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}  GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
-
-      $dao = CRM_Core_DAO::executeQuery($getContacts);
-
-      while ($dao->fetch()) {
-        $contactIds[] = $dao->cid;
-      }
-      $dao->free();
       $this->setPager();
     }
 
-    if (!empty($contactIds) || !empty($this->_params['charts'])) {
-      if (!empty($this->_params['charts'])) {
-        $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
-      }
-      else {
-        $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
-          implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
-      }
+    if (!empty($this->_contactIds) || !empty($this->_params['charts'])) {
+      $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
+        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
 
       $dao = CRM_Core_DAO::executeQuery($sql);
       $current_year = $this->_params['yid_value'];
@@ -487,6 +553,24 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       }
 
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s)') ? TRUE : $entryFound;
+
+      //handle gender
+      if (array_key_exists('civicrm_contact_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_gender_id']) {
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
+        }
+        $entryFound = TRUE;
+      }
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
+        }
+        $entryFound = TRUE;
+      }
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need

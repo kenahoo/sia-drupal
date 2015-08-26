@@ -137,7 +137,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         );
 
-      if (CRM_Core_Permission::check('administer CiviCRM')) {
+      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
         self::$_tabLinks[$cacheKey]['reminder']
           = array(
             'title' => ts('Schedule Reminders'),
@@ -319,15 +319,10 @@ ORDER BY start_date desc
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
-        $isRecurringEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
+        $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
-        if ($isRecurringEvent) {
-          if ($dao->id == $isRecurringEvent) {
-            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Parent)';
-          }
-          else {
-            $manageEvent[$dao->id]['repeat'] = 'Recurring Event - (Child)';
-          }
+        if ($repeat) {
+          $manageEvent[$dao->id]['repeat'] = ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
         }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 

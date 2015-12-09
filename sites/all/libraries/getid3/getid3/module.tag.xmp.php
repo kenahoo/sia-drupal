@@ -3,6 +3,7 @@
 /// getID3() by James Heinrich <info@getid3.org>               //
 //  available at http://getid3.sourceforge.net                 //
 //            or http://www.getid3.org                         //
+//          also https://github.com/JamesHeinrich/getID3       //
 /////////////////////////////////////////////////////////////////
 // See readme.txt for more details                             //
 /////////////////////////////////////////////////////////////////
@@ -14,7 +15,7 @@
 /////////////////////////////////////////////////////////////////
 //                                                             //
 // Module originally written [2009-Mar-26] by                  //
-//      Nigel Barnes <ngbarnesØhotmail*com>                    //
+//      Nigel Barnes <ngbarnesÃ˜hotmail*com>                    //
 // Bundled into getID3 with permission                         //
 //   called by getID3 in module.graphic.jpg.php                //
 //                                                            ///
@@ -23,9 +24,9 @@
 /**************************************************************************************************
  * SWISScenter Source                                                              Nigel Barnes
  *
- * 	Provides functions for reading information from the 'APP1' Extensible Metadata 
- *	Platform (XMP) segment of JPEG format files. 
- *	This XMP segment is XML based and contains the Resource Description Framework (RDF) 
+ * 	Provides functions for reading information from the 'APP1' Extensible Metadata
+ *	Platform (XMP) segment of JPEG format files.
+ *	This XMP segment is XML based and contains the Resource Description Framework (RDF)
  *	data, which itself can contain the Dublin Core Metadata Initiative (DCMI) information.
  *
  * 	This code uses segments from the JPEG Metadata Toolkit project by Evan Hunter.
@@ -37,21 +38,21 @@ class Image_XMP
 	* The name of the image file that contains the XMP fields to extract and modify.
 	* @see Image_XMP()
 	*/
-	var $_sFilename = null;
+	public $_sFilename = null;
 
 	/**
 	* @var array
 	* The XMP fields that were extracted from the image or updated by this class.
 	* @see getAllTags()
 	*/
-	var $_aXMP = array();
+	public $_aXMP = array();
 
 	/**
 	* @var boolean
 	* True if an APP1 segment was found to contain XMP metadata.
 	* @see isValid()
 	*/
-	var $_bXMPParse = false;
+	public $_bXMPParse = false;
 
 	/**
 	* Returns the status of XMP parsing during instantiation
@@ -61,7 +62,7 @@ class Image_XMP
 	* @return boolean
 	* Returns true if an APP1 segment was found to contain XMP metadata.
 	*/
-	function isValid()
+	public function isValid()
 	{
 		return $this->_bXMPParse;
 	}
@@ -71,7 +72,7 @@ class Image_XMP
 	*
 	* @return array - An array of XMP fields as it extracted by the XMPparse() function
 	*/
-	function getAllTags()
+	public function getAllTags()
 	{
 		return $this->_aXMP;
 	}
@@ -83,7 +84,7 @@ class Image_XMP
 	* @return array $headerdata - Array of JPEG header segments
 	* @return boolean FALSE - if headers could not be read
 	*/
-	function _get_jpeg_header_data($filename)
+	public function _get_jpeg_header_data($filename)
 	{
 		// prevent refresh from aborting file operations and hosing file
 		ignore_user_abort(true);
@@ -91,13 +92,9 @@ class Image_XMP
 		// Attempt to open the jpeg file - the at symbol supresses the error message about
 		// not being able to open files. The file_exists would have been used, but it
 		// does not work with files fetched over http or ftp.
-		$filehnd = @fopen($filename, 'rb');
-
-		// Check if the file opened successfully
-		if (!$filehnd)
-		{
-			// Could't open the file - exit
-			echo '<p>Could not open file '.htmlentities($filename).'</p>'."\n";
+		if (is_readable($filename) && is_file($filename) && ($filehnd = fopen($filename, 'rb'))) {
+			// great
+		} else {
 			return false;
 		}
 
@@ -191,13 +188,13 @@ class Image_XMP
 
 
 	/**
-	* Retrieves XMP information from an APP1 JPEG segment and returns the raw XML text as a string. 
+	* Retrieves XMP information from an APP1 JPEG segment and returns the raw XML text as a string.
 	*
 	* @param string $filename - the filename of the JPEG file to read
 	* @return string $xmp_data - the string of raw XML text
 	* @return boolean FALSE - if an APP 1 XMP segment could not be found, or if an error occured
 	*/
-	function _get_XMP_text($filename)
+	public function _get_XMP_text($filename)
 	{
 		//Get JPEG header data
 		$jpeg_header_data = $this->_get_jpeg_header_data($filename);
@@ -215,7 +212,7 @@ class Image_XMP
 					// Return the XMP text
 					$xmp_data = substr($jpeg_header_data[$i]['SegData'], 29);
 
-					return $xmp_data;
+					return trim($xmp_data); // trim() should not be neccesary, but some files found in the wild with null-terminated block (known samples from Apple Aperture) causes problems elsewhere (see http://www.getid3.org/phpBB3/viewtopic.php?f=4&t=1153)
 				}
 			}
 		}
@@ -223,14 +220,14 @@ class Image_XMP
 	}
 
 	/**
-	* Parses a string containing XMP data (XML), and returns an array 
+	* Parses a string containing XMP data (XML), and returns an array
 	* which contains all the XMP (XML) information.
 	*
 	* @param string $xml_text - a string containing the XMP data (XML) to be parsed
 	* @return array $xmp_array - an array containing all xmp details retrieved.
 	* @return boolean FALSE - couldn't parse the XMP data
 	*/
-	function read_XMP_array_from_text($xmltext)
+	public function read_XMP_array_from_text($xmltext)
 	{
 		// Check if there actually is any text to parse
 		if (trim($xmltext) == '')
@@ -278,7 +275,7 @@ class Image_XMP
 		$xmp_array = array();
 
 		// The XMP data has now been parsed into an array ...
-		
+
 		// Cycle through each of the array elements
 		$current_property = ''; // current property being processed
 		$container_index = -1; // -1 = no container open, otherwise index of container content
@@ -290,11 +287,11 @@ class Image_XMP
 				case 'x:xmpmeta':
 					// only defined attribute is x:xmptk written by Adobe XMP Toolkit; value is the version of the toolkit
 					break;
-					
+
 				case 'rdf:RDF':
 					// required element immediately within x:xmpmeta; no data here
 					break;
-					
+
 				case 'rdf:Description':
 					switch ($xml_elem['type'])
 					{
@@ -306,7 +303,8 @@ class Image_XMP
 								foreach (array_keys($xml_elem['attributes']) as $key)
 								{
 									// Check whether we want this details from this attribute
-									if (in_array($key, $GLOBALS['XMP_tag_captions']))
+//									if (in_array($key, $GLOBALS['XMP_tag_captions']))
+									if (true)
 									{
 										// Attribute wanted
 										$xmp_array[$key] = $xml_elem['attributes'][$key];
@@ -317,7 +315,7 @@ class Image_XMP
 						case 'close':
 							break;
 					}
-					
+
 				case 'rdf:ID':
 				case 'rdf:nodeID':
 					// Attributes are ignored
@@ -330,14 +328,14 @@ class Image_XMP
 						if (array_key_exists('attributes', $xml_elem))
 						{
 							// If Lang Alt (language alternatives) then ensure we take the default language
-							if ($xml_elem['attributes']['xml:lang'] != 'x-default')
+							if (isset($xml_elem['attributes']['xml:lang']) && ($xml_elem['attributes']['xml:lang'] != 'x-default'))
 							{
 								break;
 							}
 						}
 						if ($current_property != '')
 						{
-							$xmp_array[$current_property][$container_index] = $xml_elem['value'];
+							$xmp_array[$current_property][$container_index] = (isset($xml_elem['value']) ? $xml_elem['value'] : '');
 							$container_index += 1;
 						}
 					//else unidentified attribute!!
@@ -360,10 +358,11 @@ class Image_XMP
 							break;
 					}
 					break;
-					
+
 				default:
 					// Check whether we want the details from this attribute
-					if (in_array($xml_elem['tag'], $GLOBALS['XMP_tag_captions']))
+//					if (in_array($xml_elem['tag'], $GLOBALS['XMP_tag_captions']))
+					if (true)
 					{
 						switch ($xml_elem['type'])
 						{
@@ -371,17 +370,17 @@ class Image_XMP
 								// open current element
 								$current_property = $xml_elem['tag'];
 								break;
-								
+
 							case 'close':
 								// close current element
 								$current_property = '';
 								break;
-								
+
 							case 'complete':
 								// store attribute value
-								$xmp_array[$xml_elem['tag']] = @$xml_elem['value'];
+								$xmp_array[$xml_elem['tag']] = (isset($xml_elem['attributes']) ? $xml_elem['attributes'] : (isset($xml_elem['value']) ? $xml_elem['value'] : ''));
 								break;
-								
+
 							case 'cdata':
 								// ignore
 								break;
@@ -389,7 +388,7 @@ class Image_XMP
 					}
 					break;
 			}
-			
+
 		}
 		return $xmp_array;
 	}
@@ -400,7 +399,7 @@ class Image_XMP
 	*
 	* @param string - Name of the image file to access and extract XMP information from.
 	*/
-	function Image_XMP($sFilename)
+	public function Image_XMP($sFilename)
 	{
 		$this->_sFilename = $sFilename;
 
@@ -424,7 +423,8 @@ class Image_XMP
 * The Property names of all known XMP fields.
 * Note: this is a full list with unrequired properties commented out.
 */
-$GLOBALS['XMP_tag_captions'] = array( 
+/*
+$GLOBALS['XMP_tag_captions'] = array(
 // IPTC Core
 	'Iptc4xmpCore:CiAdrCity',
 	'Iptc4xmpCore:CiAdrCtry',
@@ -467,7 +467,7 @@ $GLOBALS['XMP_tag_captions'] = array(
 	'xmp:ModifyDate',
 	'xmp:Nickname',
 	'xmp:Rating',
-	'xmp:Thumbnails', 
+	'xmp:Thumbnails',
 	'xmpidq:Scheme',
 // XMP Rights Management Schema
 	'xmpRights:Certificate',
@@ -538,7 +538,7 @@ $GLOBALS['XMP_tag_captions'] = array(
 	'photoshop:State',
 	'photoshop:SupplementalCategories',
 	'photoshop:TransmissionReference',
-	'photoshop:Urgency', 
+	'photoshop:Urgency',
 // EXIF Schemas
 	'tiff:ImageWidth',
 	'tiff:ImageLength',
@@ -692,7 +692,7 @@ $GLOBALS['XMP_tag_captions'] = array(
 	'exif:Rows',
 	'exif:Settings',
 );
-
+*/
 
 /**
 * Global Variable: JPEG_Segment_Names
@@ -766,5 +766,3 @@ $GLOBALS['JPEG_Segment_Names'] = array(
 	0xFD => 'JPG13',
 	0xFE => 'COM',
 );
-
-?>

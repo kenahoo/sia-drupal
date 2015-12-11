@@ -143,9 +143,9 @@ ini_set('session.cache_expire',     200000);
 ini_set('session.cache_limiter',    'none');
 ini_set('session.cookie_lifetime',  2000000);
 ini_set('session.gc_maxlifetime',   200000);
-ini_set('session.save_handler',     'user');
+if(!ini_get('session.save_handler')) {ini_set('session.save_handler',     'user');}
 ini_set('session.use_only_cookies', 1);
-ini_set('session.use_trans_sid',    0);
+#ini_set('session.use_trans_sid',    0);
 ini_set('url_rewriter.tags',        '');
 ini_set('memory_limit',             '256M');
 ini_set('max_execution_time',       120);

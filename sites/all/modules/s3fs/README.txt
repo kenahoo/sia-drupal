@@ -1,4 +1,4 @@
-S3 File System (s3fs) provides an additional file system to your drupal site,
+S3 File System (s3fs) provides an additional file system to your Drupal site,
 alongside the public and private file systems, which stores files in Amazon's
 Simple Storage Service (S3) (or any S3-compatible storage service). You can set
 your site to use S3 File System as the default, or use it only for individual
@@ -10,7 +10,7 @@ viable under such a configuration.
 == Dependencies and Other Requirements ==
 =========================================
 - Libraries API 2.x - https://drupal.org/project/libraries
-- AWS SDK for PHP - http://aws.amazon.com/sdk-for-php
+- AWS SDK for PHP 2.x - https://github.com/aws/aws-sdk-php/releases
 - PHP 5.3.3+ is required. The AWS SDK will not work on earlier versions.
 - Your PHP must be configured with "allow_url_fopen = On" in your php.ini file.
   Otherwise, PHP will be unable to open files that are in your S3 bucket.
@@ -45,14 +45,14 @@ your site's settings.php file (sites/default/settings.php), like so:
 $conf['awssdk2_access_key'] = 'YOUR ACCESS KEY';
 $conf['awssdk2_secret_key'] = 'YOUR SECRET KEY';
 
-Configure your setttings for S3 File System (including your S3 bucket name) at
+Configure your settings for S3 File System (including your S3 bucket name) at
 /admin/config/media/s3fs/settings. You can input your AWS credentials on this
-page as well, but using the $conf array is reccomended.
+page as well, but using the $conf array is recommended.
 
 You can also configure the rest of your S3 preferences in the $conf array. See
 the "Configuring S3FS in settings.php" section below for more info.
 
-==================== ESSENTAL STEP! DO NOT SKIP THIS! =========================
+===================== ESSENTIAL STEP! DO NOT SKIP THIS! ======================
 With the settings saved, go to /admin/config/media/s3fs/actions to refresh the
 file metadata cache. This will copy the filenames and attributes for every
 existing file in your S3 bucket into Drupal's database. This can take a
@@ -98,16 +98,40 @@ the S3FS Actions page (admin/config/media/s3fs/actions), though the copy
 operation may fail if you have a lot of files, or very large files. The drush
 command will cleanly handle any combination of files.
 
+If you're using nginx rather than Apache, you probably have a config block
+like this:
+
+location ~ (^/sites/.*/files/imagecache/|^/sites/default/themes/.*/includes/fonts/|^/sites/.*/files/styles/) {
+  expires max;
+  try_files $uri @rewrite;
+}
+
+To make s3fs's custom image derivative mechanism work, you'll need to modify
+that regex it with an additional path, like so:
+
+location ~ (^/s3/files/styles/|^/sites/.*/files/imagecache/|^/sites/default/themes/.*/includes/fonts/|^/sites/.*/files/styles/) {
+  expires max;
+  try_files $uri @rewrite;
+}
+
 =================================
 == Aggregated CSS and JS in S3 ==
 =================================
-Because of the way browsers interpret relative URLs used in CSS files, and how
-they restrict requests made from external javascript files, if you want your
-site's aggregated CSS and JS to be placed in S3, you'll need to set up your
-webserver as a proxy for those files. S3 File System will present all public://
-css files with the url prefix /s3fs-css/, and all public:// javascript files
-with /s3fs-js/. So you need to set up your webserver to proxy all URLs with
-those prefixes into your S3 bucket.
+If you want your site's aggregated CSS and JS files to be stored on S3, rather
+than the default of storing them on the webserver's local filesystem, you'll
+need to do two things:
+1) Enable the "Use S3 for public:// files" option in the s3fs coniguration,
+   because Drupal always* puts aggregated CSS/JS into the public:// filesystem.
+2) Because of the way browsers interpret relative URLs used in CSS files, and
+   how they restrict requests made from external javascript files, you'll need
+   to set up your webserver as a proxy for those files.
+
+* When you've got a module like "Advanced CSS/JS Aggregation" installed, things
+get hairy. For now, that module is not compatible with s3fs public:// takeover.
+
+S3FS will present all css files in the taken over public:// filesystem with the
+url prefix /s3fs-css/, and all javascript files with /s3fs-js/. So you need to
+set up your webserver to proxy those URLs into your S3 bucket.
 
 For Apache, add this code to the right location* in your server's config:
 
@@ -131,7 +155,7 @@ ProxyPassReverse /s3fs-css/ https://YOUR-BUCKET.s3.amazonaws.com/YOUR-ROOT-FOLDE
 * The "right location" is implementation-dependent. Normally, placing these
 lines at the bottom of your httpd.conf file should be sufficient. However, if
 your site is configured to use SSL, you'll need to put these lines in the
-VirtuaHost settings for both your normal and SSL sites.
+VirtualHost settings for both your normal and SSL sites.
 
 
 For nginx, add this to your server config:
@@ -228,7 +252,7 @@ Some curl libraries, such as the one bundled with MAMP, do not come
 with authoritative certificate files. See the following page for details:
 http://dev.soup.io/post/56438473/If-youre-using-MAMP-and-doing-something
 
-Because of a bizzare limitation regarding MySQL's maximum index length for
+Because of a bizarre limitation regarding MySQL's maximum index length for
 InnoDB tables, the maximum uri length that S3FS supports is 250 characters.
 That includes the full path to the file in your bucket, as the full folder
 path is part of the uri.
@@ -240,9 +264,9 @@ thrown. If your server uses eAccelerator, it is highly recommended that you
 replace it with a different opcode cache plugin, as its development was
 abandoned several years ago.
 
-======================
-== Acknowledgements ==
-======================
+=====================
+== Acknowledgments ==
+=====================
 Special recognition goes to justafish, author of the AmazonS3 module:
 http://drupal.org/project/amazons3
 S3 File System started as a fork of her great module, but has evolved

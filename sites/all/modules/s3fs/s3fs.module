@@ -696,13 +696,9 @@ function _s3fs_get_config() {
  *   The short name of the setting. e.g. the "s3fs_use_cname" variable's short name is "use_cname".
  */
 function _s3fs_get_setting($setting) {
-  // $config is the combination of all $conf settings in settings.php and all variables stored in the DB.
+  global $conf;
+  // $config is just the s3fs_* variables with that prefix removed.
   $config = _s3fs_get_config();
-  // $conf is *only* the settings that have been hard-coded in settings.php.
-  $conf = array();
-  if (file_exists(DRUPAL_ROOT . '/' . conf_path() . '/settings.php')) {
-    include DRUPAL_ROOT . '/' . conf_path() . '/settings.php';
-  }
 
   // Get the value from _s3fs_get_config(), if it's set. This will include any overrides from settings.php.
   $default = !empty($config[$setting]) ? $config[$setting] : '';

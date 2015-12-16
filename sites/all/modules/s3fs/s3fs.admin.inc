@@ -9,13 +9,6 @@
  * Builds the Settings form.
  */
 function s3fs_settings() {
-  // If a setting is harded-coded in settings.php, we disable its field in the form, so users won't be tempted to
-  // alter it (which wouldn't do anything, because settings.php trumps all).
-  $conf = array();
-  if (file_exists(DRUPAL_ROOT . '/' . conf_path() . '/settings.php')) {
-    include DRUPAL_ROOT . '/' . conf_path() . '/settings.php';
-  }
-
   $form = array();
   // NOTE: I'd like to be able to pull this information directly from the SDK, but
   // I couldn't find a way to get the human-readable region names.
@@ -54,14 +47,12 @@ function s3fs_settings() {
     '#type'          => 'textfield',
     '#title'         => t('Amazon Web Services Access Key'),
     '#default_value' => _s3fs_get_setting('awssdk2_access_key'),
-    '#disabled'      => isset($conf['awssdk2_access_key']) || isset($conf['s3fs_awssdk2_access_key']),
   );
 
   $form['aws_credentials']['s3fs_awssdk2_secret_key'] = array(
     '#type'          => 'textfield',
     '#title'         => t('Amazon Web Services Secret Key'),
     '#default_value' => _s3fs_get_setting('awssdk2_secret_key'),
-    '#disabled'      => isset($conf['awssdk2_secret_key']) || isset($conf['s3fs_awssdk2_secret_key']),
   );
 
   $form['aws_credentials']['s3fs_awssdk2_use_instance_profile'] = array(
@@ -69,8 +60,6 @@ function s3fs_settings() {
     '#title'         => t('Use EC2 Instance Profile Credentials'),
     // TODO: Remove the 'use_instance_profile' and 's3fs_use_instance_profile' bits in 3.0.
     '#default_value' => _s3fs_get_setting('awssdk2_use_instance_profile') || _s3fs_get_setting('use_instance_profile'),
-    '#disabled'      => isset($conf['awssdk2_use_instance_profile']) || isset($conf['s3fs_awssdk2_use_instance_profile'])
-      || isset($conf['s3fs_use_instance_profile']),
     '#description'   => t(
       'If your Drupal site is running on an Amazon EC2 server, you may use the Instance Profile Credentials
       from that server rather than setting your AWS credentials directly.'
@@ -81,7 +70,6 @@ function s3fs_settings() {
     '#type'          => 'textfield',
     '#title'         => t('Default Cache Location'),
     '#default_value' => _s3fs_get_setting('awssdk2_default_cache_config'),
-    '#disabled'      => isset($conf['awssdk2_default_cache_config']) || isset($conf['s3fs_awssdk2_default_cache_config']),
     '#description'   => t('The default cache location for your EC2 Instance Profile Credentials.'),
     '#states'        => array(
       'visible' => array(
@@ -97,7 +85,6 @@ function s3fs_settings() {
     '#type'          => 'textfield',
     '#title'         => t('S3 Bucket Name'),
     '#default_value' => _s3fs_get_setting('bucket'),
-    '#disabled'      => isset($conf['s3fs_bucket']),
     '#required'      => TRUE,
   );
 
@@ -106,7 +93,6 @@ function s3fs_settings() {
     '#options'       => $region_map,
     '#title'         => t('S3 Region'),
     '#default_value' => _s3fs_get_setting('region'),
-    '#disabled'      => isset($conf['s3fs_region']),
     '#description'   => t(
       'The region in which your bucket resides. Be careful to specify this accurately,
       as you are likely to see strange or broken behavior if the region is set wrong.<br>
@@ -134,7 +120,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Use a CNAME'),
     '#default_value' => _s3fs_get_setting('use_cname'),
-    '#disabled'      => isset($conf['s3fs_use_cname']),
     '#description'   => t('Serve files from a custom domain by using an appropriately named bucket,
       e.g. "mybucket.mydomain.com".'
     ),
@@ -152,7 +137,6 @@ function s3fs_settings() {
       '#type'          => 'textfield',
       '#title'         => t('CDN Domain Name'),
       '#default_value' => _s3fs_get_setting('domain'),
-      '#disabled'      => isset($conf['s3fs_domain']),
       '#description'   => t('If serving files from CloudFront, the bucket name can differ from the domain name.'),
     ),
   );
@@ -161,7 +145,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Use a Custom Host'),
     '#default_value' => _s3fs_get_setting('use_customhost'),
-    '#disabled'      => isset($conf['s3fs_use_customhost']),
     '#description'   => t('Connect to an S3-compatible storage service other than Amazon.'),
   );
 
@@ -177,7 +160,6 @@ function s3fs_settings() {
       '#type'          => 'textfield',
       '#title'         => t('Hostname'),
       '#default_value' => _s3fs_get_setting('hostname'),
-      '#disabled'      => isset($conf['s3fs_use_customhost']),
       '#description'   => t('Custom service hostname, e.g. "objects.dreamhost.com".'),
       '#states'        => array(
         'visible' => array(
@@ -191,7 +173,6 @@ function s3fs_settings() {
     '#type'          => 'textfield',
     '#title'         => t('S3 Object Cache-Control Header'),
     '#default_value' => _s3fs_get_setting('cache_control_header'),
-    '#disabled'      => isset($conf['s3fs_cache_control_header']),
     '#description'   => t('The cache control header to apply on all S3 objects (for use by CDNs and browsers), e.g.
       "public, max-age=300".'
     ),
@@ -202,7 +183,6 @@ function s3fs_settings() {
     '#options'       => array('' => 'None', 'AES256' => 'AES256', 'aws:kms' => 'aws:kms'),
     '#title'         => t('Server-Side Encryption'),
     '#default_value' => _s3fs_get_setting('encryption'),
-    '#disabled'      => isset($conf['s3fs_encryption']),
     '#description'   => t(
       'If your bucket requires !ENCRYPTION, you can specify the encryption algorithm here',
       array(
@@ -217,7 +197,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Always serve files from S3 via HTTPS'),
     '#default_value' => _s3fs_get_setting('use_https'),
-    '#disabled'      => isset($conf['s3fs_use_https']),
     '#description'   => t(
       'Forces S3 File System to always generate HTTPS URLs for files in your bucket,
       e.g. "https://mybucket.s3.amazonaws.com/smiley.jpg".<br>
@@ -229,7 +208,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Ignore the file metadata cache'),
     '#default_value' => _s3fs_get_setting('ignore_cache'),
-    '#disabled'      => isset($conf['s3fs_ignore_cache']),
     '#description'   => t(
       "If you need to debug a problem with S3, you may want to temporarily ignore the file metadata cache.
       This will make all file system reads hit S3 instead of the cache.<br>
@@ -241,7 +219,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Use S3 for public:// files'),
     '#default_value' => _s3fs_get_setting('use_s3_for_public'),
-    '#disabled'      => isset($conf['s3fs_use_s3_for_public']),
     '#description'   => t(
       "Enable this option to store all files which would be uploaded to or created in the web server's local file
       system within your S3 bucket instead.<br><br>
@@ -257,7 +234,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t("Don't rewrite CSS/JS file paths"),
     '#default_value' => _s3fs_get_setting('no_rewrite_cssjs'),
-    '#disabled'      => isset($conf['s3fs_no_rewrite_cssjs']),
     '#description'   => t(
       'If this box is checked, s3fs will NOT rewrite the CSS/JS file paths to "/s3fs-(css|js)/...". Instead, they will
       be placed on the page with their regular CDN name. Only enable this option if you <b>know</b> you need it!'
@@ -273,7 +249,6 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Use S3 for private:// files'),
     '#default_value' => _s3fs_get_setting('use_s3_for_private'),
-    '#disabled'      => isset($conf['s3fs_use_s3_for_private']),
       '#description'   => t(
       'Enable this option to store all files which would be uploaded to or created in the private://
       file system (files available only to authenticated users) within your S3 bucket instead.'
@@ -284,7 +259,6 @@ function s3fs_settings() {
     '#type'          => 'textfield',
     '#title'         => t('Root Folder'),
     '#default_value' => _s3fs_get_setting('root_folder'),
-    '#disabled'      => isset($conf['s3fs_root_folder']),
     '#description'   => t(
       'S3 File System uses the specified folder as the root of the file system within your bucket (if blank, the bucket
       root is used). This is helpful when your bucket is used by multiple sites, or has additional data in it which
@@ -310,7 +284,6 @@ function s3fs_settings() {
     '#type'          => 'textarea',
     '#title'         => t('Presigned URLs'),
     '#default_value' => _s3fs_get_setting('presigned_urls'),
-    '#disabled'      => isset($conf['s3fs_presigned_urls']),
     '#rows'          => 5,
     '#description'   => t(
       'A list of timeouts and paths that should be delivered through a presigned url.<br>
@@ -325,7 +298,6 @@ function s3fs_settings() {
     '#type'          => 'textarea',
     '#title'         => t('Force Save As'),
     '#default_value' => _s3fs_get_setting('saveas'),
-    '#disabled'      => isset($conf['s3fs_saveas']),
     '#rows'          => 5,
     '#description'   => t(
       'A list of paths for which users will be forced to save the file, rather than displaying it in the browser.<br>
@@ -339,7 +311,6 @@ function s3fs_settings() {
     '#type' => 'textarea',
     '#title' => t('Torrents'),
     '#default_value' => _s3fs_get_setting('torrents'),
-    '#disabled'      => isset($conf['s3fs_torrents']),
     '#rows' => 5,
     '#description' => t(
       'A list of paths that should be delivered via BitTorrent.<br>

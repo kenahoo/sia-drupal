@@ -20,6 +20,35 @@ function e($errno, $msg, $file, $line, $vars) {
 }
 #set_error_handler('e', E_ERROR);
 
+function singer_list() {
+    civicrm_initialize();
+    $api = new civicrm_api3();
+    $api->Contact->Get(array('group' => 6, 'rowCount' => 10000, 'return' => 'display_name,custom_4', 'sort'=>'last_name,first_name'));
+
+    $arr = array();
+    foreach($api->values as $c) {
+        $arr[$c->custom_4][] = $c->display_name;
+    }
+    uksort($arr, "vp_sort");
+
+    $left = '';
+    $right = '';
+    foreach ($arr as $vp => $p) {
+        $chunk = "<b>{$vp}</b>:<br>\n";
+
+        foreach ($p as $name)
+            $chunk .= "&nbsp;&nbsp;&nbsp;&nbsp;{$name}<br>\n";
+
+        if (preg_match('/bass|tenor/i', $vp)) {
+            $right .= $chunk;
+        } else {
+            $left .= $chunk;
+        }
+    }
+
+    return( array($left, $right) );
+}
+
 /**
  * Implements hook_menu().
  * See http://realtidings.com/blog/12/Apr/26/drupal-commerce-custom-add-cart-link .

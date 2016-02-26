@@ -32,7 +32,7 @@ if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", getenv("DOCUMENT_ROOT
 function flerb($dbs) {
     $shell_user = posix_getpwuid(posix_getuid());
     $cnf = parse_ini_file($shell_user['dir']."/.my.cnf");
-    foreach(['password', 'database', 'host', 'user'] as $key) {
+    foreach(array('password', 'database', 'host', 'user') as $key) {
         $key2 = $key=='user' ? 'username' : $key;
         if (isset($cnf[$key])) {
             $dbs[$key2] = $cnf[$key];

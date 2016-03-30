@@ -109,7 +109,7 @@ function collapsible($title, $content, $collapsed=true) {
 function treatTable($title, $collapsed, $tab) {
     $content = theme('table', array('header'=> array("Date", "Bringer"), 'rows'=>$tab));
     print( collapsible($title, $content, $collapsed) );
-    print( '<br clear="both" />' );
+    print( '<div clear="both"></div>' );
 }
 
 function ticketLine($desc, $id, $reserved) {

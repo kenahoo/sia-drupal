@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -152,6 +152,10 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO
           'description' => 'physical tablename for entity being joined to file, e.g. civicrm_contact',
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'pseudoconstant' => array(
+            'optionGroupName' => 'tag_used_for',
+            'optionEditPath' => 'civicrm/admin/options/tag_used_for',
+          )
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -163,7 +167,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO
         'tag_id' => array(
           'name' => 'tag_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Tag ID') ,
+          'title' => ts('Tag') ,
           'description' => 'FK to civicrm_tag',
           'required' => true,
           'FKClassName' => 'CRM_Core_DAO_Tag',

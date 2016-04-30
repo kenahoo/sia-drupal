@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -230,7 +230,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO
           'export' => true,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
-            'type' => 'Autocomplete-Select',
+            'type' => 'EntityRef',
           ) ,
         ) ,
         'membership_type_id' => array(
@@ -395,7 +395,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO
         'contribution_recur_id' => array(
           'name' => 'contribution_recur_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Memberhip Recurring Contribution') ,
+          'title' => ts('Membership Recurring Contribution') ,
           'description' => 'Conditional foreign key to civicrm_contribution_recur id. Each membership in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.',
           'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
         ) ,

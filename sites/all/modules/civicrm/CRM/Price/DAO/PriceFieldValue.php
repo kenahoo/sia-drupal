@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -261,7 +261,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO
           'description' => 'Price field option amount',
           'required' => true,
           'maxlength' => 512,
-          'size' => CRM_Utils_Type::EIGHT,
+          'size' => 8,
           'html' => array(
             'type' => 'Text',
           ) ,

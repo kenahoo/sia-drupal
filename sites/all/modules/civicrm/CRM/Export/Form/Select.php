@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -444,7 +444,7 @@ FROM   {$this->_componentTable}
    * @return string
    */
   public function getTitle() {
-    return ts('Export All or Selected Fields');
+    return ts('Export Options');
   }
 
   /**

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -141,18 +141,21 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('ACL Contact Cache ID') ,
           'description' => 'primary key',
           'required' => true,
         ) ,
         'user_id' => array(
           'name' => 'user_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID') ,
           'description' => 'FK to civicrm_contact (could be null for anon user)',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID') ,
           'description' => 'FK to civicrm_contact',
           'required' => true,
           'FKClassName' => 'CRM_Contact_DAO_Contact',

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -132,6 +132,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Currency ID') ,
           'description' => 'Currency Id',
           'required' => true,
         ) ,
@@ -154,7 +155,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO
         'symbol' => array(
           'name' => 'symbol',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Symbol') ,
+          'title' => ts('Currency Symbol') ,
           'description' => 'Currency Symbol',
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
@@ -165,7 +166,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO
         'numeric_code' => array(
           'name' => 'numeric_code',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Numeric Code') ,
+          'title' => ts('Currency Numeric Code') ,
           'description' => 'Numeric currency code',
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
@@ -178,7 +179,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO
         'full_name' => array(
           'name' => 'full_name',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Full Name') ,
+          'title' => ts('Full Currency Name') ,
           'description' => 'Full currency name',
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,

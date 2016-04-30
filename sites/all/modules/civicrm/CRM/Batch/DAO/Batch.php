@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -292,7 +292,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO
           'description' => 'FK to Saved Search ID',
           'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
           'html' => array(
-            'type' => 'Autocomplete-Select',
+            'type' => 'EntityRef',
           ) ,
         ) ,
         'status_id' => array(
@@ -360,7 +360,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO
         'payment_instrument_id' => array(
           'name' => 'payment_instrument_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Batch Payment Instrument') ,
+          'title' => ts('Batch Payment Method') ,
           'description' => 'fk to Payment Instrument options in civicrm_option_values',
           'html' => array(
             'type' => 'Select',

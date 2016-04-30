@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -157,7 +157,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO
           'title' => ts('Website') ,
           'description' => 'Website',
           'maxlength' => 128,
-          'size' => CRM_Utils_Type::BIG,
+          'size' => 30,
           'import' => true,
           'where' => 'civicrm_website.url',
           'headerPattern' => '/Website/i',

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -126,6 +126,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mapping ID') ,
           'description' => 'Mapping ID',
           'required' => true,
         ) ,
@@ -148,6 +149,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO
         'mapping_type_id' => array(
           'name' => 'mapping_type_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mapping Type') ,
           'description' => 'Mapping Type',
           'html' => array(
             'type' => 'Select',

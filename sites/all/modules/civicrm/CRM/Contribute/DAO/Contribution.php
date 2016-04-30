@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -111,7 +111,7 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO
    */
   public $payment_instrument_id;
   /**
-   * when was gift received
+   * Date contribution was received - not necessarily the creation date of the record
    *
    * @var datetime
    */
@@ -305,13 +305,13 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO
           'export' => true,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
-            'type' => 'Autocomplete-Select',
+            'type' => 'EntityRef',
           ) ,
         ) ,
         'financial_type_id' => array(
           'name' => 'financial_type_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Financial Type ID') ,
+          'title' => ts('Financial Type') ,
           'description' => 'FK to Financial Type for (total_amount - non_deductible_amount).',
           'export' => false,
           'where' => 'civicrm_contribution.financial_type_id',
@@ -350,7 +350,7 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO
         'payment_instrument_id' => array(
           'name' => 'payment_instrument_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Payment Instrument ID') ,
+          'title' => ts('Payment Method') ,
           'description' => 'FK to Payment Instrument',
           'html' => array(
             'type' => 'Select',
@@ -363,8 +363,8 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO
         'receive_date' => array(
           'name' => 'receive_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Receive Date') ,
-          'description' => 'when was gift received',
+          'title' => ts('Date Received') ,
+          'description' => 'Date contribution was received - not necessarily the creation date of the record',
           'import' => true,
           'where' => 'civicrm_contribution.receive_date',
           'headerPattern' => '/receive(.?date)?/i',
@@ -649,7 +649,7 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Check Number') ,
           'maxlength' => 255,
-          'size' => CRM_Utils_Type::SIX,
+          'size' => 6,
           'import' => true,
           'where' => 'civicrm_contribution.check_number',
           'headerPattern' => '/check(.?number)?/i',

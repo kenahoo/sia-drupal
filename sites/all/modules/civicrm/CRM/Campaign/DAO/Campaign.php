@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -368,7 +368,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO
           'default' => 'NULL',
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'html' => array(
-            'type' => 'Autocomplete-Select',
+            'type' => 'EntityRef',
           ) ,
         ) ,
         'is_active' => array(

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -157,11 +157,13 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Spool ID') ,
           'required' => true,
         ) ,
         'job_id' => array(
           'name' => 'job_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Job') ,
           'description' => 'The ID of the Job .',
           'required' => true,
           'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
@@ -187,13 +189,13 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO
         'added_at' => array(
           'name' => 'added_at',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Added At') ,
+          'title' => ts('Added') ,
           'description' => 'date on which this job was added.',
         ) ,
         'removed_at' => array(
           'name' => 'removed_at',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Removed At') ,
+          'title' => ts('Removed') ,
           'description' => 'date on which this job was removed.',
         ) ,
       );

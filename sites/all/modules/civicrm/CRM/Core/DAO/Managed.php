@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -138,6 +138,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Managed ID') ,
           'description' => 'Surrogate Key',
           'required' => true,
         ) ,
@@ -170,13 +171,14 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity ID') ,
           'description' => 'Foreign key to the referenced item.',
           'required' => true,
         ) ,
         'cleanup' => array(
           'name' => 'cleanup',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Cleanup') ,
+          'title' => ts('Cleanup Setting') ,
           'description' => 'Policy on when to cleanup entity (always, never, unused)',
           'maxlength' => 32,
           'size' => CRM_Utils_Type::MEDIUM,

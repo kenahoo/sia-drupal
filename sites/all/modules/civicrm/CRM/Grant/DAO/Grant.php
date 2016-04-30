@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -228,7 +228,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO
           'dataPattern' => '',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
-            'type' => 'Autocomplete-Select',
+            'type' => 'EntityRef',
           ) ,
         ) ,
         'application_received_date' => array(

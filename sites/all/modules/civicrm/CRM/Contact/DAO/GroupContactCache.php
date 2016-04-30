@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -135,12 +135,14 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Group Contact Cache ID') ,
           'description' => 'primary key',
           'required' => true,
         ) ,
         'group_id' => array(
           'name' => 'group_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Group') ,
           'description' => 'FK to civicrm_group',
           'required' => true,
           'FKClassName' => 'CRM_Contact_DAO_Group',
@@ -156,6 +158,7 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID') ,
           'description' => 'FK to civicrm_contact',
           'required' => true,
           'FKClassName' => 'CRM_Contact_DAO_Contact',

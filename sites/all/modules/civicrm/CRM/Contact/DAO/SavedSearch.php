@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -81,7 +81,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO
    */
   static $_log = false;
   /**
-   * Saved search ID
+   * Saved Search ID
    *
    * @var int unsigned
    */
@@ -158,7 +158,8 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
-          'description' => 'Saved search ID',
+          'title' => ts('Saved Search ID') ,
+          'description' => 'Saved Search ID',
           'required' => true,
         ) ,
         'form_values' => array(
@@ -175,12 +176,14 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO
         'mapping_id' => array(
           'name' => 'mapping_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mapping ID') ,
           'description' => 'Foreign key to civicrm_mapping used for saved search-builder searches.',
           'FKClassName' => 'CRM_Core_DAO_Mapping',
         ) ,
         'search_custom_id' => array(
           'name' => 'search_custom_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Option Value ID') ,
           'description' => 'Foreign key to civicrm_option value table used for saved custom searches.',
         ) ,
         'where_clause' => array(

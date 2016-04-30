@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -133,6 +133,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Trackable URL ID') ,
           'required' => true,
         ) ,
         'url' => array(
@@ -145,6 +146,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO
         'mailing_id' => array(
           'name' => 'mailing_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing') ,
           'description' => 'FK to the mailing',
           'required' => true,
           'FKClassName' => 'CRM_Mailing_DAO_Mailing',

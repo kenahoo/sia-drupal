@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -175,6 +175,9 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO
           'description' => 'Name of Domain / Organization',
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -183,6 +186,9 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO
           'description' => 'Description of Domain.',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'config_backend' => array(
           'name' => 'config_backend',

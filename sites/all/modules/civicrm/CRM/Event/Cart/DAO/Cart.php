@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -133,19 +133,21 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO
         'cart_id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Cart ID') ,
           'description' => 'Cart Id',
           'required' => true,
         ) ,
         'user_id' => array(
           'name' => 'user_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Created By') ,
           'description' => 'FK to civicrm_contact who created this cart',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'completed' => array(
           'name' => 'completed',
           'type' => CRM_Utils_Type::T_BOOLEAN,
-          'title' => ts('Completed') ,
+          'title' => ts('Complete?') ,
         ) ,
       );
     }

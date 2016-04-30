@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -147,6 +147,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity Financial Account ID') ,
           'description' => 'ID',
           'required' => true,
         ) ,
@@ -167,6 +168,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity ID') ,
           'description' => 'Links to an id in the entity_table, such as vid in civicrm_financial_type',
           'required' => true,
         ) ,
@@ -187,6 +189,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO
         'financial_account_id' => array(
           'name' => 'financial_account_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Account') ,
           'description' => 'FK to the financial_account_id',
           'required' => true,
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',

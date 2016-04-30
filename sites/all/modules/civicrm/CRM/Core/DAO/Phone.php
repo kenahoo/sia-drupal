@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -231,6 +231,9 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO
           'headerPattern' => '/phone/i',
           'dataPattern' => '/^[\d\(\)\-\.\s]+$/',
           'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'phone_ext' => array(
           'name' => 'phone_ext',
@@ -238,7 +241,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO
           'title' => ts('Phone Extension') ,
           'description' => 'Optional extension for a phone number.',
           'maxlength' => 16,
-          'size' => CRM_Utils_Type::FOUR,
+          'size' => 4,
           'import' => true,
           'where' => 'civicrm_phone.phone_ext',
           'headerPattern' => '/extension/i',

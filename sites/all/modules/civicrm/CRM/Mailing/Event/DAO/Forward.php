@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -140,11 +140,13 @@ class CRM_Mailing_Event_DAO_Forward extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Forward ID') ,
           'required' => true,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Event Queue') ,
           'description' => 'FK to EventQueue',
           'required' => true,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
@@ -152,13 +154,14 @@ class CRM_Mailing_Event_DAO_Forward extends CRM_Core_DAO
         'dest_queue_id' => array(
           'name' => 'dest_queue_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Destination Queue') ,
           'description' => 'FK to EventQueue for destination',
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
         ) ,
         'time_stamp' => array(
           'name' => 'time_stamp',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Time Stamp') ,
+          'title' => ts('Timestamp') ,
           'description' => 'When this forward event occurred.',
           'required' => true,
         ) ,

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -125,12 +125,13 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Bounce Type ID') ,
           'required' => true,
         ) ,
         'name' => array(
           'name' => 'name',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Name') ,
+          'title' => ts('Bounce Type Name') ,
           'description' => 'Type of bounce',
           'required' => true,
           'maxlength' => 24,
@@ -139,7 +140,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO
         'description' => array(
           'name' => 'description',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Description') ,
+          'title' => ts('Bounce Type Description') ,
           'description' => 'A description of this bounce type',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -128,7 +128,13 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
    */
   public $currency;
   /**
-   * user-specified unique processor transaction id, bank id + trans id,... depending on payment_method
+   * Is this entry either a payment or a reversal of a payment?
+   *
+   * @var boolean
+   */
+  public $is_payment;
+  /**
+   * Transaction id supplied by external processor. This may not be unique.
    *
    * @var string
    */
@@ -140,7 +146,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
    */
   public $trxn_result_code;
   /**
-   * pseudo FK to civicrm_option_value of financial_item status option_group
+   * pseudo FK to civicrm_option_value of contribution_status_id option_group
    *
    * @var int unsigned
    */
@@ -295,11 +301,22 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
             'nameColumn' => 'numeric_code',
           )
         ) ,
+        'is_payment' => array(
+          'name' => 'is_payment',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Is Payment?') ,
+          'description' => 'Is this entry either a payment or a reversal of a payment?',
+          'import' => true,
+          'where' => 'civicrm_financial_trxn.is_payment',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'export' => true,
+        ) ,
         'trxn_id' => array(
           'name' => 'trxn_id',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Transaction ID') ,
-          'description' => 'user-specified unique processor transaction id, bank id + trans id,... depending on payment_method',
+          'description' => 'Transaction id supplied by external processor. This may not be unique.',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
@@ -315,12 +332,16 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
           'name' => 'status_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Financial Transaction Status Id') ,
-          'description' => 'pseudo FK to civicrm_option_value of financial_item status option_group',
+          'description' => 'pseudo FK to civicrm_option_value of contribution_status_id option_group',
           'import' => true,
           'where' => 'civicrm_financial_trxn.status_id',
           'headerPattern' => '/status/i',
           'dataPattern' => '',
           'export' => true,
+          'pseudoconstant' => array(
+            'optionGroupName' => 'contribution_status',
+            'optionEditPath' => 'civicrm/admin/options/contribution_status',
+          )
         ) ,
         'payment_processor_id' => array(
           'name' => 'payment_processor_id',
@@ -348,7 +369,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
           'title' => ts('Check Number') ,
           'description' => 'Check number',
           'maxlength' => 255,
-          'size' => CRM_Utils_Type::SIX,
+          'size' => 6,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -375,6 +396,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO
         'fee_amount' => 'fee_amount',
         'net_amount' => 'net_amount',
         'currency' => 'currency',
+        'is_payment' => 'is_payment',
         'trxn_id' => 'trxn_id',
         'trxn_result_code' => 'trxn_result_code',
         'status_id' => 'status_id',

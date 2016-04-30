@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -140,6 +140,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('State ID') ,
           'description' => 'State/Province ID',
           'required' => true,
         ) ,
@@ -167,6 +168,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO
         'country_id' => array(
           'name' => 'country_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('County') ,
           'description' => 'ID of Country that State/Province belong',
           'required' => true,
           'FKClassName' => 'CRM_Core_DAO_Country',

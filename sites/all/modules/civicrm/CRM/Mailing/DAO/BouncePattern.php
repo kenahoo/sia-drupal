@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -133,11 +133,13 @@ class CRM_Mailing_DAO_BouncePattern extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Bounce Pattern ID') ,
           'required' => true,
         ) ,
         'bounce_type_id' => array(
           'name' => 'bounce_type_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Bounce Type') ,
           'description' => 'Type of bounce',
           'required' => true,
           'FKClassName' => 'CRM_Mailing_DAO_BounceType',

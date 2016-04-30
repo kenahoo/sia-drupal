@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -174,6 +174,9 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('IM Location Type') ,
           'description' => 'Which Location does this email belong to.',
+          'html' => array(
+            'type' => 'Select',
+          ) ,
           'pseudoconstant' => array(
             'table' => 'civicrm_location_type',
             'keyColumn' => 'id',
@@ -192,6 +195,9 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO
           'headerPattern' => '/I(nstant )?M(ess.*)?|screen(\s+)?name/i',
           'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
           'export' => true,
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'provider_id' => array(
           'name' => 'provider_id',

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -177,17 +177,20 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Action Schedule ID') ,
           'required' => true,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Action Schedule Contact ID') ,
           'description' => 'FK to Contact ID',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity ID') ,
           'description' => 'FK to id of the entity that the action was performed on. Pseudo - FK.',
           'required' => true,
         ) ,
@@ -202,6 +205,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO
         'action_schedule_id' => array(
           'name' => 'action_schedule_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Schedule') ,
           'description' => 'FK to the action schedule that this action originated from.',
           'required' => true,
           'FKClassName' => 'CRM_Core_DAO_ActionSchedule',
@@ -209,12 +213,13 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO
         'action_date_time' => array(
           'name' => 'action_date_time',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Action Date Time') ,
+          'title' => ts('Action Date And Time') ,
           'description' => 'date time that the action was performed on.',
         ) ,
         'is_error' => array(
           'name' => 'is_error',
           'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Error?') ,
           'description' => 'Was there any error sending the reminder?',
         ) ,
         'message' => array(

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -191,6 +191,9 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO
           'required' => true,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Mailing_BAO_Mailing::mailingGroupEntityTables',
+          )
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -153,6 +153,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Log ID') ,
           'description' => 'Log ID',
           'required' => true,
         ) ,
@@ -168,6 +169,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity ID ') ,
           'description' => 'Foreign key to the referenced item.',
           'required' => true,
         ) ,
@@ -180,6 +182,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO
         'modified_id' => array(
           'name' => 'modified_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Modified By') ,
           'description' => 'FK to Contact ID of person under whose credentials this data modification was made.',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,

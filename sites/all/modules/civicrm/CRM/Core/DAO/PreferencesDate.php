@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -143,12 +143,13 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Date Preference ID') ,
           'required' => true,
         ) ,
         'name' => array(
           'name' => 'name',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Name') ,
+          'title' => ts('Date Preference Name') ,
           'description' => 'The meta name for this date (fixed in code)',
           'required' => true,
           'maxlength' => 64,
@@ -172,7 +173,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO
         'end' => array(
           'name' => 'end',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('End') ,
+          'title' => ts('End Offset') ,
           'description' => 'The end offset relative to current year, can be negative',
           'required' => true,
         ) ,

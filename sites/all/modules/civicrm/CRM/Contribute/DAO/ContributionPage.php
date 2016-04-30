@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -243,18 +243,6 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
    */
   public $thankyou_footer;
   /**
-   * if true, signup is done on behalf of an organization
-   *
-   * @var boolean
-   */
-  public $is_for_organization;
-  /**
-   * This text field is shown when is_for_organization is checked. For example - I am contributing on behalf on an organization.
-   *
-   * @var text
-   */
-  public $for_organization;
-  /**
    * if true, receipt is automatically emailed to contact on success
    *
    * @var boolean
@@ -414,7 +402,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
           'rows' => 6,
           'cols' => 50,
           'html' => array(
-            'type' => 'TextArea',
+            'type' => 'RichTextEditor',
           ) ,
         ) ,
         'financial_type_id' => array(
@@ -600,7 +588,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
           'rows' => 8,
           'cols' => 60,
           'html' => array(
-            'type' => 'TextArea',
+            'type' => 'RichTextEditor',
           ) ,
         ) ,
         'thankyou_footer' => array(
@@ -611,24 +599,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
           'rows' => 8,
           'cols' => 60,
           'html' => array(
-            'type' => 'TextArea',
-          ) ,
-        ) ,
-        'is_for_organization' => array(
-          'name' => 'is_for_organization',
-          'type' => CRM_Utils_Type::T_BOOLEAN,
-          'title' => ts('Allow For Organization') ,
-          'description' => 'if true, signup is done on behalf of an organization',
-        ) ,
-        'for_organization' => array(
-          'name' => 'for_organization',
-          'type' => CRM_Utils_Type::T_TEXT,
-          'title' => ts('On Behalf Of Organization') ,
-          'description' => 'This text field is shown when is_for_organization is checked. For example - I am contributing on behalf on an organization.',
-          'rows' => 2,
-          'cols' => 50,
-          'html' => array(
-            'type' => 'TextArea',
+            'type' => 'RichTextEditor',
           ) ,
         ) ,
         'is_email_receipt' => array(
@@ -694,7 +665,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
           'rows' => 6,
           'cols' => 50,
           'html' => array(
-            'type' => 'TextArea',
+            'type' => 'RichTextEditor',
           ) ,
         ) ,
         'amount_block_is_active' => array(
@@ -813,8 +784,6 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
         'thankyou_title' => 'thankyou_title',
         'thankyou_text' => 'thankyou_text',
         'thankyou_footer' => 'thankyou_footer',
-        'is_for_organization' => 'is_for_organization',
-        'for_organization' => 'for_organization',
         'is_email_receipt' => 'is_email_receipt',
         'receipt_from_name' => 'receipt_from_name',
         'receipt_from_email' => 'receipt_from_email',

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -147,12 +147,14 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Premium Product ID') ,
           'description' => 'Contribution ID',
           'required' => true,
         ) ,
         'premiums_id' => array(
           'name' => 'premiums_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Premium') ,
           'description' => 'Foreign key to premiums settings record.',
           'required' => true,
           'FKClassName' => 'CRM_Contribute_DAO_Premium',
@@ -160,6 +162,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO
         'product_id' => array(
           'name' => 'product_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Product') ,
           'description' => 'Foreign key to each product object.',
           'required' => true,
           'FKClassName' => 'CRM_Contribute_DAO_Product',

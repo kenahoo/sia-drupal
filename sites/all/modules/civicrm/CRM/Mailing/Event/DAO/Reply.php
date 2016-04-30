@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -133,11 +133,13 @@ class CRM_Mailing_Event_DAO_Reply extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Reply ID') ,
           'required' => true,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Event Queue') ,
           'description' => 'FK to EventQueue',
           'required' => true,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
@@ -145,7 +147,7 @@ class CRM_Mailing_Event_DAO_Reply extends CRM_Core_DAO
         'time_stamp' => array(
           'name' => 'time_stamp',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Time Stamp') ,
+          'title' => ts('Reply Timestamp') ,
           'description' => 'When this reply event occurred.',
           'required' => true,
         ) ,

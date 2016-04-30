@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -177,6 +177,9 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO
           'required' => true,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'pseudoconstant' => array(
+            'callback' => 'CRM_Core_BAO_Note::entityTables',
+          )
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -220,7 +223,10 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO
           'title' => ts('Subject') ,
           'description' => 'subject of note description',
           'maxlength' => 255,
-          'size' => CRM_Utils_Type::HUGE,
+          'size' => 60,
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'privacy' => array(
           'name' => 'privacy',
@@ -229,6 +235,10 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO
           'description' => 'Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)',
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'pseudoconstant' => array(
+            'optionGroupName' => 'note_privacy',
+            'optionEditPath' => 'civicrm/admin/options/note_privacy',
+          )
         ) ,
       );
     }

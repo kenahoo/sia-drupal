@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -164,6 +164,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Pledge Block ID') ,
           'description' => 'Pledge ID',
           'required' => true,
         ) ,
@@ -193,6 +194,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO
         'is_pledge_interval' => array(
           'name' => 'is_pledge_interval',
           'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Expose Frequency Interval?') ,
           'description' => 'Is frequency interval exposed on the contribution form.',
         ) ,
         'max_reminders' => array(

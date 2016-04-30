@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -135,18 +135,21 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO
         'event_in_cart_id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Event In Cart') ,
           'description' => 'Event In Cart Id',
           'required' => true,
         ) ,
         'event_id' => array(
           'name' => 'event_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Event') ,
           'description' => 'FK to Event ID',
           'FKClassName' => 'CRM_Event_DAO_Event',
         ) ,
         'event_cart_id' => array(
           'name' => 'event_cart_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Event In Cart') ,
           'description' => 'FK to Event Cart ID',
           'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
         ) ,

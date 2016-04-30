@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -145,11 +145,13 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Bounce ID') ,
           'required' => true,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Event Queue') ,
           'description' => 'FK to EventQueue',
           'required' => true,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
@@ -157,6 +159,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO
         'bounce_type_id' => array(
           'name' => 'bounce_type_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Bounce Type') ,
           'description' => 'What type of bounce was it?',
           'html' => array(
             'type' => 'Select',
@@ -178,7 +181,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO
         'time_stamp' => array(
           'name' => 'time_stamp',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Time Stamp') ,
+          'title' => ts('Timestamp') ,
           'description' => 'When this bounce event occurred.',
           'required' => true,
         ) ,

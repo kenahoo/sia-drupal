@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -123,7 +123,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO
    */
   public $help_post;
   /**
-   * Group id, foriegn key from civicrm_group
+   * Group id, foreign key from civicrm_group
    *
    * @var int unsigned
    */
@@ -325,7 +325,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO
           'name' => 'limit_listings_group_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Profile Search Limit Group') ,
-          'description' => 'Group id, foriegn key from civicrm_group',
+          'description' => 'Group id, foreign key from civicrm_group',
           'FKClassName' => 'CRM_Contact_DAO_Group',
         ) ,
         'post_URL' => array(

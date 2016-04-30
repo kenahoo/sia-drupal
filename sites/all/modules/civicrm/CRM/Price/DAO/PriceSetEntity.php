@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -141,6 +141,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Price Set Entity ID') ,
           'description' => 'Price Set Entity',
           'required' => true,
         ) ,
@@ -156,12 +157,14 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Entity IF') ,
           'description' => 'Item in table',
           'required' => true,
         ) ,
         'price_set_id' => array(
           'name' => 'price_set_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Price Set') ,
           'description' => 'price set being used',
           'required' => true,
           'FKClassName' => 'CRM_Price_DAO_PriceSet',

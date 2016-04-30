@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -241,6 +241,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO
           'description' => 'a pseudo-FK to civicrm_option_value containing PDF Page Format.',
           'pseudoconstant' => array(
             'optionGroupName' => 'pdf_format',
+            'keyColumn' => 'id',
             'optionEditPath' => 'civicrm/admin/options/pdf_format',
           )
         ) ,

@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -339,7 +339,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO
    */
   static function getTableName()
   {
-    return self::$_tableName;
+    return CRM_Core_DAO::getLocaleTableName(self::$_tableName);
   }
   /**
    * Returns if this table needs to be logged

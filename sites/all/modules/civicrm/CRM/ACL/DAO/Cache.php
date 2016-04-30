@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -141,18 +141,21 @@ class CRM_ACL_DAO_Cache extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Cache ID') ,
           'description' => 'Unique table ID',
           'required' => true,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Cache Contact') ,
           'description' => 'Foreign Key to Contact',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'acl_id' => array(
           'name' => 'acl_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Cache ACL') ,
           'description' => 'Foreign Key to ACL',
           'required' => true,
           'FKClassName' => 'CRM_ACL_DAO_ACL',
@@ -160,7 +163,7 @@ class CRM_ACL_DAO_Cache extends CRM_Core_DAO
         'modified_date' => array(
           'name' => 'modified_date',
           'type' => CRM_Utils_Type::T_DATE,
-          'title' => ts('Modified Date') ,
+          'title' => ts('Cache Modified Date') ,
           'description' => 'When was this cache entry last modified',
         ) ,
       );

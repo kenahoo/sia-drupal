@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -219,7 +219,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO
           'title' => ts('Email') ,
           'description' => 'Email address',
           'maxlength' => 254,
-          'size' => CRM_Utils_Type::MEDIUM,
+          'size' => 30,
           'import' => true,
           'where' => 'civicrm_email.email',
           'headerPattern' => '/e.?mail/i',
@@ -252,6 +252,9 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO
           'where' => 'civicrm_email.on_hold',
           'headerPattern' => '',
           'dataPattern' => '',
+          'html' => array(
+            'type' => 'CheckBox',
+          ) ,
         ) ,
         'is_bulkmail' => array(
           'name' => 'is_bulkmail',

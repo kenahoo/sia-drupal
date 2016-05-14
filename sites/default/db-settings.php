@@ -16,22 +16,31 @@ $databases = array (
     ),
 );
 
-
-if (preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", getenv("DOCUMENT_ROOT"))
+$s275 = "/Users/ken/Documents/SIA/server275-site";
+if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
     ||
-    preg_match("{^/Users/ken/Documents/SIA/site-upgrade}", getenv("PWD"))) {
+    preg_match("{^${s275}}", getenv("PWD"))) {
+    # Production server
 
-    $host = 'localhost';
-    $site_root = '/Users/ken/Documents/SIA/site-upgrade';
+    $host = 'www.singersinaccord.org';
+    $site_root = $s275;
 
 } else {
-    $host = 'www.singersinaccord.org';
-    $site_root = '/home/kenahoo/singersinaccord.org';
+    # Development server
+    $host = 'localhost';
+    $site_root = '/Users/ken/Documents/SIA/server275-site';
 }
 
 function flerb($dbs) {
     $shell_user = posix_getpwuid(posix_getuid());
-    $cnf = parse_ini_file($shell_user['dir']."/.my.cnf");
+    $home_cnf = $shell_user['dir']."/.my.cnf";
+    if (file_exists($home_cnf)) {
+	$cnf = parse_ini_file($home_cnf);
+    } else if (file_exists(".my.cnf")) {
+	$cnf = parse_ini_file(".my.cnf");
+    } else {
+	return $dbs;
+    }
     foreach(array('password', 'database', 'host', 'user') as $key) {
         $key2 = $key=='user' ? 'username' : $key;
         if (isset($cnf[$key])) {

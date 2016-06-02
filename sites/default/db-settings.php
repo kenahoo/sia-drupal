@@ -34,18 +34,21 @@ if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
 function flerb($dbs) {
     $shell_user = posix_getpwuid(posix_getuid());
     $home_cnf = $shell_user['dir']."/.my.cnf";
-    if (file_exists($home_cnf)) {
-	$cnf = parse_ini_file($home_cnf);
-    } else if (file_exists(".my.cnf")) {
-	$cnf = parse_ini_file(".my.cnf");
-    } else {
-	return $dbs;
-    }
-    foreach(array('password', 'database', 'host', 'user') as $key) {
-        $key2 = $key=='user' ? 'username' : $key;
-        if (isset($cnf[$key])) {
-            $dbs[$key2] = $cnf[$key];
-        }
+
+    foreach(array($home_cnf, "sites/default/.my.cnf") as $file) {
+	if (!file_exists($file)) {
+	    continue;
+	}
+	// print("using $file<br>");
+	$cnf = parse_ini_file($file);
+
+	foreach(array('password', 'database', 'host', 'user') as $key) {
+            $key2 = $key=='user' ? 'username' : $key;
+            if (isset($cnf[$key])) {
+		// print("Setting $key=$cnf[$key]<br>");
+		$dbs[$key2] = $cnf[$key];
+            }
+	}
     }
     return $dbs;
 }

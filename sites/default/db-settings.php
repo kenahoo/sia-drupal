@@ -34,7 +34,7 @@ if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
     $civi_database = 'singersin_combined';
 }
 
-function flerb($dbs) {
+$flerb = function($dbs) {
     $shell_user = posix_getpwuid(posix_getuid());
     $home_cnf = $shell_user['dir']."/.my.cnf";
 
@@ -54,6 +54,7 @@ function flerb($dbs) {
 	}
     }
     return $dbs;
-}
+};
 
-$databases['default']['default'] = flerb($databases['default']['default']);
+$databases['default']['default'] = $flerb($databases['default']['default']);
+unset($flerb);

@@ -212,8 +212,7 @@
  *   );
  * @endcode
  */
-$db_url = 'mysql://username:password@localhost/databasename';
-$db_prefix = '';
+$databases = array();
 
 /**
  * Access control for update.php script.
@@ -226,7 +225,7 @@ $db_prefix = '';
  * After finishing the upgrade, be sure to open this file again and change the
  * TRUE back to a FALSE!
  */
-# $db_collation = 'utf8_general_ci';
+$update_free_access = FALSE;
 
 /**
  * Salt for one-time login links and cancel links, form tokens, etc.
@@ -245,7 +244,7 @@ $db_prefix = '';
  *   $drupal_hash_salt = file_get_contents('/home/example/salt.txt');
  *
  */
-$update_free_access = FALSE;
+$drupal_hash_salt = '';
 
 /**
  * Base URL (optional).
@@ -279,18 +278,30 @@ $update_free_access = FALSE;
  * runtime settings and the .htaccess file for non-runtime settings. Settings
  * defined there should not be duplicated here so as to avoid conflict issues.
  */
-ini_set('arg_separator.output',     '&amp;');
-ini_set('magic_quotes_runtime',     0);
-ini_set('magic_quotes_sybase',      0);
-ini_set('session.cache_expire',     200000);
-ini_set('session.cache_limiter',    'none');
-ini_set('session.cookie_lifetime',  2000000);
-ini_set('session.gc_maxlifetime',   200000);
-ini_set('session.save_handler',     'user');
-ini_set('session.use_cookies',      1);
-ini_set('session.use_only_cookies', 1);
-ini_set('session.use_trans_sid',    0);
-ini_set('url_rewriter.tags',        '');
+
+/**
+ * Some distributions of Linux (most notably Debian) ship their PHP
+ * installations with garbage collection (gc) disabled. Since Drupal depends on
+ * PHP's garbage collection for clearing sessions, ensure that garbage
+ * collection occurs by using the most common settings.
+ */
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 100);
+
+/**
+ * Set session lifetime (in seconds), i.e. the time from the user's last visit
+ * to the active session may be deleted by the session garbage collector. When
+ * a session is deleted, authenticated users are logged out, and the contents
+ * of the user's $_SESSION variable is discarded.
+ */
+ini_set('session.gc_maxlifetime', 200000);
+
+/**
+ * Set session cookie lifetime (in seconds), i.e. the time from the session is
+ * created to the cookie expires, i.e. when the browser is expected to discard
+ * the cookie. The value 0 means "until the browser is closed".
+ */
+ini_set('session.cookie_lifetime', 2000000);
 
 /**
  * If you encounter a situation where users post a large amount of text, and

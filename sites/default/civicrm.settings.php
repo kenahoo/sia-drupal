@@ -179,7 +179,9 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
 global $civicrm_root;
 
 $civicrm_root = $site_root . '/sites/all/modules/civicrm';
-define( 'CIVICRM_TEMPLATE_COMPILEDIR', $site_root . '/sites/default/files/civicrm/templates_c/' );
+if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+  define( 'CIVICRM_TEMPLATE_COMPILEDIR', $site_root . '/sites/default/files/civicrm/templates_c/');
+}
 
 /**
  * Site URLs:
@@ -212,13 +214,18 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', $site_root . '/sites/default/files/civicr
  * Front-end site:
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/');
  *
- * EXAMPLE - Standalone Installations:
- * If your site's home url is http://www.example.com/civicrm/
+ */
+if (!defined('CIVICRM_UF_BASEURL')) {
+  define( 'CIVICRM_UF_BASEURL'      , 'http://' . $host . '/');
+}
+
+/**
+ * Define any CiviCRM Settings Overrides per http://wiki.civicrm.org/confluence/display/CRMDOC/Override+CiviCRM+Settings
  *
  * Uncomment and edit the below as appropriate.
  */
- 
-define( 'CIVICRM_UF_BASEURL'      , 'http://'.$host.'/' );
+ // Add this line only once above any settings overrides.
+ //  global $civicrm_setting;
 
  // Override the Temporary Files directory.
  // $civicrm_setting['Directory Preferences']['customFileUploadDir'] = '/path/to/upload';
@@ -266,9 +273,147 @@ define( 'CIVICRM_UF_BASEURL'      , 'http://'.$host.'/' );
  * We recommend using a 16-32 bit alphanumeric/punctuation key.
  * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
  */
-define( 'CIVICRM_SITE_KEY', null );
+if (!defined('CIVICRM_SITE_KEY')) {
+  define( 'CIVICRM_SITE_KEY', '21d9f7d30907e304a5b0235d6081fbc1');
+}
 
-} // end Pantheon check
+/**
+ * Enable this constant, if you want to send your email through the smarty
+ * templating engine(allows you to do conditional and more complex logic)
+ *
+ */
+if (!defined('CIVICRM_MAIL_SMARTY')) {
+  define( 'CIVICRM_MAIL_SMARTY', 0 );
+}
+
+/**
+ * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
+ * Enabling this setting will not send any email, ensure this is commented out in production
+ * The CIVICRM_MAIL_LOG is a debug option which disables MTA (mail transport agent) interaction.
+ * You must disable CIVICRM_MAIL_LOG before CiviCRM will talk to your MTA.
+ */
+// if (!defined('CIVICRM_MAIL_LOG')) {
+// define( 'CIVICRM_MAIL_LOG', '/home/singersin/www/www/sites/default/files/civicrm/templates_c//mail.log');
+// }
+
+
+if (!defined('CIVICRM_DOMAIN_ID')) {
+  define( 'CIVICRM_DOMAIN_ID', 1);
+}
+
+/**
+ * Settings to enable external caching using a cache server.  This is an
+ * advanced feature, and you should read and understand the documentation
+ * before you turn it on. We cannot store these settings in the DB since the
+ * config could potentially also be cached and we need to avoid an infinite
+ * recursion scenario.
+ *
+ * @see http://civicrm.org/node/126
+ */
+
+/**
+ * If you have a cache server configured and want CiviCRM to make use of it,
+ * set the following constant.  You should only set this once you have your cache
+ * server up and working, because CiviCRM will not start up if your server is
+ * unavailable on the host and port that you specify. By default CiviCRM will use
+ * an in-memory array cache
+ *
+ * To use the php extension memcache  use a value of 'Memcache'
+ * To use the php extension memcached use a value of 'Memcached'
+ * To use the php extension apc       use a value of 'APCcache'
+ * To use the php extension redis     use a value of 'Redis'
+ * To not use any caching (not recommended), use a value of 'NoCache'
+ *
+ */
+if (!defined('CIVICRM_DB_CACHE_CLASS')) {
+  define('CIVICRM_DB_CACHE_CLASS', 'ArrayCache');
+}
+
+/**
+ * Change this to the IP address of your cache server if it is not on the
+ * same machine (Unix).
+ */
+if (!defined('CIVICRM_DB_CACHE_HOST')) {
+  define('CIVICRM_DB_CACHE_HOST', 'localhost');
+}
+
+/**
+ * Change this if you are not using the standard port for your cache server
+ */
+if (!defined('CIVICRM_DB_CACHE_PORT')) {
+  define('CIVICRM_DB_CACHE_PORT', 11211 );
+}
+
+/**
+ * Change this if your cache server requires a password (currently only works 
+ * with Redis)
+ */
+if (!defined('CIVICRM_DB_CACHE_PASSWORD')) {
+  define('CIVICRM_DB_CACHE_PASSWORD', '' );
+}
+
+/**
+ * Items in cache will expire after the number of seconds specified here.
+ * Default value is 3600 (i.e., after an hour)
+ */
+if (!defined('CIVICRM_DB_CACHE_TIMEOUT')) {
+  define('CIVICRM_DB_CACHE_TIMEOUT', 3600 );
+}
+
+/**
+ * If you are sharing the same cache instance with more than one CiviCRM
+ * database, you will need to set a different value for the following argument
+ * so that each copy of CiviCRM will not interfere with other copies.  If you only
+ * have one copy of CiviCRM, you may leave this set to ''.  A good value for
+ * this if you have two servers might be 'server1_' for the first server, and
+ * 'server2_' for the second server.
+ */
+if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
+  define('CIVICRM_DB_CACHE_PREFIX', '');
+}
+
+/**
+ * If you have multilingual site and you are using the "inherit CMS language"
+ * configuration option, but wish to, for example, use fr_CA instead of the
+ * default fr_FR (for French), set one or more of the constants below to an
+ * appropriate regional value.
+ */
+// define('CIVICRM_LANGUAGE_MAPPING_FR', 'fr_CA');
+// define('CIVICRM_LANGUAGE_MAPPING_EN', 'en_CA');
+// define('CIVICRM_LANGUAGE_MAPPING_ES', 'es_MX');
+// define('CIVICRM_LANGUAGE_MAPPING_PT', 'pt_BR');
+// define('CIVICRM_LANGUAGE_MAPPING_ZH', 'zh_TW');
+
+/**
+ * Native gettext improves performance of localized CiviCRM installations
+ * significantly. However, your host must enable the locale (language).
+ * On most GNU/Linux, Unix or MacOSX systems, you may view them with
+ * the command line by typing: "locale -a".
+ *
+ * On Debian or Ubuntu, you may reconfigure locales with:
+ * # dpkg-reconfigure locales
+ *
+ * For more information:
+ * http://wiki.civicrm.org/confluence/x/YABFBQ
+ */
+// if (!defined('CIVICRM_GETTEXT_NATIVE')) {
+// define('CIVICRM_GETTEXT_NATIVE', 1);
+// }
+
+/**
+ * Configure MySQL to throw more errors when encountering unusual SQL expressions.
+ *
+ * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
+ * to FALSE; for SVN checkouts, it defaults to TRUE.
+ */
+// if (!defined('CIVICRM_MYSQL_STRICT')) {
+// define('CIVICRM_MYSQL_STRICT', TRUE );
+// }
+
+if (CIVICRM_UF === 'UnitTests') {
+  if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');
+  if (!defined('CIVICRM_MYSQL_STRICT')) define('CIVICRM_MYSQL_STRICT', true);
+}
 
 /**
  * 
@@ -280,12 +425,18 @@ $include_path = '.'           . PATH_SEPARATOR .
                 $civicrm_root . PATH_SEPARATOR .
                 $civicrm_root . DIRECTORY_SEPARATOR . 'packages' . PATH_SEPARATOR .
                 get_include_path( );
-set_include_path( $include_path );
+if ( set_include_path( $include_path ) === false ) {
+   echo "Could not set the include path<p>";
+   exit( );
+}
 
-if ( function_exists( 'variable_get' ) && variable_get('clean_url', '0') != '0' ) {
-    define( 'CIVICRM_CLEANURL', 1 );
-} else {
-    define( 'CIVICRM_CLEANURL', 0 );
+if (!defined('CIVICRM_CLEANURL')) {
+  if ( function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
+    define('CIVICRM_CLEANURL', 1 );
+  }
+  else {
+    define('CIVICRM_CLEANURL', 0);
+  }
 }
 
 // force PHP to auto-detect Mac line endings

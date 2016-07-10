@@ -17,7 +17,7 @@ $databases = array (
     ),
 );
 
-$s275 = "/Users/ken/Documents/SIA/server275-site";
+$s275 = "/home/singersin/www/www";
 if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
     ||
     preg_match("{^${s275}}", getenv("PWD"))) {

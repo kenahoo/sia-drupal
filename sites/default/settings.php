@@ -217,9 +217,12 @@ require_once 'db-settings.php';
 global $databases;
 
 
-#$d = $databases['default']['default'];
-#$db_url = "mysqli://$d[username]:$d[password]@$d[host]/$d[database]";
+$d = $databases['default']['default'];
+$db_url = "mysqli://$d[username]:$d[password]@$d[host]/$d[database]";
 $db_prefix = '';
+
+//print("hi there: " . $db_url);
+
 
 
 /**

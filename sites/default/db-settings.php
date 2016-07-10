@@ -3,6 +3,7 @@
 global $databases;
 global $site_root;
 global $host;
+global $civi_database;
 
 $databases = array (
     'default' =>
@@ -24,11 +25,13 @@ if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
 
     $host = 'www.singersinaccord.org';
     $site_root = $s275;
+    $civi_database = 'singersin_combined';
 
 } else {
     # Development server
     $host = 'localhost';
     $site_root = '/Users/ken/Documents/SIA/server275-site';
+    $civi_database = 'singersin_combined';
 }
 
 function flerb($dbs) {

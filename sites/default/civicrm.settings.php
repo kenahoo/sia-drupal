@@ -108,9 +108,13 @@ if (!defined('CIVICRM_DSN')) {
     global $site_root;
     global $civicrm_root;
     global $host;
+    global $civi_database;
     require_once 'db-settings.php';
     $d = $databases['default']['default'];
-    define( 'CIVICRM_DSN', "mysql://$d[username]:$d[password]@$d[host]/$d[database]?new_link=true" );
+
+    $cividb = isset($civi_database) ? $civi_database : $d[database];
+    define( 'CIVICRM_DSN', "mysql://$d[username]:$d[password]@$d[host]/$cividb?new_link=true" );
+    unset($cividb);
   }
 }
 

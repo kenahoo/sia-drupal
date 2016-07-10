@@ -451,8 +451,8 @@ switch ($memLimitUnit) {
     case 'm': $memLimit *= 1024;
     case 'k': $memLimit *= 1024;
 }
-if ( $memLimit >= 0 and $memLimit < 50331648 ) {
-    ini_set('memory_limit', '48M');
+if ($memLimit >= 0 and $memLimit < 134217728) {
+    ini_set('memory_limit', '128M');
 }
 
 require_once 'CRM/Core/ClassLoader.php';

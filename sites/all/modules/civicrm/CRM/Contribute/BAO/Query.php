@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Contribute_BAO_Query {
 
@@ -239,7 +239,7 @@ class CRM_Contribute_BAO_Query {
     // Adding address_id in a way that is more easily extendable since the above is a bit ... wordy.
     $supportedBasicReturnValues = array('address_id');
     foreach ($supportedBasicReturnValues as $fieldName) {
-      if (!empty($query->_returnProperties[$fieldName])) {
+      if (!empty($query->_returnProperties[$fieldName]) && empty($query->_select[$fieldName])) {
         $query->_select[$fieldName] = "civicrm_contribution.{$fieldName} as $fieldName";
         $query->_element[$fieldName] = $query->_tables['civicrm_contribution'] = 1;
       }
@@ -886,6 +886,7 @@ class CRM_Contribute_BAO_Query {
       // on what field to show instead.
       'contribution_product_id' => 1,
       'product_name' => 1,
+      'currency' => 1,
     );
     if (self::isSoftCreditOptionEnabled()) {
       $properties = array_merge($properties, self::softCreditReturnProperties());

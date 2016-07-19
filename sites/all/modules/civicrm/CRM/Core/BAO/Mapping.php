@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
@@ -72,10 +72,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     // delete from mapping_field table
     $mappingField = new CRM_Core_DAO_MappingField();
     $mappingField->mapping_id = $id;
-    $mappingField->find();
-    while ($mappingField->fetch()) {
-      $mappingField->delete();
-    }
+    $mappingField->delete();
 
     // delete from mapping table
     $mapping = new CRM_Core_DAO_Mapping();
@@ -597,7 +594,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               $relationshipType->id = $id;
               if ($relationshipType->find(TRUE)) {
                 $direction = "contact_sub_type_$second";
-		 $target_type = 'contact_type_' . $second;
+                $target_type = 'contact_type_' . $second;
                 if (isset($relationshipType->$direction)) {
                   $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$direction], (array) $relationshipCustomFields);
                 }

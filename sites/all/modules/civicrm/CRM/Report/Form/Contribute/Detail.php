@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -63,41 +63,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
-            'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-          ),
-          'age' => array(
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'fields' => $this->getBasicContactFields(),
         'filters' => array(
           'sort_name' => array(
             'title' => ts('Donor Name'),
@@ -338,7 +304,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         ),
       ),
     ) + $this->addAddressFields(FALSE);
-
+    // The tests test for this variation of the sort_name field. Don't argue with the tests :-).
+    $this->_columns['civicrm_contact']['fields']['sort_name']['title'] = ts('Donor Name');
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -375,6 +342,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         'title' => ts('Campaign'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => $this->activeCampaigns,
+        'type' => CRM_Utils_Type::T_INT,
       );
       $this->_columns['civicrm_contribution']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
     }
@@ -517,7 +485,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,
                ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,
                {$this->_aliases['civicrm_contribution']}.currency as currency,
-	       SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
+               SUM( {$this->_aliases['civicrm_contribution']}.fee_amount ) as fees,
                SUM( {$this->_aliases['civicrm_contribution']}.net_amount ) as net
         ";
 
@@ -604,6 +572,12 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
     $this->beginPostProcess();
+    // CRM-18312 - display soft_credits and soft_credits_for column
+    // when 'Contribution or Soft Credit?' column is not selected
+    if (empty($this->_params['fields']['contribution_or_soft'])) {
+      $this->_params['fields']['contribution_or_soft'] = 1;
+      $this->noDisplayContributionOrSoftColumn = TRUE;
+    }
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'contributions_only' &&
@@ -707,7 +681,6 @@ UNION ALL
 
     // assign variables to templates
     $this->doTemplateAssignment($rows);
-
     // do print / pdf / instance stuff if needed
     $this->endPostProcess($rows);
   }
@@ -770,6 +743,7 @@ UNION ALL
         unset($rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id']);
       }
 
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contribution/detail', ts('View Contribution Details')) ? TRUE : $entryFound;
       // convert donor sort name to link
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
         !empty($rows[$rowNum]['civicrm_contact_sort_name']) &&
@@ -872,6 +846,12 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         $rows[$rowNum]['civicrm_contribution_soft_credit_for'] = $string;
       }
 
+      // CRM-18312 - hide 'contribution_or_soft' column if unchecked.
+      if (!empty($this->noDisplayContributionOrSoftColumn)) {
+        unset($rows[$rowNum]['civicrm_contribution_contribution_or_soft']);
+        unset($this->_columnHeaders['civicrm_contribution_contribution_or_soft']);
+      }
+
       //convert soft_credit_type_id into label
       if (array_key_exists('civicrm_contribution_soft_soft_credit_type_id', $rows[$rowNum])) {
         $rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id'] = CRM_Core_PseudoConstant::getLabel(
@@ -882,24 +862,6 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
 
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;
-
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
-      }
-
-      // display birthday in the configured custom format
-      if (array_key_exists('civicrm_contact_birth_date', $row)) {
-        $birthDate = $row['civicrm_contact_birth_date'];
-        if ($birthDate) {
-          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
-        }
-        $entryFound = TRUE;
-      }
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need

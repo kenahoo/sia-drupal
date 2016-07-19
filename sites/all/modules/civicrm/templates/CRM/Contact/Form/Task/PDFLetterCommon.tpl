@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,6 +115,13 @@
 
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+
+<table class="form-layout-compressed">
+  <tr>
+    <td class="label-left">{$form.document_type.label}</td>
+    <td>{$form.document_type.html}</td>
+  </tr>
+</table>
 
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 

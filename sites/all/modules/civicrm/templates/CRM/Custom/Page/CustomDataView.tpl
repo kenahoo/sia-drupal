@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -74,11 +74,7 @@
                     {else}
                       <td class="label">{$element.field_title}</td>
                       {if $element.field_data_type == 'Money'}
-                        {if $element.field_type == 'Text'}
-                          <td class="html-adjust">{$element.field_value|crmMoney}</td>
-                        {else}
-                          <td class="html-adjust">{$element.field_value}</td>
-                        {/if}
+                        <td class="html-adjust">{$element.field_value}</td>
                       {else}
                         <td class="html-adjust">
                           {if $element.contact_ref_id}
@@ -131,11 +127,7 @@
             </div>
           {else}
             {if $element.field_data_type == 'Money'}
-              {if $element.field_type == 'Text'}
-                 <div class="content">{if $element.field_value}{$element.field_value|crmMoney}{else}<br/>{/if}</div>
-              {else}
-                 <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
-              {/if}
+                <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
             {else}
               <div class="content">
                 {if $element.contact_ref_id}

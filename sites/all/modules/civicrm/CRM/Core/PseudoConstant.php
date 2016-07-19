@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Core_PseudoConstant {
 
@@ -252,7 +252,10 @@ class CRM_Core_PseudoConstant {
 
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
-        return call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']));
+        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']));
+        //CRM-18223: Allow additions to field options via hook.
+        CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
+        return $fieldOptions;
       }
 
       // Merge params with schema defaults
@@ -294,7 +297,8 @@ class CRM_Core_PseudoConstant {
           $params['labelColumn'] ? $params['labelColumn'] : 'label',
           $params['onlyActive'],
           $params['fresh'],
-          $params['keyColumn'] ? $params['keyColumn'] : 'value'
+          $params['keyColumn'] ? $params['keyColumn'] : 'value',
+          !empty($params['orderColumn']) ? $params['orderColumn'] : 'weight'
         );
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $options, $params);
         return $options;
@@ -703,7 +707,7 @@ class CRM_Core_PseudoConstant {
       self::populate(self::$stateProvince, 'CRM_Core_DAO_StateProvince', TRUE, 'name', 'is_active', $whereClause);
 
       // localise the province names if in an non-en_US locale
-      global $tsLocale;
+      $tsLocale = CRM_Core_I18n::getLocale();
       if ($tsLocale != '' and $tsLocale != 'en_US') {
         $i18n = CRM_Core_I18n::singleton();
         $i18n->localizeArray(self::$stateProvince, array(
@@ -834,7 +838,7 @@ WHERE  id = %1";
       }
 
       // localise the country names if in an non-en_US locale
-      global $tsLocale;
+      $tsLocale = CRM_Core_I18n::getLocale();
       if ($tsLocale != '' and $tsLocale != 'en_US') {
         $i18n = CRM_Core_I18n::singleton();
         $i18n->localizeArray(self::$country, array(
@@ -1562,7 +1566,7 @@ ORDER BY name";
 
     // localise the stateProvince names if in an non-en_US locale
     $config = CRM_Core_Config::singleton();
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     if ($tsLocale != '' and $tsLocale != 'en_US') {
       $i18n = CRM_Core_I18n::singleton();
       $i18n->localizeArray($result, array(

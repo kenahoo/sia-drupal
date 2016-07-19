@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
@@ -295,6 +295,24 @@ WHERE cog.name = 'payment_instrument' ";
       $titles = array();
     }
     return $titles;
+  }
+
+  /**
+   * Validate account relationship with financial account type
+   *
+   * @param obj $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
+   *
+   */
+  public static function validateRelationship($financialTypeAccount) {
+    $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
+    $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialTypeAccount->financial_account_id, 'financial_account_type_id');
+    if (CRM_Utils_Array::value($financialTypeAccount->account_relationship, $financialAccountLinks) != $financialAccountType) {
+      $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $params = array(
+        1 => $accountRelationships[$financialTypeAccount->account_relationship],
+      );
+      throw new Exception(ts("This financial account cannot have '%1' relationship.", $params));
+    }
   }
 
 }

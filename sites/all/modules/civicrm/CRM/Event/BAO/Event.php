@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
@@ -194,7 +194,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         2 => array($id, 'integer'),
       );
 
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     // price set cleanup, CRM-5527
@@ -1008,7 +1008,7 @@ WHERE civicrm_event.is_active = 1
           $from = ' FROM ' . $tableName;
           $where = " WHERE {$tableName}.entity_id = {$id}";
           $query = $insert . $select . $from . $where;
-          $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          $dao = CRM_Core_DAO::executeQuery($query);
         }
       }
     }

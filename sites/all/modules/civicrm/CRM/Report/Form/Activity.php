@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_selectAliasesTotal = array();
@@ -46,6 +46,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     // There could be multiple contacts. We not clear on which contact id to display.
     // Lets hide it for now.
     $this->_exposeContactID = FALSE;
+    // if navigated from count link of activity summary reports.
+    $this->_resetDateFilter = CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean', CRM_Core_DAO::$_nullObject);
 
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
@@ -580,7 +582,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op && ($op != 'nnll' || $op != 'nll')) {
+            if ($op && ($op != 'nnll' && $op != 'nll')) {
               $clause = $this->whereClause($field,
                 $op,
                 CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
@@ -745,7 +747,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
 
   public function postProcess() {
     //reset value of activity_date
-    if (!empty($this->_force)) {
+    if (!empty($this->_resetDateFilter)) {
       $this->_formValues["activity_date_time_relative"] = NULL;
     }
     $this->beginPostProcess();

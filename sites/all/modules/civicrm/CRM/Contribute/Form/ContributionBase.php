@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -622,17 +622,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         'financial_type' => 1,
       );
 
-      $fields = NULL;
-      if ($contactID && CRM_Core_BAO_UFGroup::filterUFGroups($id, $contactID)) {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
-      }
-      else {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
-      }
+      $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
+        NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
+      );
 
       if ($fields) {
         // unset any email-* fields since we already collect it, CRM-2888
@@ -1108,7 +1100,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $allowAutoRenewOpt = (int) $memType['auto_renew'];
             if (is_array($this->_paymentProcessors)) {
               foreach ($this->_paymentProcessors as $id => $val) {
-                if (!$val['is_recur']) {
+                if ($id && !$val['is_recur']) {
                   $allowAutoRenewOpt = 0;
                   continue;
                 }
@@ -1199,7 +1191,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->assign('autoRenewOption', $autoRenewOption);
         }
 
-        if (!$this->_values['is_pay_later'] && is_array($this->_paymentProcessors) && ($allowAutoRenewMembership || $autoRenewOption)) {
+        if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
           $this->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
         }
 

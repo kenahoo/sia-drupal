@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -1835,25 +1835,6 @@ class CRM_Utils_Date {
     }
     return $format;
   }
-
-  /**
-   * Get the time in UTC for the current time. You can optionally send an offset from the current time if needed
-   *
-   * @param int $offset
-   *   the offset from the current time in seconds.
-   *
-   * @return string
-   *   the time in UTC
-   */
-  public static function getUTCTime($offset = 0) {
-    $originalTimezone = date_default_timezone_get();
-    date_default_timezone_set('UTC');
-    $time = time() + $offset;
-    $now = date('YmdHis', $time);
-    date_default_timezone_set($originalTimezone);
-    return $now;
-  }
-
 
   /**
    * @param $date

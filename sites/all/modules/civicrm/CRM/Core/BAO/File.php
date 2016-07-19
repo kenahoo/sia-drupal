@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
  */
@@ -145,7 +145,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $fileDAO->uri = $filename;
     $fileDAO->mime_type = $mimeType;
     $fileDAO->file_type_id = $fileTypeID;
-    $fileDAO->upload_date = date('Ymdhis');
+    $fileDAO->upload_date = date('YmdHis');
     $fileDAO->save();
 
     // need to add/update civicrm_entity_file
@@ -532,7 +532,7 @@ AND       CEF.entity_id    = %2";
 
     $numAttachments = Civi::settings()->get('max_attachments');
 
-    $now = date('Ymdhis');
+    $now = date('YmdHis');
 
     // setup all attachments
     for ($i = 1; $i <= $numAttachments; $i++) {

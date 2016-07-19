@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -584,8 +584,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
     }
 
-    // reset the group contact cache since smart groups might be affected due to this
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity);
@@ -1880,6 +1879,9 @@ SELECT  display_name
       'campaign_id' => $activity->campaign_id,
     );
 
+    if (!empty($activity->activity_id)) {
+      $activityParams['id'] = $activity->activity_id;
+    }
     // create activity with target contacts
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
@@ -2410,9 +2412,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     if (!$componentId || $allow) {
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
       // Account for possibility of activity not having a source contact (as it may have been deleted).
-      if ($sourceContactId) {
-        $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
-      }
+      $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
     }
 
     // Check for target and assignee contacts.

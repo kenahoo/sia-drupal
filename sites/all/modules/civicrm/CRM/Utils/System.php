@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -685,7 +685,7 @@ class CRM_Utils_System {
     if (is_array($value)) {
       // @todo Reuse of the $value variable = asking for trouble.
       foreach ($value as $key => $value) {
-        if (!self::isNull($value)) {
+        if (in_array($key, CRM_Core_DAO::acceptedSQLOperators(), TRUE) || !self::isNull($value)) {
           return FALSE;
         }
       }

@@ -51,6 +51,39 @@ function singer_list() {
     return( array($left, $right) );
 }
 
+function format_phones($ph) {
+    return join(
+	'<br>',
+	array_map(
+	    function($ph) {return sprintf("%s (%s)", $ph['phone'], $ph['phoneTypeId']==2 ? "Mobile" : $ph['locationType']);},
+	    array_filter(
+		array_values($ph),
+		function($ph) {return $ph['locationType'] != 'Billing';}
+	    )
+	)
+    );
+}
+
+function singer_roster2() {
+    civicrm_initialize();
+    $api = new civicrm_api3();
+    $api->Contact->Get(array('group' => 6,#'Current Singers',
+			     'sequential' => 1,
+			     'rowCount' => 10000,
+			     'return' => 'custom_4,display_name,email,phone,'.
+				       'street_address,city,state_province,postal_code,id',
+			     'sort'=>'custom_4,last_name,first_name'));
+
+    return array_map( function($c) {
+	return array($c->custom_4,
+		     sprintf("%s<br><a href=\"mailto:%s\">%s</a>",
+			     $c->display_name, $c->email, $c->email),
+		     format_phones(CRM_Core_BAO_Phone::allPhones($c->id)),
+		     sprintf("%s<br>%s, %s %s", $c->street_address, $c->city,
+			     $c->state_province, $c->postal_code)
+	);
+    }, $api->values);
+}
 
 function singer_roster($db = NULL) {
     $db = is_null($db) ? '' : $db . '.';

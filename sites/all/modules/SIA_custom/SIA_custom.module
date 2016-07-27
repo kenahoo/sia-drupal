@@ -21,11 +21,7 @@ function e($errno, $msg, $file, $line, $vars) {
 #set_error_handler('e', E_ERROR);
 
 function singer_list() {
-    civicrm_initialize();
-    $api = new civicrm_api3();
-    $api->Contact->Get(array('group' => 6, 'rowCount' => 10000,
-			     'return' => 'display_name,custom_4',
-			     'sort'=>'last_name,first_name'));
+    $api = singer_data();
 
     $arr = array();
     foreach($api->values as $c) {
@@ -64,7 +60,7 @@ function format_phones($ph) {
     );
 }
 
-function singer_roster2() {
+function singer_data() {
     civicrm_initialize();
     $api = new civicrm_api3();
     $api->Contact->Get(array('group' => 6,#'Current Singers',
@@ -73,6 +69,11 @@ function singer_roster2() {
 			     'return' => 'custom_4,display_name,email,phone,'.
 				       'street_address,city,state_province,postal_code,id',
 			     'sort'=>'custom_4,last_name,first_name'));
+    return $api;
+}
+
+function singer_roster2() {
+    $api = singer_data();
 
     return array_map( function($c) {
 	return array($c->custom_4,

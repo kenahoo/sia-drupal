@@ -263,4 +263,87 @@ function mp3_listing($start, $end, $title, $collapsed=true, $dir='sites/default/
   print( collapsible($title, $content, $collapsed) );
 }
 
+
+function list_sync_check() {
+    $drup_group = 'choir member';
+
+    $show_diffs = function($a, $b, $message) {
+	$diffs = array_diff($a, $b);
+	if (count($diffs) == 0) {
+	    return;
+	}
+	print(theme_item_list(array('items' => $diffs,
+				    'title' => "$message:",
+				    'type' => 'ul',
+				    'attributes' => array())));
+    };
+
+    $get_crm = function() {
+	$api = singer_data();
+	$emails = array_map(function($c){return $c->email;}, $api->values);
+	asort($emails);
+	return $emails;
+    };
+
+    $get_drupal = function() use ($drup_group) {
+	// TODO don't use a direct query
+	global $databases;
+	$db_crm = $databases['default']['default']['database'];
+	$query = <<<EOF
+     SELECT u.mail FROM $db_crm.users u
+     JOIN $db_crm.users_roles ur
+     JOIN $db_crm.role r
+     WHERE u.uid=ur.uid AND ur.rid=r.rid AND r.name='$drup_group'
+     ORDER BY u.mail
+EOF;
+
+	$result = db_query($query);
+
+	$emails = array();
+	foreach($result as $row) {
+	    foreach ($row as $key => $value) {
+		$emails[] = $value;
+	    }
+	}
+	asort($emails);
+	return $emails;
+    };
+
+
+    $get_mailman = function() {
+        global $SITE_CONFIG;
+        $mm = $SITE_CONFIG['mailman'];
+        $cmd = sprintf("python %s --url_path /mailman/admin -c %s %s %s",
+                       $mm['script'], $mm['host'], $mm['list'], $mm['password']);
+	$handle = popen($cmd, "r");
+	$header = fgetcsv($handle);
+        if (!$handle || !$header) {
+            throw new Exception("Couldn't retrieve info from MailMan");
+        }
+
+	$i = array_search("email address", $header);
+
+	$emails = array();
+	while (($data = fgetcsv($handle)) !== FALSE) {
+	    $emails[] = $data[$i];
+	}
+	asort($emails);
+	return $emails;
+    };
+
+    ###################################
+
+
+    $from_crm = $get_crm();
+    $from_drupal = $get_drupal();
+    $from_mailman = $get_mailman();
+
+    $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group");
+    $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group");
+
+    $show_diffs($from_crm, $from_mailman, "Add to MailMan list");
+    $show_diffs($from_mailman, $from_crm, "Remove from MailMan list");
+}
+
+
 //# Don't close with ?>

@@ -43,14 +43,22 @@ $flerb = function($dbs) {
 	    continue;
 	}
 	// print("using $file<br>");
-	$cnf = parse_ini_file($file);
+	$cnf = parse_ini_file($file, true);
 
-	foreach(array('password', 'database', 'host', 'user') as $key) {
-            $key2 = $key=='user' ? 'username' : $key;
-            if (isset($cnf[$key])) {
-		// print("Setting $key=$cnf[$key]<br>");
-		$dbs[$key2] = $cnf[$key];
-            }
+	global $SITE_CONFIG;
+	$SITE_CONFIG = $cnf;
+
+	foreach ($cnf as $section => $vals) {
+	    if ($section == 'mailman') {
+		continue;
+	    }
+	    foreach(array('password', 'database', 'host', 'user') as $key) {
+		$key2 = $key=='user' ? 'username' : $key;
+		if (isset($vals[$key])) {
+		    // print("Setting $key=$cnf[$key]<br>");
+		    $dbs[$key2] = $vals[$key];
+		}
+	    }
 	}
     }
     return $dbs;

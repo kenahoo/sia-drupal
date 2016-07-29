@@ -266,12 +266,14 @@ function mp3_listing($start, $end, $title, $collapsed=true, $dir='sites/default/
 
 function list_sync_check() {
     $drup_group = 'choir member';
+    $did_something = false;
 
-    $show_diffs = function($a, $b, $message) {
+    $show_diffs = function($a, $b, $message) use (&$did_something) {
         $diffs = array_diff($a, $b);
         if (count($diffs) == 0) {
             return;
         }
+        $did_something = true;
         print(theme_item_list(array('items' => $diffs,
                                     'title' => "$message:",
                                     'type' => 'ul',
@@ -343,6 +345,10 @@ EOF;
 
     $show_diffs($from_crm, $from_mailman, "Add to MailMan list");
     $show_diffs($from_mailman, $from_crm, "Remove from MailMan list");
+
+    if (!$did_something) {
+        print("<p><em>Nothing!  Looks like you're good!</em></p>");
+    }
 }
 
 

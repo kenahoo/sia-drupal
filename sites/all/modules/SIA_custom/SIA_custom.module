@@ -49,14 +49,14 @@ function singer_list() {
 
 function format_phones($ph) {
     return join(
-	'<br>',
-	array_map(
-	    function($ph) {return sprintf("%s (%s)", $ph['phone'], $ph['phoneTypeId']==2 ? "Mobile" : $ph['locationType']);},
-	    array_filter(
-		array_values($ph),
-		function($ph) {return $ph['locationType'] != 'Billing';}
-	    )
-	)
+        '<br>',
+        array_map(
+            function($ph) {return sprintf("%s (%s)", $ph['phone'], $ph['phoneTypeId']==2 ? "Mobile" : $ph['locationType']);},
+            array_filter(
+                array_values($ph),
+                function($ph) {return $ph['locationType'] != 'Billing';}
+            )
+        )
     );
 }
 
@@ -64,11 +64,11 @@ function singer_data() {
     civicrm_initialize();
     $api = new civicrm_api3();
     $api->Contact->Get(array('group' => 6,#'Current Singers',
-			     'sequential' => 1,
-			     'rowCount' => 10000,
-			     'return' => 'custom_4,display_name,email,phone,'.
-				       'street_address,city,state_province,postal_code,id',
-			     'sort'=>'custom_4,last_name,first_name'));
+                             'sequential' => 1,
+                             'rowCount' => 10000,
+                             'return' => 'custom_4,display_name,email,phone,'.
+                                       'street_address,city,state_province,postal_code,id',
+                             'sort'=>'custom_4,last_name,first_name'));
     return $api;
 }
 
@@ -76,13 +76,13 @@ function singer_roster2() {
     $api = singer_data();
 
     return array_map( function($c) {
-	return array($c->custom_4,
-		     sprintf("%s<br><a href=\"mailto:%s\">%s</a>",
-			     $c->display_name, $c->email, $c->email),
-		     format_phones(CRM_Core_BAO_Phone::allPhones($c->id)),
-		     sprintf("%s<br>%s, %s %s", $c->street_address, $c->city,
-			     $c->state_province, $c->postal_code)
-	);
+        return array($c->custom_4,
+                     sprintf("%s<br><a href=\"mailto:%s\">%s</a>",
+                             $c->display_name, $c->email, $c->email),
+                     format_phones(CRM_Core_BAO_Phone::allPhones($c->id)),
+                     sprintf("%s<br>%s, %s %s", $c->street_address, $c->city,
+                             $c->state_province, $c->postal_code)
+        );
     }, $api->values);
 }
 
@@ -119,19 +119,19 @@ ORDER BY v.voice_part_4, c.last_name
 function SIA_custom_menu() {
   $items['product/add/%/%'] =
     array(
-	  'page callback' => 'SIA_custom_product_add',
-	  'page arguments' => array(2,3),  # items 2 & 3 of the path, which come from the '%' components.
-	  'access arguments' => array('access content'),
-	  'type' => MENU_CALLBACK,
-	 );
+          'page callback' => 'SIA_custom_product_add',
+          'page arguments' => array(2,3),  # items 2 & 3 of the path, which come from the '%' components.
+          'access arguments' => array('access content'),
+          'type' => MENU_CALLBACK,
+         );
 
   $items['donation/add'] =
     array(
-	  'page callback' => 'SIA_custom_donation_add',
-	  #'page arguments' => array(2),  # item 2 of the path, which comes from the '%' components.
-	  'access arguments' => array('access content'),
-	  'type' => MENU_CALLBACK,
-	 );
+          'page callback' => 'SIA_custom_donation_add',
+          #'page arguments' => array(2),  # item 2 of the path, which comes from the '%' components.
+          'access arguments' => array('access content'),
+          'type' => MENU_CALLBACK,
+         );
 
   return $items;
 }
@@ -268,28 +268,28 @@ function list_sync_check() {
     $drup_group = 'choir member';
 
     $show_diffs = function($a, $b, $message) {
-	$diffs = array_diff($a, $b);
-	if (count($diffs) == 0) {
-	    return;
-	}
-	print(theme_item_list(array('items' => $diffs,
-				    'title' => "$message:",
-				    'type' => 'ul',
-				    'attributes' => array())));
+        $diffs = array_diff($a, $b);
+        if (count($diffs) == 0) {
+            return;
+        }
+        print(theme_item_list(array('items' => $diffs,
+                                    'title' => "$message:",
+                                    'type' => 'ul',
+                                    'attributes' => array())));
     };
 
     $get_crm = function() {
-	$api = singer_data();
-	$emails = array_map(function($c){return $c->email;}, $api->values);
-	asort($emails);
-	return $emails;
+        $api = singer_data();
+        $emails = array_map(function($c){return $c->email;}, $api->values);
+        asort($emails);
+        return $emails;
     };
 
     $get_drupal = function() use ($drup_group) {
-	// TODO don't use a direct query
-	global $databases;
-	$db_crm = $databases['default']['default']['database'];
-	$query = <<<EOF
+        // TODO don't use a direct query
+        global $databases;
+        $db_crm = $databases['default']['default']['database'];
+        $query = <<<EOF
      SELECT u.mail FROM $db_crm.users u
      JOIN $db_crm.users_roles ur
      JOIN $db_crm.role r
@@ -297,16 +297,16 @@ function list_sync_check() {
      ORDER BY u.mail
 EOF;
 
-	$result = db_query($query);
+        $result = db_query($query);
 
-	$emails = array();
-	foreach($result as $row) {
-	    foreach ($row as $key => $value) {
-		$emails[] = $value;
-	    }
-	}
-	asort($emails);
-	return $emails;
+        $emails = array();
+        foreach($result as $row) {
+            foreach ($row as $key => $value) {
+                $emails[] = $value;
+            }
+        }
+        asort($emails);
+        return $emails;
     };
 
 
@@ -315,20 +315,20 @@ EOF;
         $mm = $SITE_CONFIG['mailman'];
         $cmd = sprintf("python %s --url_path /mailman/admin -c %s %s %s",
                        $mm['script'], $mm['host'], $mm['list'], $mm['password']);
-	$handle = popen($cmd, "r");
-	$header = fgetcsv($handle);
+        $handle = popen($cmd, "r");
+        $header = fgetcsv($handle);
         if (!$handle || !$header) {
             throw new Exception("Couldn't retrieve info from MailMan");
         }
 
-	$i = array_search("email address", $header);
+        $i = array_search("email address", $header);
 
-	$emails = array();
-	while (($data = fgetcsv($handle)) !== FALSE) {
-	    $emails[] = $data[$i];
-	}
-	asort($emails);
-	return $emails;
+        $emails = array();
+        while (($data = fgetcsv($handle)) !== FALSE) {
+            $emails[] = $data[$i];
+        }
+        asort($emails);
+        return $emails;
     };
 
     ###################################

@@ -288,24 +288,17 @@ function list_sync_check() {
     };
 
     $get_drupal = function() use ($drup_group) {
-        // TODO don't use a direct query
-        global $databases;
-        $db_crm = $databases['default']['default']['database'];
-        $query = <<<EOF
-     SELECT u.mail FROM $db_crm.users u
-     JOIN $db_crm.users_roles ur
-     JOIN $db_crm.role r
-     WHERE u.uid=ur.uid AND ur.rid=r.rid AND r.name='$drup_group'
-     ORDER BY u.mail
-EOF;
-
-        $result = db_query($query);
+        $role = user_role_load_by_name($drup_group);
+        $uids = db_select('users_roles', 'ur')
+            ->fields('ur', array('uid'))
+            ->condition('ur.rid', $role->rid, '=')
+            ->execute()
+            ->fetchCol();
+        $users = user_load_multiple($uids);
 
         $emails = array();
-        foreach($result as $row) {
-            foreach ($row as $key => $value) {
-                $emails[] = $value;
-            }
+        foreach($users as $user) {
+            $emails[] = $user->mail;
         }
         asort($emails);
         return $emails;

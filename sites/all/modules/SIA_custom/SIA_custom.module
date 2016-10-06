@@ -20,6 +20,26 @@ function e($errno, $msg, $file, $line, $vars) {
 }
 #set_error_handler('e', E_ERROR);
 
+function add_to_constant_contact($path) {
+    global $SITE_CONFIG;
+    $mm = $SITE_CONFIG['constantcontact'];
+
+    $curl = curl_init("https://api.constantcontact.com/v2/activities/addcontacts?api_key=" . $mm['api_key']);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $mm['access_token']));
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, array(
+        'file_name' => 'contacts.csv',
+        'lists' => '2',
+        'data' => new \CurlFile($path)
+    ));
+
+    $curl_response = curl_exec($curl);
+
+    print($curl_response . "\n");
+}
+
+
 function singer_list() {
     $api = singer_data();
 

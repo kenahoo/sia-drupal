@@ -106,32 +106,6 @@ function singer_roster2() {
     }, $api->values);
 }
 
-function singer_roster($db = NULL) {
-    $db = is_null($db) ? '' : $db . '.';
-    
-    $result = db_query("
-SELECT v.voice_part_4, c.display_name, e.email,
-  CONCAT_WS('<br> ', CONCAT(p1.phone, ' (h)'), CONCAT(p2.phone, ' (w)'), p3.phone) AS phone,
-  CONCAT(ad.street_address, '<br> ', ad.city, ', ', ad.abbreviation, ' ', ad.postal_code) AS address
-FROM ${db}civicrm_contact c
-LEFT OUTER JOIN ${db}civicrm_email e ON c.id=e.contact_id
-JOIN ${db}civicrm_group_contact gc ON c.id=gc.contact_id
-JOIN ${db}civicrm_group g ON gc.group_id=g.id
-LEFT OUTER JOIN ${db}civicrm_value_constituent_information_1 v ON c.id=v.entity_id
-LEFT OUTER JOIN (SELECT * FROM ${db}civicrm_phone WHERE location_type_id=1 AND phone_type_id=1) AS p1 ON c.id=p1.contact_id
-LEFT OUTER JOIN (SELECT * FROM ${db}civicrm_phone WHERE location_type_id=2 AND phone_type_id=1) AS p2 ON c.id=p2.contact_id
-LEFT OUTER JOIN (SELECT GROUP_CONCAT(CONCAT(phone,' (m)') SEPARATOR '<br>') AS phone, contact_id FROM ${db}civicrm_phone WHERE phone_type_id=2 GROUP BY contact_id) AS p3 ON c.id=p3.contact_id
-LEFT OUTER JOIN (SELECT a.*, s.abbreviation FROM ${db}civicrm_address a JOIN ${db}civicrm_state_province s ON a.state_province_id=s.id WHERE is_primary=1) AS ad ON c.id=ad.contact_id
-WHERE e.is_primary IS TRUE
-AND gc.status='Added'
-AND g.title='Current Singers'
-AND c.is_deleted=0
-ORDER BY v.voice_part_4, c.last_name
-");
-    return($result);
-}
-
-
 /**
  * Implements hook_menu().
  * See http://realtidings.com/blog/12/Apr/26/drupal-commerce-custom-add-cart-link .

@@ -80,10 +80,20 @@ function format_phones($ph) {
     );
 }
 
+## Get numeric group ID for given name
+function civi_group_id($name) {
+    $result = civicrm_api3('Group', 'get', array(
+        'sequential' => 1,
+        'return' => array("id"),
+        'title' => $name,
+    ));
+    return $result['values'][0]['id'];
+}
+
 function singer_data() {
     civicrm_initialize();
     $api = new civicrm_api3();
-    $api->Contact->Get(array('group' => 6,#'Current Singers',
+    $api->Contact->Get(array('group' => civi_group_id('Current Singers'),
                              'sequential' => 1,
                              'rowCount' => 10000,
                              'return' => 'custom_4,display_name,email,phone,'.

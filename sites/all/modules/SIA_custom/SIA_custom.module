@@ -20,9 +20,22 @@ function e($errno, $msg, $file, $line, $vars) {
 }
 #set_error_handler('e', E_ERROR);
 
-function add_to_constant_contact($path) {
+function write_csv($path, $data, $header) {
+    print("Writing $path\n");
+    $fp = fopen($path, 'w');
+    fputcsv($fp, $header);
+    foreach ($data as $line) {
+        fputcsv($fp, $line);
+    }
+    fclose($fp);
+}
+
+function sync_to_constant_contact() {
     global $SITE_CONFIG;
     $mm = $SITE_CONFIG['constantcontact'];
+
+    $tmpfname = tempnam(sys_get_temp_dir(), "contacts");
+    write_csv($tmpfname, email_recipients(), array('Email address', 'First name', 'Last name'));
 
     $curl = curl_init("https://api.constantcontact.com/v2/activities/addcontacts?api_key=" . $mm['api_key']);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $mm['access_token']));
@@ -30,13 +43,29 @@ function add_to_constant_contact($path) {
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, array(
         'file_name' => 'contacts.csv',
-        'lists' => '2',
-        'data' => new \CurlFile($path)
+        'lists' => '1331507544',  ## TODO get this dynamically
+        'data' => new \CurlFile($tmpfname)
     ));
 
-    $curl_response = curl_exec($curl);
+    if (!($curl_response = curl_exec($curl))) {
+        print(curl_error($curl));
+    } else {
+        print($curl_response . "\n");
+    }
+}
 
-    print($curl_response . "\n");
+function email_recipients() {
+    civicrm_initialize();
+    $api = new civicrm_api3();
+    $api->Contact->Get(array('group' => civi_group_id('Email newsletter recipients'),
+                             'sequential' => 1,
+                             'rowCount' => 20000,
+                             'return' => 'email,first_name,last_name'));
+    $out = array();
+    foreach($api->values as $c) {
+        $out[] = array($c->email, $c->first_name, $c->last_name);
+    }
+    return $out;
 }
 
 

@@ -304,13 +304,14 @@ function list_sync_check() {
     $show_diffs = function($a, $b, $message) use (&$did_something) {
         $diffs = array_diff($a, $b);
         if (count($diffs) == 0) {
-            return;
+            return $diffs;
         }
         $did_something = true;
         print(theme_item_list(array('items' => $diffs,
                                     'title' => "$message:",
                                     'type' => 'ul',
                                     'attributes' => array())));
+        return $diffs;
     };
 
     $get_crm = function() {
@@ -366,11 +367,18 @@ function list_sync_check() {
     $from_drupal = $get_drupal();
     $from_mailman = $get_mailman();
 
-    $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group");
-    $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group");
+    $drup_add = $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group");
+    $drup_rm  = $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group");
 
     $show_diffs($from_crm, $from_mailman, "Add to MailMan list");
     $show_diffs($from_mailman, $from_crm, "Remove from MailMan list");
+
+    if (count($drup_add) > 0) {
+        print("<p>To add to Drupal: drush user-add-role 'choir member' " . join(",", $drup_add) . "</p>");
+    }
+    if (count($drup_rm) > 0) {
+        print("<p>To remove from Drupal: drush user-remove-role 'choir member' " . join(",", $drup_rm) . "</p>");
+    }
 
     if (!$did_something) {
         print("<p><em>Nothing!  Looks like you're good!</em></p>");

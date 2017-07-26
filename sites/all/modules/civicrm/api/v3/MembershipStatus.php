@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -109,7 +109,8 @@ function civicrm_api3_membership_status_update($params) {
     $membershipStatusBAO->save();
   }
   $membershipStatus = array();
-  _civicrm_api3_object_to_array(clone($membershipStatusBAO), $membershipStatus);
+  $cloneBAO = clone($membershipStatusBAO);
+  _civicrm_api3_object_to_array($cloneBAO, $membershipStatus);
   $membershipStatus['is_error'] = 0;
   return $membershipStatus;
 }
@@ -120,13 +121,17 @@ function civicrm_api3_membership_status_update($params) {
  * This API is used for deleting a membership status
  *
  * @param array $params
- *
  * @return array
+ * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_membership_status_delete($params) {
 
   $memberStatusDelete = CRM_Member_BAO_MembershipStatus::del($params['id'], TRUE);
-  return $memberStatusDelete ? civicrm_api3_create_error($memberStatusDelete['error_message']) : civicrm_api3_create_success();
+  if ($memberStatusDelete) {
+    throw new API_Exception($memberStatusDelete['error_message']);
+  }
+  return civicrm_api3_create_success();
 }
 
 /**

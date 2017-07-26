@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -43,15 +43,17 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
   protected $_ppDAO;
 
+  /**
+   * Get the name of the base entity being edited.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'PaymentProcessor';
+  }
+
   public function preProcess() {
-    if (!CRM_Core_Permission::check('administer payment processors')) {
-      CRM_Core_Error::statusBounce('The \'administer payment processors\' permission is required to add or edit a payment processor.');
-    }
     parent::preProcess();
-
-    CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
-
-    // get the payment processor meta information
 
     if ($this->_id) {
       $this->_ppType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, NULL);
@@ -77,9 +79,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->_ppDAO = new CRM_Financial_DAO_PaymentProcessorType();
     $this->_ppDAO->id = $this->_ppType;
 
-    if (!$this->_ppDAO->find(TRUE)) {
-      CRM_Core_Error::fatal(ts('Could not find payment processor meta information'));
-    }
+    $this->_ppDAO->find(TRUE);
 
     if ($this->_id) {
       $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
@@ -179,6 +179,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
         'CRM_Financial_DAO_PaymentProcessor',
         $this->_id,
+        'name',
+        CRM_Core_Config::domainID(),
       ));
 
     $this->add('text', 'description', ts('Description'),
@@ -211,16 +213,21 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     // is this processor active ?
     $this->add('checkbox', 'is_active', ts('Is this Payment Processor active?'));
     $this->add('checkbox', 'is_default', ts('Is this Payment Processor the default?'));
-
+    $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard();
+    $this->addCheckBox('accept_credit_cards', ts('Accepted Credit Card Type(s)'),
+      $creditCardTypes, NULL, NULL, NULL, NULL, '&nbsp;&nbsp;&nbsp;');
     foreach ($this->_fields as $field) {
       if (empty($field['label'])) {
         continue;
       }
 
-      $this->add('text', $field['name'],
-        $field['label'], $attributes[$field['name']]
-      );
-      $this->add('text', "test_{$field['name']}",
+      $this->addField($field['name'], array('label' => $field['label']));
+
+      $fieldSpec = civicrm_api3($this->getDefaultEntity(), 'getfield', array(
+        'name' => $field['name'],
+        'action' => 'create',
+      ));
+      $this->add($fieldSpec['values']['html']['type'], "test_{$field['name']}",
         $field['label'], $attributes[$field['name']]
       );
       if (!empty($field['rule'])) {
@@ -327,7 +334,18 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($this->_ppType) {
       $defaults['payment_processor_type_id'] = $this->_ppType;
     }
-
+    $cards = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
+          $this->_id,
+          'accepted_credit_cards'
+        ), TRUE);
+    $acceptedCards = array();
+    if (!empty($cards)) {
+      foreach ($cards as $card => $val) {
+        $acceptedCards[$card] = 1;
+      }
+    }
+    $defaults['accept_credit_cards'] = $acceptedCards;
+    unset($defaults['accepted_credit_cards']);
     // now get testID
     $testDAO = new CRM_Financial_DAO_PaymentProcessor();
     $testDAO->name = $dao->name;
@@ -341,7 +359,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $defaults[$testName] = $testDAO->{$field['name']};
       }
     }
-    $defaults['financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($dao->id, 'civicrm_payment_processor', 'financial_account_id');
+    $defaults['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($dao->id, NULL, 'civicrm_payment_processor');
 
     return $defaults;
   }
@@ -383,6 +401,20 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
       }
     }
+    if (!empty($values['accept_credit_cards'])) {
+      $creditCards = array();
+      $accptedCards = array_keys($values['accept_credit_cards']);
+      $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard();
+      foreach ($creditCardTypes as $type => $val) {
+        if (in_array($type, $accptedCards)) {
+          $creditCards[$type] = $creditCardTypes[$type];
+        }
+      }
+      $creditCards = json_encode($creditCards);
+    }
+    else {
+      $creditCards = "NULL";
+    }
     $params  = array_merge(array(
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
@@ -395,6 +427,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_type' => $this->_ppDAO->payment_type,
       'payment_instrument_id' => $this->_ppDAO->payment_instrument_id,
       'financial_account_id' => $values['financial_account_id'],
+      'accepted_credit_cards' => $creditCards,
     ), $values);
 
     civicrm_api3('PaymentProcessor', 'create', $params);

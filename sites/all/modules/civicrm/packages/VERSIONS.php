@@ -63,7 +63,6 @@
  *
  * Package List: PEAR
  * ==================
- * Auth_SASL                     1.0.3      BSD 3-cl.
  * Contact_Vcard_Build           1.1.2      PHP 3          local changes
  * Contact_Vcard_Parse           1.32.0     PHP 3.0
  * Date                          1.4.7      BSD 3-cl.
@@ -82,14 +81,11 @@
  * Mail_mimeDecode               1.5.1      BSD 3-cl.
  * Net_Curl                      1.2.5      BSD 3-cl.
  * Net_DIME                      1.0.1      BSD 3-cl.
- * Net_SMTP                      1.6.1      PHP 2          local changes
- * Net_Socket                    1.0.9      PHP 2
  * Net_URL                       1.0.15     BSD 3-cl.
  * Net_UserAgent_Detect          2.5.1      PHP 2
  * Pager                         2.4.8      BSD 3-cl.
  * PEAR                          1.9.0      PHP 3.0
  * PHP_Beautifier                0.1.14     PHP 3.0
- * Services_JSON                 1.0.1      BSD 2-cl.
  * Services_Twilio               3.10.0     MIT
  * Structures_Graph              1.0.2      LGPL 2.1+
  * System_Command                1.0.6      PHP 2

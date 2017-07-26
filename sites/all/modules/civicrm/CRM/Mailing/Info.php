@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
@@ -49,7 +49,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     return array(
       'name' => 'CiviMail',
       'translatedName' => ts('CiviMail'),
-      'title' => 'CiviCRM Mailing Engine',
+      'title' => ts('CiviCRM Mailing Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
     );
@@ -71,6 +71,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ) {
       return array();
     }
+    global $civicrm_root;
 
     $reportIds = array();
     $reportTypes = array('detail', 'opened', 'bounce', 'clicks');
@@ -81,32 +82,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $reportIds[$report] = $result['values'][0]['id'];
     }
     $result = array();
-    $result['crmMailing'] = array(
-      'ext' => 'civicrm',
-      'js' => array(
-        'ang/crmMailing.js',
-        'ang/crmMailing/*.js',
-      ),
-      'css' => array('ang/crmMailing.css'),
-      'partials' => array('ang/crmMailing'),
-    );
-    $result['crmMailingAB'] = array(
-      'ext' => 'civicrm',
-      'js' => array(
-        'ang/crmMailingAB.js',
-        'ang/crmMailingAB/*.js',
-        'ang/crmMailingAB/*/*.js',
-      ),
-      'css' => array('ang/crmMailingAB.css'),
-      'partials' => array('ang/crmMailingAB'),
-    );
-    $result['crmD3'] = array(
-      'ext' => 'civicrm',
-      'js' => array(
-        'ang/crmD3.js',
-        'bower_components/d3/d3.min.js',
-      ),
-    );
+    $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
+    $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
+    $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
 
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
@@ -161,9 +139,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'option_group_id' => "from_email_address",
       'domain_id' => CRM_Core_Config::domainID(),
     ));
+    $enabledLanguages = CRM_Core_I18n::languages(TRUE);
+    $isMultiLingual = (count($enabledLanguages) > 1);
     CRM_Core_Resources::singleton()
       ->addSetting(array(
         'crmMailing' => array(
+          'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
           'civiMails' => $civiMails['values'],
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => $groupNames['values'],
@@ -183,6 +164,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
           'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
           'reportIds' => $reportIds,
+          'enabledLanguages' => $enabledLanguages,
+          'isMultiLingual' => $isMultiLingual,
         ),
       ))
       ->addPermissions(array(

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * PEAR_ErrorStack and use that framework
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'PEAR/ErrorStack.php';
@@ -195,32 +195,29 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // can avoid infinite loops.
     global $_DB_DATAOBJECT;
 
-    if (!isset($_DB_DATAOBJECT['CONFIG']['database'])) {
-      // we haven't setup sql, so it's not our sql error...
-    }
-    elseif (preg_match('/^mysql:/', $_DB_DATAOBJECT['CONFIG']['database']) &&
-      mysql_error()
-    ) {
-      $mysql_error = mysql_error() . ', ' . mysql_errno();
-      $template->assign_by_ref('mysql_code', $mysql_error);
-
-      // execute a dummy query to clear error stack
-      mysql_query('select 1');
-    }
-    elseif (preg_match('/^mysqli:/', $_DB_DATAOBJECT['CONFIG']['database'])) {
+    if (isset($_DB_DATAOBJECT['CONFIG']['database'])) {
       $dao = new CRM_Core_DAO();
-
       if (isset($_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5])) {
         $conn = $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
-        $link = $conn->connection;
 
-        if (mysqli_error($link)) {
-          $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
-          $template->assign_by_ref('mysql_code', $mysql_error);
-
-          // execute a dummy query to clear error stack
-          mysqli_query($link, 'select 1');
+        // FIXME: Polymorphism for the win.
+        if ($conn instanceof DB_mysqli) {
+          $link = $conn->connection;
+          if (mysqli_error($link)) {
+            $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
+            mysqli_query($link, 'select 1'); // execute a dummy query to clear error stack
+          }
         }
+        elseif ($conn instanceof DB_mysql) {
+          if (mysql_error()) {
+            $mysql_error = mysql_error() . ', ' . mysql_errno();
+            mysql_query('select 1'); // execute a dummy query to clear error stack
+          }
+        }
+        else {
+          $mysql_error = 'fixme-unknown-db-cxn';
+        }
+        $template->assign_by_ref('mysql_code', $mysql_error);
       }
     }
 
@@ -312,6 +309,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Display an error page with an error message describing what happened.
+   *
+   * @deprecated
+   *  This is a really annoying function. We ❤ exceptions. Be exceptional!
+   *
+   * @see CRM-20181
    *
    * @param string $message
    *   The error message.
@@ -526,29 +528,23 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * in the formatting of the output.
    *
    * @param string $variable_name
-   * @param mixed $variable
-   * @param bool $print
-   *   Should we use print_r ? (else we use var_dump).
-   * @param bool $log
-   *   Should we log or return the output.
-   * @param string $comp
    *   Variable name.
+   * @param mixed $variable
+   *   Variable value.
+   * @param bool $print
+   *   Use print_r (if true) or var_dump (if false).
+   * @param bool $log
+   *   Log or return the output?
+   * @param string $prefix
+   *   Prefix for output logfile.
    *
    * @return string
-   *   the generated output
-   *
-   *
+   *   The generated output
    *
    * @see CRM_Core_Error::debug()
    * @see CRM_Core_Error::debug_log_message()
    */
-  public static function debug_var(
-    $variable_name,
-    $variable,
-    $print = TRUE,
-    $log = TRUE,
-    $comp = ''
-  ) {
+  public static function debug_var($variable_name, $variable, $print = TRUE, $log = TRUE, $prefix = '') {
     // check if variable is set
     if (!isset($variable)) {
       $out = "\$$variable_name is not set";
@@ -571,7 +567,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         reset($variable);
       }
     }
-    return self::debug_log_message($out, FALSE, $comp);
+    return self::debug_log_message($out, FALSE, $prefix);
   }
 
   /**
@@ -584,17 +580,17 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param bool $out
    *   Should we log or return the output.
    *
-   * @param string $comp
-   *   Message to be output.
+   * @param string $prefix
+   *   Message prefix.
    * @param string $priority
    *
    * @return string
    *   Format of the backtrace
    */
-  public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL) {
+  public static function debug_log_message($message, $out = FALSE, $prefix = '', $priority = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    $file_log = self::createDebugLogger($comp);
+    $file_log = self::createDebugLogger($prefix);
     $file_log->log("$message\n", $priority);
 
     $str = '<p/><code>' . htmlspecialchars($message) . '</code>';
@@ -603,7 +599,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     $file_log->close();
 
-    if (!empty($config->userFrameworkLogging)) {
+    if (!isset(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
+      // Set it to FALSE first & then try to set it. This is to prevent a loop as calling
+      // $config->userFrameworkLogging can trigger DB queries & under log mode this
+      // then gets called again.
+      \Civi::$statics[__CLASS__]['userFrameworkLogging'] = FALSE;
+      \Civi::$statics[__CLASS__]['userFrameworkLogging'] = $config->userFrameworkLogging;
+    }
+
+    if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
         watchdog('civicrm', '%message', array('%message' => $message), WATCHDOG_DEBUG);
@@ -653,7 +657,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Generate a hash for the logfile.
+   *
    * CRM-13640.
+   *
+   * @param CRM_Core_Config $config
+   *
+   * @return string
    */
   public static function generateLogFileHash($config) {
     // Use multiple (but stable) inputs for hash information.
@@ -671,7 +680,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Generate the name of the logfile to use and store it as a static.
    *
-   * This function includes poor man's log file management and a check as to whether the file exists.
+   * This function includes simplistic log rotation and a check as to whether
+   * the file exists.
    *
    * @param string $prefix
    */
@@ -684,9 +694,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $hash = self::generateLogFileHash($config);
       $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
 
-      // Roll log file monthly or if greater than 256M
-      // note that PHP file functions have a limit of 2G and hence
-      // the alternative was introduce
+      // Roll log file monthly or if greater than 256M.
+      // Size-based rotation introduced in response to filesize limits on
+      // certain OS/PHP combos.
       if (file_exists($fileName)) {
         $fileTime = date("Ym", filemtime($fileName));
         $fileSize = filesize($fileName);

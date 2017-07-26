@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -142,10 +142,12 @@
         //Reload table after draw
         $(settings.nTable).trigger('crmLoad');
         if (parentsOnly) {
-          $('tbody tr.crm-group-parent', settings.nTable).each( function() {
-            $(this).find('td:first')
-              .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
-              .find('div').css({'display': 'inline'});
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function () {
+            $('tbody tr.crm-group-parent', settings.nTable).each(function () {
+              $(this).find('td:first')
+                .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
+                .find('div').css({'display': 'inline'});
+            });
           });
         }
       }
@@ -189,7 +191,7 @@
         $('.parent_is_' + parent_id).hide();
         $('.parent_is_' + parent_id).each(function(i, obj) {
           // also hide children of children
-          var gID = $(this).find('td:nth-child(2)').text();
+          var gID = $(this).data('id');
           $('.parent_is_' + gID).hide();
         });
       }

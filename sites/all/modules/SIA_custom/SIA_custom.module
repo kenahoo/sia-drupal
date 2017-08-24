@@ -81,10 +81,10 @@ function singer_list() {
     $left = '';
     $right = '';
     foreach ($arr as $vp => $p) {
-        $chunk = "<b>{$vp}</b>:<br>\n";
+        $chunk = "<strong>{$vp}</strong>:\n";
 
         foreach ($p as $name)
-            $chunk .= "&nbsp;&nbsp;&nbsp;&nbsp;{$name}<br>\n";
+            $chunk .= "&nbsp;&nbsp;&nbsp;&nbsp;{$name}\n";
 
         if (preg_match('/bass|tenor/i', $vp)) {
             $right .= $chunk;
@@ -144,6 +144,36 @@ function singer_roster2() {
         );
     }, $api->values);
 }
+
+function SIA_custom_token_info()
+{
+    $info['tokens']['sia']['singer_list_html'] = array(
+        'name' => t('Singer list HTML'),
+        'description' => t("A two-column formatted list of current singers in the database."),
+    );
+    return $info;
+}
+
+/**
+ * Implements hook_tokens(). This hook replaces each token with its value.
+ */
+function SIA_custom_tokens($type, $tokens, array $data = array(), array $options = array()) {
+    $replacements = array();
+    $sanitize = !empty($options['sanitize']);
+
+    foreach ($tokens as $name => $original) {
+        if ($name == 'singer_list_html') {
+            $arr = singer_list();
+            $val = ("<div style=\"float:left;margin:20px\">{$arr[0]}</div>" .
+                    "<div style=\"float:left;margin:20px\">{$arr[1]}</div>" .
+                    "<br  style=\"clear:both\">");
+            $replacements[$original] = $val;
+        }
+    }
+
+    return $replacements;
+}
+
 
 /**
  * Implements hook_menu().

@@ -145,11 +145,14 @@ function singer_roster2() {
     }, $api->values);
 }
 
-function SIA_custom_token_info()
-{
+function SIA_custom_token_info() {
     $info['tokens']['sia']['singer_list_html'] = array(
         'name' => t('Singer list HTML'),
         'description' => t("A two-column formatted list of current singers in the database."),
+    );
+    $info['tokens']['sia']['singer_roster_html'] = array(
+      'name' => t('Singer roster HTML'),
+      'description' => t("A detailed table of current singers in the database."),
     );
     return $info;
 }
@@ -168,6 +171,14 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
                     "<div style=\"float:left;margin:20px\">{$arr[1]}</div>" .
                     "<br  style=\"clear:both\">");
             $replacements[$original] = $val;
+        }
+        if ($name == 'singer_roster_html') {
+          $rows = singer_roster2();
+          $val = theme('table',
+            array('header' => array('Voice Part', 'Name', 'Phone', 'Address'),
+              'rows' => $rows)
+          );
+          $replacements[$original] = $val;
         }
     }
 

@@ -61,11 +61,10 @@ function email_recipients() {
                              'sequential' => 1,
                              'rowCount' => 20000,
                              'return' => 'email,first_name,last_name'));
-    $out = array();
-    foreach($api->values as $c) {
-        $out[] = array($c->email, $c->first_name, $c->last_name);
-    }
-    return $out;
+
+    return array_map(function($c) {
+        return array($c->email, $c->first_name, $c->last_name);
+    }, $api->values);
 }
 
 
@@ -179,6 +178,9 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
               'rows' => $rows)
           );
           $replacements[$original] = $val;
+        }
+        if ($name == 'list_sync_check') {
+          $replacements[$original] = list_sync_check();
         }
     }
 
@@ -340,19 +342,18 @@ function mp3_listing($start, $end, $title, $collapsed=true, $dir='sites/default/
 
 function list_sync_check() {
     $drup_group = 'choir member';
-    $did_something = false;
 
-    $show_diffs = function($a, $b, $message) use (&$did_something) {
+    $show_diffs = function($a, $b, $message) {
         $diffs = array_diff($a, $b);
-        if (count($diffs) == 0) {
+        if (!$diffs) {
             return $diffs;
         }
-        $did_something = true;
-        print(theme_item_list(array('items' => $diffs,
-                                    'title' => "$message:",
-                                    'type' => 'ul',
-                                    'attributes' => array())));
-        return $diffs;
+        return array('emails' => $diffs, 'html' => theme_item_list(array(
+          'items' => $diffs,
+          'title' => "$message:",
+          'type' => 'ul',
+          'attributes' => array()
+        )));
     };
 
     $get_crm = function() {
@@ -408,23 +409,26 @@ function list_sync_check() {
     $from_drupal = $get_drupal();
     $from_mailman = $get_mailman();
 
-    $drup_add = $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group");
-    $drup_rm  = $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group");
+    $out = '';
 
-    $show_diffs($from_crm, $from_mailman, "Add to MailMan list");
-    $show_diffs($from_mailman, $from_crm, "Remove from MailMan list");
+    if ($result = $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group")) {
+      $out .= $result['html'];
+      $out .= "<p>To add to Drupal: drush user-add-role 'choir member' " . join(",", $result['emails']) . "</p>";
+    }
+    if ($result = $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group")) {
+      $out .= $result['html'];
+      $out .= "<p>To remove from Drupal: drush user-remove-role 'choir member' " . join(",", $result['emails']) . "</p>";
+    }
+    if ($result = $show_diffs($from_crm, $from_mailman, "Add to MailMan list")) {
+      $out .= $result['html'];
+    }
+    if ($result = $show_diffs($from_mailman, $from_crm, "Remove from MailMan list")) {
+      $out .= $result['html'];
+    }
 
-    if (count($drup_add) > 0) {
-        print("<p>To add to Drupal: drush user-add-role 'choir member' " . join(",", $drup_add) . "</p>");
-    }
-    if (count($drup_rm) > 0) {
-        print("<p>To remove from Drupal: drush user-remove-role 'choir member' " . join(",", $drup_rm) . "</p>");
+    if (!$out) {
+      $out .= "<p><em>Nothing!  Looks like you're good!</em></p>";
     }
 
-    if (!$did_something) {
-        print("<p><em>Nothing!  Looks like you're good!</em></p>");
-    }
+    return $out;
 }
-
-
-//# Don't close with ?>

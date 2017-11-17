@@ -413,11 +413,11 @@ function list_sync_check() {
 
     if ($result = $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group")) {
       $out .= $result['html'];
-      $out .= "<p>To add to Drupal: drush user-add-role 'choir member' " . join(",", $result['emails']) . "</p>";
+      $out .= "<p>To add to Drupal: drush user-add-role '$drup_group' " . join(",", $result['emails']) . "</p>";
     }
     if ($result = $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group")) {
       $out .= $result['html'];
-      $out .= "<p>To remove from Drupal: drush user-remove-role 'choir member' " . join(",", $result['emails']) . "</p>";
+      $out .= "<p>To remove from Drupal: drush user-remove-role '$drup_group' " . join(",", $result['emails']) . "</p>";
     }
     if ($result = $show_diffs($from_crm, $from_mailman, "Add to MailMan list")) {
       $out .= $result['html'];

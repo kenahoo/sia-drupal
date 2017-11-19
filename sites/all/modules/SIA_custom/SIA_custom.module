@@ -118,6 +118,17 @@ function civi_group_id($name) {
     return $result['values'][0]['id'];
 }
 
+function concert_page() {
+
+  $q = db_select('node')
+    ->condition('type', 'concert_portfolio', '=')
+    ->condition('status', 1, '=');
+  $q->addExpression('max(nid)', 'max_nid');
+  $concert_nid = $q->execute()->fetchCol();
+
+  return( drupal_render(node_view(node_load($concert_nid[0]), 'full')) );
+}
+
 function singer_data() {
     civicrm_initialize();
     $api = new civicrm_api3();
@@ -181,6 +192,9 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
         }
         if ($name == 'list_sync_check') {
           $replacements[$original] = list_sync_check();
+        }
+        if ($name == 'concert_page') {
+          $replacements[$original] = concert_page();
         }
     }
 

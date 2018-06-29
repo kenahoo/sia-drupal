@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -97,7 +97,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $mimeType = NULL
   ) {
     if (!$mimeType) {
-      CRM_Core_Error::fatal(ts('Mime Type is now a required parameter'));
+      CRM_Core_Error::statusBounce(ts('Mime Type is now a required parameter for file upload'));
     }
 
     $config = CRM_Core_Config::singleton();
@@ -116,7 +116,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     CRM_Utils_File::createDir($directoryName);
 
     if (!rename($data, $directoryName . DIRECTORY_SEPARATOR . $filename)) {
-      CRM_Core_Error::fatal(ts('Could not move custom file to custom upload directory'));
+      CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
     }
 
     // to get id's
@@ -203,7 +203,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $entityFileDAO->entity_table = $tableName;
 
     if (!$entityFileDAO->find(TRUE)) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::fatal(sprintf('No record found for given file ID - %d and entity ID - %d', $fileID, $entityID));
     }
 
     $entityFileDAO->delete();
@@ -453,7 +453,7 @@ AND       CEF.entity_id    = %2";
 
     // add attachments
     for ($i = 1; $i <= $numAttachments; $i++) {
-      $form->addElement('file', "attachFile_$i", ts('Attach File'), 'size=30 maxlength=60');
+      $form->addElement('file', "attachFile_$i", ts('Attach File'), 'size=30 maxlength=221');
       $form->addUploadElement("attachFile_$i");
       $form->setMaxFileSize($maxFileSize * 1024 * 1024);
       $form->addRule("attachFile_$i",

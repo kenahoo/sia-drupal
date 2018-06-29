@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -179,7 +179,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $pledgeStatus = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
-    $pledgeStatusNames = CRM_Core_OptionGroup::values('contribution_status',
+    $pledgeStatusNames = CRM_Core_OptionGroup::values('pledge_status',
       FALSE, FALSE, FALSE, NULL, 'name', TRUE
     );
     // get default status label (pending)

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -141,6 +141,9 @@ return array(
     'help_text' => NULL,
     'pseudoconstant' => array(
       'callback' => 'CRM_Admin_Form_Setting_Localization::getCurrencySymbols',
+    ),
+    'on_change' => array(
+      'CRM_Admin_Form_Setting_Localization::onChangeDefaultCurrency',
     ),
   ),
   'defaultContactCountry' => array(

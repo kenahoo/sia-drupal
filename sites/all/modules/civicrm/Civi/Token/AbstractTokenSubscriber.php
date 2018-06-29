@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,22 +115,6 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
         'label' => $label,
       ));
     }
-  }
-
-  /**
-   * Get all custom field tokens of $entity
-   *
-   * @param string $entity
-   * @return array $customTokens
-   *   return custom field tokens in array('custom_N' => 'label') format
-   */
-  public function getCustomTokens($entity) {
-    $customTokens = array();
-    foreach (\CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens["custom_$id"] = $info['label'];
-    }
-
-    return $customTokens;
   }
 
   /**

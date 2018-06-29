@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -38,8 +38,6 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   protected $_totalPaid = FALSE;
   protected $_customGroupExtends = array('Pledge', 'Individual');
   protected $_customGroupGroupBy = TRUE;
-  protected $_addressField = FALSE;
-  protected $_emailField = FALSE;
 
   /**
    * This report has not been optimised for group filtering.
@@ -156,7 +154,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             'title' => ts('Pledge Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_OptionGroup::values('contribution_status'),
+            'options' => CRM_Core_OptionGroup::values('pledge_status'),
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
@@ -216,23 +214,8 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
                           {$this->_aliases['civicrm_pledge']}.contact_id )
                  {$this->_aclFrom} ";
 
-    // include address field if address column is to be included
-    if ($this->_addressField) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_address']}.contact_id) AND
-                               {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-
-    // include email field if email column is to be included
-    if ($this->_emailField) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_email']}.contact_id) AND
-                               {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
 
     if (!empty($this->_params['fields']['total_paid'])) {
       $this->_from .= "
@@ -268,11 +251,11 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupByArray[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
-                $this->_groupBy[] = $field['dbAlias'];
+                $this->_groupByArray[] = $field['dbAlias'];
               }
             }
           }
@@ -280,13 +263,13 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       }
 
       if (!empty($this->_statFields) &&
-        (($append && count($this->_groupBy) <= 1) || (!$append)) &&
+        (($append && count($this->_groupByArray) <= 1) || (!$append)) &&
         !$this->_having
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $groupBy = $this->_groupBy;
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
+      $groupBy = $this->_groupByArray;
+      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupByArray);
     }
     else {
       $groupBy = "{$this->_aliases['civicrm_contact']}.id";
@@ -429,7 +412,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       //handle status id
       if (array_key_exists('civicrm_pledge_status_id', $row)) {
         if ($value = $row['civicrm_pledge_status_id']) {
-          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $value);
         }
         $entryFound = TRUE;
       }

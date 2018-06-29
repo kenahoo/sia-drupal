@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -90,6 +90,8 @@ class CRM_Utils_Token {
 
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @return array
    */
   public static function getRequiredTokens() {
@@ -118,7 +120,8 @@ class CRM_Utils_Token {
    *    else an array of the missing tokens
    */
   public static function requiredTokens(&$str) {
-    $requiredTokens = self::getRequiredTokens();
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
 
     $missing = array();
     foreach ($requiredTokens as $token => $value) {
@@ -657,17 +660,14 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    // Refresh contact tokens in case they have changed. There is heavy caching
+    // in exportable fields so there is no benefit in doing this conditionally.
+    self::$_tokens['contact'] = array_merge(
+      array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
+      array('checksum', 'contact_id')
+    );
+
     $key = 'contact';
-    if (self::$_tokens[$key] == NULL) {
-      // This should come from UF
-
-      self::$_tokens[$key]
-        = array_merge(
-          array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
-          array('checksum', 'contact_id')
-        );
-    }
-
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
@@ -1157,7 +1157,7 @@ class CRM_Utils_Token {
    * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
-   * @param $contactIDs
+   * @param array $contactIDs
    * @param array $returnProperties
    *   Of required properties.
    * @param bool $skipOnHold Don't return on_hold contact info also.
@@ -1186,7 +1186,7 @@ class CRM_Utils_Token {
   ) {
 
     $params = array();
-    foreach ($contactIDs as $key => $contactID) {
+    foreach ($contactIDs as $contactID) {
       $params[] = array(
         CRM_Core_Form::CB_PREFIX . $contactID,
         '=',
@@ -1215,7 +1215,7 @@ class CRM_Utils_Token {
       $fields = array_merge(array_keys(CRM_Contact_BAO_Contact::exportableFields()),
         array('display_name', 'checksum', 'contact_id')
       );
-      foreach ($fields as $key => $val) {
+      foreach ($fields as $val) {
         // The unavailable fields are not available as tokens, do not have a one-2-one relationship
         // with contacts and are expensive to resolve.
         // @todo see CRM-17253 - there are some other fields (e.g note) that should be excluded
@@ -1235,18 +1235,16 @@ class CRM_Utils_Token {
       }
     }
 
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
-
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs));
+    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
 
     $contactDetails = &$details[0];
 
-    foreach ($contactIDs as $key => $contactID) {
+    foreach ($contactIDs as $contactID) {
       if (array_key_exists($contactID, $contactDetails)) {
         if (!empty($contactDetails[$contactID]['preferred_communication_method'])
         ) {
           $communicationPreferences = array();
-          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $key => $val) {
+          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $val) {
             if ($val) {
               $communicationPreferences[$val] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_communication_method', $val);
             }
@@ -1368,6 +1366,7 @@ class CRM_Utils_Token {
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
       }
 
+      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
       // check if there are any unevaluated tokens
       $greetingTokens = self::getTokens($tokenString);
 
@@ -1422,6 +1421,49 @@ class CRM_Utils_Token {
         list($contact) = $greetingDetails;
         // Replace tokens defined in Hooks.
         $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
+      }
+    }
+  }
+
+  /**
+   * At this point, $contactDetails has loaded the contact from the DAO. Any
+   * (non-custom) missing fields are null.  By removing them, we can avoid
+   * expensive calls to CRM_Contact_BAO_Query.
+   *
+   * @param string $tokenString
+   * @param array $contactDetails
+   */
+  private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
+    $greetingTokensOriginal = $greetingTokens;
+    $contactFieldList = CRM_Contact_DAO_Contact::fields();
+    // Sometimes contactDetails are in a multidemensional array, sometimes a
+    // single-dimension array.
+    if (array_key_exists(0, $contactDetails) && is_array($contactDetails[0])) {
+      $contactDetails = current($contactDetails[0]);
+    }
+    $nullFields = array_keys(array_diff_key($contactFieldList, $contactDetails));
+
+    // Handle legacy tokens
+    foreach (self::legacyContactTokens() as $oldToken => $newToken) {
+      if (CRM_Utils_Array::key($newToken, $nullFields)) {
+        $nullFields[] = $oldToken;
+      }
+    }
+
+    // Remove null contact fields from $greetingTokens
+    $greetingTokens['contact'] = array_diff($greetingTokens['contact'], $nullFields);
+
+    // Also remove them from $tokenString
+    $removedTokens = array_diff($greetingTokensOriginal['contact'], $greetingTokens['contact']);
+    // Handle legacy tokens again, sigh
+    if (!empty($removedTokens)) {
+      foreach ($removedTokens as $token) {
+        if (CRM_Utils_Array::value($token, self::legacyContactTokens()) !== NULL) {
+          $removedTokens[] = CRM_Utils_Array::value($token, self::legacyContactTokens());
+        }
+      }
+      foreach ($removedTokens as $token) {
+        $tokenString = str_replace("{contact.$token}", '', $tokenString);
       }
     }
   }
@@ -1517,7 +1559,8 @@ class CRM_Utils_Token {
     $key = 'contribution';
     if (self::$_tokens[$key] == NULL) {
       self::$_tokens[$key] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-        array('campaign', 'financial_type')
+        array('campaign', 'financial_type'),
+        self::getCustomFieldTokens('Contribution')
       ));
     }
   }
@@ -1795,6 +1838,25 @@ class CRM_Utils_Token {
       'gender' => 'gender_id',
       'communication_style' => 'communication_style_id',
     );
+  }
+
+  /**
+   * Get all custom field tokens of $entity
+   *
+   * @param string $entity
+   * @param bool $usedForTokenWidget
+   *
+   * @return array $customTokens
+   *   return custom field tokens in array('custom_N' => 'label') format
+   */
+  public static function getCustomFieldTokens($entity, $usedForTokenWidget = FALSE) {
+    $customTokens = array();
+    $tokenName = $usedForTokenWidget ? "{contribution.custom_%d}" : "custom_%d";
+    foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
+      $customTokens[sprintf($tokenName, $id)] = $info['label'];
+    }
+
+    return $customTokens;
   }
 
   /**

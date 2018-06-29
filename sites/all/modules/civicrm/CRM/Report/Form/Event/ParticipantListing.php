@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
@@ -115,27 +115,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Participant Name'),
-            'operator' => 'like',
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'filters' => CRM_Report_Form::getBasicContactFilters(),
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -192,12 +172,12 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'participant_register_date' => array('title' => ts('Registration Date')),
           'total_paid' => array(
             'title' => ts('Total Paid'),
-            'dbAlias' => 'SUM(ft.total_amount)',
+            'dbAlias' => 'IFNULL(SUM(ft.total_amount), 0)',
             'type' => 1024,
           ),
           'balance' => array(
             'title' => ts('Balance'),
-            'dbAlias' => 'participant_civireport.fee_amount - SUM(ft.total_amount)',
+            'dbAlias' => 'participant_civireport.fee_amount - IFNULL(SUM(ft.total_amount), 0)',
             'type' => 1024,
           ),
         ),
@@ -533,16 +513,12 @@ ORDER BY  cv.label
              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_participant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
              {$this->_aclFrom}
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                       {$this->_aliases['civicrm_address']}.is_primary = 1
-             LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
-                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                       {$this->_aliases['civicrm_email']}.is_primary = 1)
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                         {$this->_aliases['civicrm_phone']}.is_primary = 1
       ";
+
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
+
     if ($this->_contribField) {
       $this->_from .= "
              LEFT JOIN civicrm_participant_payment pp
@@ -563,14 +539,9 @@ ORDER BY  cv.label
       $this->_from .= "
             LEFT JOIN civicrm_entity_financial_trxn eft
                   ON (eft.entity_id = {$this->_aliases['civicrm_contribution']}.id)
-            LEFT JOIN civicrm_financial_account fa
-                  ON (fa.account_type_code = 'AR')
-            LEFT JOIN civicrm_financial_account fae
-                  ON (fae.account_type_code = 'EXP')
             LEFT JOIN civicrm_financial_trxn ft
                   ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
-                     (ft.to_financial_account_id != fa.id) AND
-                     (ft.to_financial_account_id != fae.id)
+                     (ft.is_payment = 1)
       ";
     }
   }

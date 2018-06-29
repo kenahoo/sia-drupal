@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -148,6 +148,21 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
+    'help_text' => NULL,
+  ),
+  'update_contribution_on_membership_type_change' => array(
+    'group_name' => 'Contribute Preferences',
+    'group' => 'contribute',
+    'name' => 'update_contribution_on_membership_type_change',
+    'type' => 'Integer',
+    'html_type' => 'checkbox',
+    'quick_form_type' => 'Element',
+    'default' => 0,
+    'add' => '4.7',
+    'title' => 'Automatically update related contributions when Membership Type is changed',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.',
     'help_text' => NULL,
   ),
 );

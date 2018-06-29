@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -154,7 +154,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   public function setDefaultValues() {
     if (isset($this->_id)) {
       $defaults = array_merge($this->_values,
-        CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
+        CRM_Badge_BAO_Layout::getDecodedData(CRM_Utils_Array::value('data', $this->_values, '[]')));
     }
     else {
       for ($i = 1; $i <= self::FIELD_ROWCOUNT; $i++) {

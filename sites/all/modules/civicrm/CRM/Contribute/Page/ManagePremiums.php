@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -105,28 +105,17 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    */
   public function run() {
-
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
+    $id = $this->getIdAndAction();
 
     // what action to take ?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::PREVIEW)) {
-      $this->edit($action, $id, TRUE);
+    if (!($this->_action & CRM_Core_Action::BROWSE)) {
+      $this->edit($this->_action, $id, TRUE);
     }
     // finally browse the custom groups
     $this->browse();
 
     // parent run
-    return parent::run();
+    return CRM_Core_Page::run();
   }
 
   /**

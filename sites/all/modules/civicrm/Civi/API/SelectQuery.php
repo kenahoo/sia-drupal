@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -467,8 +467,10 @@ abstract class SelectQuery {
       }
     }
 
-    // Always select the ID.
-    $this->selectFields[self::MAIN_TABLE_ALIAS . ".id"] = "id";
+    // Always select the ID if the table has one.
+    if (array_key_exists('id', $this->apiFieldSpec)) {
+      $this->selectFields[self::MAIN_TABLE_ALIAS . ".id"] = "id";
+    }
 
     // core return fields
     foreach ($return as $fieldName) {

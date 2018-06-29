@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@ use Civi\API\Provider\ProviderInterface;
 
 /**
  * @package Civi
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class Kernel {
 
@@ -410,7 +410,7 @@ class Kernel {
       }
     }
 
-    $data = civicrm_api3_create_error($msg, $data);
+    $data = \civicrm_api3_create_error($msg, $data);
 
     if (isset($apiRequest['params']) && is_array($apiRequest['params']) && !empty($apiRequest['params']['api.has_parent'])) {
       $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];

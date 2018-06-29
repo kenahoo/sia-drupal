@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
 
@@ -83,17 +83,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    */
   public function run() {
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
+    $id = $this->getIdAndAction();
 
     // set breadcrumb to append to admin/access
     $breadCrumb = array(
@@ -105,15 +95,15 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     // what action to take ?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
-      $this->edit($action, $id);
+    if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
+      $this->edit($this->_action, $id);
     }
 
     // finally browse the acl's
     $this->browse();
 
-    // parent run
-    return parent::run();
+    // This replaces parent run, but do parent's parent run
+    return CRM_Core_Page::run();
   }
 
   /**

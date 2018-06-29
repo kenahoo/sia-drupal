@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -85,7 +85,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     $tokens['source'] = ts('Contribution Source');
     $tokens['status'] = ts('Contribution Status');
     $tokens['type'] = ts('Financial Type');
-    $tokens = array_merge($tokens, $this->getCustomTokens('Contribution'));
+    $tokens = array_merge($tokens, CRM_Utils_Token::getCustomFieldTokens('Contribution'));
     parent::__construct('contribution', $tokens);
   }
 

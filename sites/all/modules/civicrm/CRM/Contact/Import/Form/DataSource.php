@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -168,10 +168,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       ts('For Duplicate Contacts')
     );
 
-    $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
-      'Import Contact',
-      'name'
-    ));
+    $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
 
     $this->assign('savedMapping', $mappingArray);
     $this->addElement('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
@@ -206,7 +203,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $config = CRM_Core_Config::singleton();
     $geoCode = FALSE;
-    if (!empty($config->geocodeMethod)) {
+    if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $geoCode = TRUE;
       $this->addElement('checkbox', 'doGeocodeAddress', ts('Geocode addresses during import?'));
     }

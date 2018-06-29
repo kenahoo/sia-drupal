@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -952,5 +952,40 @@ return array(
     'is_contact' => 0,
     'description' => 'If enabled, then CMS email id will be syncronised with CiviCRM contacts\'s primary email.',
     'help_text' => NULL,
+  ),
+  'preserve_activity_tab_filter' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'preserve_activity_tab_filter',
+    'type' => 'String',
+    'html_type' => 'Text',
+    'default' => '0',
+    'add' => '4.7',
+    'title' => 'Preserve activity filters as a user preference',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts',
+    'help_text' => NULL,
+  ),
+  'do_not_notify_assignees_for' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'do_not_notify_assignees_for',
+    'type' => 'Array',
+    'add' => '4.7',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'default' => array(),
+    'title' => 'Do not notify assignees for',
+    'help_text' => 'These activity types will be excluded from automated email notifications to assignees.',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'multiple' => 1,
+      'class' => 'huge crm-select2',
+    ),
+    'pseudoconstant' => array(
+      'optionGroupName' => 'activity_type',
+    ),
+    'quick_form_type' => 'Select',
   ),
 );

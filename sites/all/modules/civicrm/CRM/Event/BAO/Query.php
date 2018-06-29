@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -253,6 +253,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    * @param $query
    */
   public static function whereClauseSingle(&$values, &$query) {
+    $checkPermission = empty($query->_skipPermission);
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
 
@@ -461,7 +462,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         if (!array_key_exists($qillName, $fields)) {
           break;
         }
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, array('check_permission' => $checkPermission));
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         return;
     }

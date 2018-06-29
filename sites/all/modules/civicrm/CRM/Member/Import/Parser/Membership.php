@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -211,6 +211,17 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             }
             break;
 
+          case 'status_override_end_date':
+            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+              if (!CRM_Utils_Rule::date($params[$key])) {
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
+              }
+            }
+            else {
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
+            }
+            break;
+
           case 'membership_type_id':
             $membershipTypes = CRM_Member_PseudoConstant::membershipType();
             if (!CRM_Utils_Array::crmInArray($val, $membershipTypes) &&
@@ -279,7 +290,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $session = CRM_Core_Session::singleton();
       $dateType = $session->get('dateTypes');
       $formatted = array();
-      $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+      $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
+      $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
 
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
@@ -415,12 +427,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
 
       if ($this->_contactIdIndex < 0) {
-
-        //retrieve contact id using contact dedupe rule
-        $formatValues['contact_type'] = $this->_contactType;
-        $formatValues['version'] = 3;
-        require_once 'CRM/Utils/DeprecatedUtils.php';
-        $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
+        $error = $this->checkContactDuplicate($formatValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
           $matchedIDs = explode(',', $error['error_message']['params'][0]);

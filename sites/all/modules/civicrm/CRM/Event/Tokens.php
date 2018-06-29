@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,7 +61,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'contact_phone' => ts('Event Contact (Phone)'),
         'balance' => ts('Event Balance'),
       ),
-      $this->getCustomTokens('Event')
+      CRM_Utils_Token::getCustomFieldTokens('Event')
     ));
   }
 

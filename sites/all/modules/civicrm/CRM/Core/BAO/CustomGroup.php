@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -60,37 +60,37 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $group->title = $params['title'];
     }
 
-    if (in_array($params['extends'][0],
-      array(
-        'ParticipantRole',
-        'ParticipantEventName',
-        'ParticipantEventType',
-      )
-    )) {
+    $extends = CRM_Utils_Array::value('extends', $params, []);
+    $extendsEntity = CRM_Utils_Array::value(0, $extends);
+
+    $participantEntities = array(
+      'ParticipantRole',
+      'ParticipantEventName',
+      'ParticipantEventType',
+    );
+
+    if (in_array($extendsEntity, $participantEntities)) {
       $group->extends = 'Participant';
     }
     else {
-      $group->extends = $params['extends'][0];
+      $group->extends = $extendsEntity;
     }
 
     $group->extends_entity_column_id = 'null';
-    if (
-      $params['extends'][0] == 'ParticipantRole' ||
-      $params['extends'][0] == 'ParticipantEventName' ||
-      $params['extends'][0] == 'ParticipantEventType'
+    if (in_array($extendsEntity, $participantEntities)
     ) {
-      $group->extends_entity_column_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $params['extends'][0], 'value', 'name');
+      $group->extends_entity_column_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');
     }
 
     //this is format when form get submit.
-    $extendsChildType = CRM_Utils_Array::value(1, $params['extends']);
+    $extendsChildType = CRM_Utils_Array::value(1, $extends);
     //lets allow user to pass direct child type value, CRM-6893
     if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
       $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
-      if (CRM_Utils_Array::value(0, $params['extends']) == 'Relationship') {
+      if (CRM_Utils_Array::value(0, $extends) == 'Relationship') {
         $extendsChildType = str_replace(array('_a_b', '_b_a'), array(
           '',
           '',
@@ -120,9 +120,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_pre',
       'help_post',
       'is_active',
-      'is_public',
       'is_multiple',
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    if ($is_public_version) {
+      $fields[] = 'is_public';
+    }
     foreach ($fields as $field) {
       if (isset($params[$field]) || $field == 'is_multiple') {
         $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
@@ -185,7 +189,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $group->save();
     if (!isset($params['id'])) {
       if (!isset($params['table_name'])) {
-        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 42));
+        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 13));
         $tableName = "civicrm_value_{$munged_title}_{$group->id}";
       }
       $group->table_name = $tableName;
@@ -207,7 +211,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $params['id'],
         'table_name'
       );
-      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($params['extends'][0]));
+      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($extendsEntity));
     }
     $transaction->commit();
 
@@ -418,9 +422,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
-        'is_public',
       ),
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    if ($is_public_version) {
+      $tableData['custom_group'][] = 'is_public';
+    }
     if (!$toReturn || !is_array($toReturn)) {
       $toReturn = $tableData;
     }
@@ -513,7 +521,7 @@ WHERE civicrm_custom_group.is_active = 1
         );
     }
 
-    if ($showPublicOnly) {
+    if ($showPublicOnly && $is_public_version) {
       $strWhere .= "AND civicrm_custom_group.is_public = 1";
     }
 
@@ -1023,7 +1031,6 @@ ORDER BY civicrm_custom_group.weight,
     );
 
     // create select
-    $select = "SELECT";
     $s = array();
     foreach ($tableData as $tableName => $tableColumn) {
       foreach ($tableColumn as $columnName) {
@@ -1252,6 +1259,10 @@ ORDER BY civicrm_custom_group.weight,
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;
+    // This function isn't really accessible with user data but since the string
+    // is not passed as a param to the query CRM_Core_DAO::escapeString seems like a harmless
+    // precaution.
+    $entityType = CRM_Core_DAO::escapeString($entityType);
 
     switch ($entityType) {
       case 'Contact':
@@ -1274,13 +1285,7 @@ ORDER BY civicrm_custom_group.weight,
         }
         break;
 
-      case 'Case':
-      case 'Location':
-      case 'Address':
-      case 'Activity':
-      case 'Contribution':
-      case 'Membership':
-      case 'Participant':
+      default:
         $customGroupDAO->whereAdd("extends IN ('$entityType')");
         break;
     }
@@ -1954,7 +1959,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Build custom data view.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Core_Form|CRM_Core_Page $form
    *   Page object.
    * @param array $groupTree
    * @param bool $returnCount
@@ -1965,6 +1970,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param int $entityId
    *
    * @return array|int
+   * @throws \Exception
    */
   public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL) {
     $details = array();

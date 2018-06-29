@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Case_Info extends CRM_Core_Component_Info {
 
@@ -243,6 +243,42 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
         CRM_Core_Error::fatal($msg);
       }
     }
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getRedactOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Do not redact emails'),
+      '1' => ts('Redact emails'),
+    );
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getMultiClientOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Single client per case'),
+      '1' => ts('Multiple client per case'),
+    );
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getSortOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Definition order'),
+      '1' => ts('Alphabetical order'),
+    );
   }
 
 }

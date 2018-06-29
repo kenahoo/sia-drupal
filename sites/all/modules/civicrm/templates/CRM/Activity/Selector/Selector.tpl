@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,17 +26,23 @@
 <div class="crm-activity-selector-{$context}">
   <div class="crm-accordion-wrapper crm-search_filters-accordion">
     <div class="crm-accordion-header">
-    {ts}Filter by Activity Type{/ts}</a>
+    {ts}Filter by Activity{/ts}</a>
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
-      <div class="no-border form-layout-compressed activity-search-options">
-          <div class="crm-contact-form-block-activity_type_filter_id crm-inline-edit-field">
-            {$form.activity_type_filter_id.label} {$form.activity_type_filter_id.html|crmAddClass:big}
-          </div>
-          <div class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
-            {$form.activity_type_exclude_filter_id.label} {$form.activity_type_exclude_filter_id.html|crmAddClass:big}
-          </div>
-      </div>
+      <table class="no-border form-layout-compressed activity-search-options">
+        <tr>
+          <td class="crm-contact-form-block-activity_type_filter_id crm-inline-edit-field">
+            {$form.activity_type_filter_id.label}<br /> {$form.activity_type_filter_id.html|crmAddClass:medium}
+          </td>
+          <td class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
+            {$form.activity_type_exclude_filter_id.label}<br /> {$form.activity_type_exclude_filter_id.html|crmAddClass:medium}
+          </td>
+          {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high' label='<label>Date</label>'}
+          <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
+            <label>{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
+          </td>
+        </tr>
+      </table>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
   <table class="contact-activity-selector-{$context} crm-ajax-table">
@@ -62,8 +68,13 @@
           "ajax": {
             "url": {/literal}'{crmURL p="civicrm/ajax/contactactivity" h=0 q="snippet=4&context=$context&cid=$contactId"}'{literal},
             "data": function (d) {
+              var status_id = $('.crm-activity-selector-' + context + ' select#status_id').val() || [];
               d.activity_type_id = $('.crm-activity-selector-' + context + ' select#activity_type_filter_id').val(),
-              d.activity_type_exclude_id = $('.crm-activity-selector-' + context + ' select#activity_type_exclude_filter_id').val()
+              d.activity_type_exclude_id = $('.crm-activity-selector-' + context + ' select#activity_type_exclude_filter_id').val(),
+              d.activity_date_relative = $('select#activity_date_relative').val(),
+              d.activity_date_low = $('#activity_date_low').val(),
+              d.activity_date_high = $('#activity_date_high').val(),
+              d.activity_status_id = status_id.join(',')
             }
           }
         });

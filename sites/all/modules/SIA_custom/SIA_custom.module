@@ -129,10 +129,11 @@ function concert_page() {
   return( drupal_render(node_view(node_load($concert_nid[0]), 'full')) );
 }
 
-function singer_data() {
+function singer_data($groups=['Current Singers']) {
     civicrm_initialize();
     $api = new civicrm_api3();
-    $api->Contact->Get(array('group' => civi_group_id('Current Singers'),
+    $group_list = array_filter(array_map('civi_group_id', $groups), function($x) {return isset($x);});
+    $api->Contact->Get(array('group' => $group_list,
                              'sequential' => 1,
                              'rowCount' => 10000,
                              'return' => 'custom_4,display_name,email,phone,'.
@@ -371,7 +372,7 @@ function list_sync_check() {
     };
 
     $get_crm = function() {
-        $api = singer_data();
+        $api = singer_data(['Current Singers', 'Non-Singing Members']);
         $emails = array_map(function($c){return $c->email;}, $api->values);
         asort($emails);
         return $emails;

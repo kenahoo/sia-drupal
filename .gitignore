@@ -6,3 +6,5 @@ sites/*/files
 sites/*/private
 google*.html
 .my.cnf
+.idea
+server275-site.iml

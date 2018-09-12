@@ -200,7 +200,11 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
     $customGroupDAO->find();
     while ($customGroupDAO->fetch()) {
-      $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroupDAO->table_name]
+      // will be empty.
+      if (!empty($this->logs[$customGroupDAO->table_name])) {
+        $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+      }
     }
     return $customGroupTables;
   }
@@ -941,7 +945,7 @@ COLS;
    * but this is the only entity currently available...
    */
   public function getLogTablesForContact() {
-    $tables = array_keys(CRM_Dedupe_Merger::cidRefs());
+    $tables = array_keys(CRM_Core_DAO::getReferencesToContactTable());
     return array_intersect($tables, $this->tables);
   }
 

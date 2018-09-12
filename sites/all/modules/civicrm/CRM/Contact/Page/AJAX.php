@@ -415,7 +415,7 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Request::retrieve('context', 'String'),
+            CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
             CRM_Utils_Request::retrieve('cid', 'Positive')
           );
 
@@ -440,7 +440,7 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Request::retrieve('context', 'String'),
+            CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
             CRM_Utils_Request::retrieve('cid', 'Positive')
           );
 
@@ -510,7 +510,7 @@ LIMIT {$offset}, {$rowCount}
       // send query to hook to be modified if needed
       CRM_Utils_Hook::contactListQuery($query,
         $name,
-        CRM_Utils_Request::retrieve('context', 'String'),
+        CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
         CRM_Utils_Request::retrieve('cid', 'Positive')
       );
 
@@ -651,7 +651,7 @@ LIMIT {$offset}, {$rowCount}
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
     $null = NULL;
     $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
-    $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
+    $selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
     if ($rowCount < 0) {
       $rowCount = 0;
     }
@@ -966,19 +966,19 @@ LIMIT {$offset}, {$rowCount}
           $elements[$key] = self::_convertToId($element);
         }
         CRM_Utils_Type::escapeAll($elements, 'Integer');
-        CRM_Core_BAO_PrevNextCache::markSelection($cacheKey, $actionToPerform, $elements);
+        Civi::service('prevnext')->markSelection($cacheKey, $actionToPerform, $elements);
       }
       else {
-        CRM_Core_BAO_PrevNextCache::markSelection($cacheKey, $actionToPerform);
+        Civi::service('prevnext')->markSelection($cacheKey, $actionToPerform);
       }
     }
     elseif ($variableType == 'single') {
       $cId = self::_convertToId($name);
       CRM_Utils_Type::escape($cId, 'Integer');
       $action = ($state == 'checked') ? 'select' : 'unselect';
-      CRM_Core_BAO_PrevNextCache::markSelection($cacheKey, $action, $cId);
+      Civi::service('prevnext')->markSelection($cacheKey, $action, $cId);
     }
-    $contactIds = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey);
+    $contactIds = Civi::service('prevnext')->getSelection($cacheKey);
     $countSelectionCids = count($contactIds[$cacheKey]);
 
     $arrRet = array('getCount' => $countSelectionCids);
@@ -1017,13 +1017,9 @@ LIMIT {$offset}, {$rowCount}
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    $rgid = CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer');
-    $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
     $pnid = $_REQUEST['pnid'];
     $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
-
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', $null, FALSE);
 
     $params = array(
       1 => array($isSelected, 'Boolean'),
@@ -1054,7 +1050,7 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $context = CRM_Utils_Type::escape($_GET['context'], 'String');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer', FALSE);
 
     if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {

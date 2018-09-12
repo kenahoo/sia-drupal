@@ -121,6 +121,27 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * @return array
+   */
+  public function checkPhpEcrypt() {
+    $messages = array();
+    $test_pass = 'iAmARandomString';
+    $encrypted_test_pass = CRM_Utils_Crypt::encrypt($test_pass);
+    if ($encrypted_test_pass == base64_encode($test_pass)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Your PHP does not include the recommended encryption functions. Some passwords will not be stored encrypted, and if you have recently upgraded from a PHP that does include these functions, your encrypted passwords will not be decrypted correctly. If you are using PHP 7.0 or earlier, you probably want to include the "%1" extension.',
+          array('1' => 'mcrypt')
+        ),
+        ts('PHP Missing Extension "mcrypt"'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
@@ -889,7 +910,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
     $headers = get_headers($arrowUrl);
     $fileExists = stripos($headers[0], "200 OK") ? 1 : 0;
-    if (!$fileExists) {
+    if ($fileExists === FALSE) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',

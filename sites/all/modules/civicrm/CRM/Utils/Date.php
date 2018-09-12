@@ -696,6 +696,58 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Translate a TTL to a concrete expiration time.
+   *
+   * @param NULL|int|DateInterval $ttl
+   * @param int $default
+   *   The value to use if $ttl is not specified (NULL).
+   * @return int
+   *   Timestamp (seconds since epoch).
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  public static function convertCacheTtlToExpires($ttl, $default) {
+    if ($ttl === NULL) {
+      $ttl = $default;
+    }
+
+    if (is_int($ttl)) {
+      return time() + $ttl;
+    }
+    elseif ($ttl instanceof DateInterval) {
+      return date_add(new DateTime(), $ttl)->getTimestamp();
+    }
+    else {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache TTL");
+    }
+  }
+
+  /**
+   * Normalize a TTL.
+   *
+   * @param NULL|int|DateInterval $ttl
+   * @param int $default
+   *   The value to use if $ttl is not specified (NULL).
+   * @return int
+   *   Seconds until expiration.
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  public static function convertCacheTtl($ttl, $default) {
+    if ($ttl === NULL) {
+      return $default;
+    }
+    elseif (is_int($ttl)) {
+      return $ttl;
+    }
+    elseif ($ttl instanceof DateInterval) {
+      return date_add(new DateTime(), $ttl)->getTimestamp() - time();
+    }
+    else {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache TTL");
+    }
+  }
+
+
+  /**
    * @param null $timeStamp
    *
    * @return bool|string
@@ -1027,8 +1079,8 @@ class CRM_Utils_Date {
   /**
    * Resolves the given relative time interval into finite time limits.
    *
-   * @param array $relativeTerm
-   *   Relative time frame like this, previous, etc.
+   * @param string $relativeTerm
+   *   Relative time frame: this, previous, previous_1.
    * @param int $unit
    *   Frequency unit like year, month, week etc.
    *
@@ -1039,6 +1091,9 @@ class CRM_Utils_Date {
     $now = getdate();
     $from = $to = $dateRange = array();
     $from['H'] = $from['i'] = $from['s'] = 0;
+    $relativeTermParts = explode('_', $relativeTerm);
+    $relativeTermPrefix = $relativeTermParts[0];
+    $relativeTermSuffix = isset($relativeTermParts[1]) ? $relativeTermParts[1] : '';
 
     switch ($unit) {
       case 'year':
@@ -1162,7 +1217,7 @@ class CRM_Utils_Date {
         $from['d'] = $config->fiscalYearStart['d'];
         $from['M'] = $config->fiscalYearStart['M'];
         $fYear = self::calculateFiscalYear($from['d'], $from['M']);
-        switch ($relativeTerm) {
+        switch ($relativeTermPrefix) {
           case 'this':
             $from['Y'] = $fYear;
             $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
@@ -1174,12 +1229,22 @@ class CRM_Utils_Date {
             break;
 
           case 'previous':
-            $from['Y'] = $fYear - 1;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
-            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-            $to['d'] = $fiscalEnd['2'];
-            $to['M'] = $fiscalEnd['1'];
-            $to['Y'] = $fiscalEnd['0'];
+            if (!is_numeric($relativeTermSuffix)) {
+              $from['Y'] = ($relativeTermSuffix === 'before') ? $fYear - 2 : $fYear - 1;
+              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+              $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+              $to['d'] = $fiscalEnd['2'];
+              $to['M'] = $fiscalEnd['1'];
+              $to['Y'] = $fiscalEnd['0'];
+            }
+            else {
+              $from['Y'] = $fYear - $relativeTermSuffix;
+              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+              $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+              $to['d'] = $fiscalEnd['2'];
+              $to['M'] = $fiscalEnd['1'];
+              $to['Y'] = $fYear;
+            }
             break;
 
           case 'next':
@@ -1745,7 +1810,7 @@ class CRM_Utils_Date {
    *   Fiscal Start Month.
    *
    * @return int
-   *   $fy       Current Fiscl Year
+   *   $fy       Current Fiscal Year
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
     $date = date("Y-m-d");

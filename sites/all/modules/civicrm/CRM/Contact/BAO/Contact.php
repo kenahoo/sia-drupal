@@ -1013,7 +1013,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     CRM_Utils_Recent::delContact($id);
     self::updateContactCache($id, empty($restore));
 
-    // delete any dupe cache entry
+    // delete any prevnext/dupe cache entry
+    // These two calls are redundant in default deployments, but they're
+    // meaningful if "prevnext" is memory-backed.
+    Civi::service('prevnext')->deleteItem($id);
     CRM_Core_BAO_PrevNextCache::deleteItem($id);
 
     $transaction->commit();
@@ -1021,10 +1024,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     if ($skipUndelete) {
       CRM_Utils_Hook::post('delete', $contactType, $contact->id, $contact);
     }
-
-    // also reset the DB_DO global array so we can reuse the memory
-    // http://issues.civicrm.org/jira/browse/CRM-4387
-    CRM_Core_DAO::freeResult();
 
     return TRUE;
   }
@@ -3340,30 +3339,21 @@ AND       civicrm_openid.is_primary = 1";
    * @param int $masterAddressId
    *   Master id.
    * @param int $contactId
-   *   Contact id.
+   *   Contact id. (deprecated - do not use)
    *
    * @return string|null
    *   the found display name or null.
    */
   public static function getMasterDisplayName($masterAddressId = NULL, $contactId = NULL) {
     $masterDisplayName = NULL;
-    $sql = NULL;
-    if (!$masterAddressId && !$contactId) {
+    if (!$masterAddressId) {
       return $masterDisplayName;
     }
 
-    if ($masterAddressId) {
-      $sql = "
+    $sql = "
    SELECT display_name from civicrm_contact
 LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     WHERE civicrm_address.id = " . $masterAddressId;
-    }
-    elseif ($contactId) {
-      $sql = "
-   SELECT display_name from civicrm_contact cc, civicrm_address add1
-LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
-    WHERE cc.id = add2.contact_id AND add1.contact_id = " . $contactId;
-    }
 
     $masterDisplayName = CRM_Core_DAO::singleValueQuery($sql);
     return $masterDisplayName;

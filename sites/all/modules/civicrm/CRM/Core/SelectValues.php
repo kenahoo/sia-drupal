@@ -203,7 +203,6 @@ class CRM_Core_SelectValues {
       'RichTextEditor' => ts('Rich Text Editor'),
       'Autocomplete-Select' => ts('Autocomplete-Select'),
       'Multi-Select' => ts('Multi-Select'),
-      'AdvMulti-Select' => ts('AdvMulti-Select'),
       'Link' => ts('Link'),
       'ContactReference' => ts('Autocomplete-Select'),
     );
@@ -1094,6 +1093,19 @@ class CRM_Core_SelectValues {
       2 => ts('Details Only'),
       3 => ts('Subject Only'),
       6 => ts('Both'),
+    );
+  }
+
+  /**
+   * Relationship permissions
+   *
+   * @return array
+   */
+  public static function getPermissionedRelationshipOptions() {
+    return array(
+      CRM_Contact_BAO_Relationship::NONE => ts('None'),
+      CRM_Contact_BAO_Relationship::VIEW => ts('View only'),
+      CRM_Contact_BAO_Relationship::EDIT => ts('View and update'),
     );
   }
 

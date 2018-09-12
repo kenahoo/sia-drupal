@@ -422,7 +422,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/vendor/autoload.php';
+    $autoloader = require_once $root . '/autoload.php';
     if ($autoloader === TRUE) {
       $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
     }
@@ -648,6 +648,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
     $current_path = \Drupal::service('path.current')->getPath();
     return $this->url($current_path);
+  }
+
+  /**
+   * Function to return current language of Drupal8
+   *
+   * @return string
+   */
+  public function getCurrentLanguage() {
+    // Drupal might not be bootstrapped if being called by the REST API.
+    if (!class_exists('Drupal')) {
+      return NULL;
+    }
+
+    return \Drupal::languageManager()->getCurrentLanguage()->getId();
   }
 
 }

@@ -1,0 +1,15 @@
+div.view-concerts div.views-field-field-concert-date {
+  float: left;
+  padding-left: 10px;
+  padding-right: 10px;
+  clear: both;
+}
+
+div.view-concerts div.views-field-field-collaborator {
+  padding-bottom: 10px;
+}
+
+div.item-list li.pager-current {
+  padding-left: 10px;
+  padding-right: 10px;
+}

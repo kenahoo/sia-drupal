@@ -5,5 +5,6 @@ package = "SIA Custom Function Library"
 dependencies[] = getid3
 dependencies[] = ctools
 dependencies[] = civicrm
+styles[] = styles.css
 
 version = "7.x-0.1"

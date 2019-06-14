@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
+class ComposerStaticInit188b9eabfe4090f2e62fb6879322428c
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
@@ -18,6 +18,10 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
     );
 
     public static $prefixLengthsPsr4 = array (
+        'c' => 
+        array (
+            'cweagans\\Composer\\' => 18,
+        ),
         'Z' => 
         array (
             'Zend\\Validator\\' => 15,
@@ -38,12 +42,14 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
         'P' => 
         array (
             'Psr\\SimpleCache\\' => 16,
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\Common\\' => 17,
         ),
         'M' => 
         array (
+            'MimeType\\' => 9,
             'MJS\\TopSort\\Tests\\' => 18,
             'MJS\\TopSort\\' => 12,
         ),
@@ -68,6 +74,10 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
     );
 
     public static $prefixDirsPsr4 = array (
+        'cweagans\\Composer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
+        ),
         'Zend\\Validator\\' => 
         array (
             0 => __DIR__ . '/..' . '/zendframework/zend-validator/src',
@@ -116,6 +126,10 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
@@ -127,6 +141,10 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
         'PhpOffice\\Common\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/common/src/Common',
+        ),
+        'MimeType\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/katzien/php-mime-type/src',
         ),
         'MJS\\TopSort\\Tests\\' => 
         array (
@@ -187,10 +205,6 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
         ),
         'P' => 
         array (
-            'Psr\\Log\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/psr/log',
-            ),
             'PHPUnit_' => 
             array (
                 0 => __DIR__ . '/../..' . '/packages',
@@ -215,6 +229,17 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
             array (
                 0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
             ),
+            'Mail' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/mail',
+            ),
+        ),
+        'L' => 
+        array (
+            'Log' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/log',
+            ),
         ),
         'F' => 
         array (
@@ -228,6 +253,10 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
             'Crypt' => 
             array (
                 0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
+            ),
+            'Console' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/console_getopt',
             ),
             'Civi\\' => 
             array (
@@ -250,6 +279,10 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
                 0 => __DIR__ . '/..' . '/pear/auth_sasl',
             ),
         ),
+    );
+
+    public static $fallbackDirsPsr0 = array (
+        0 => __DIR__ . '/..' . '/pear/pear-core-minimal/src',
     );
 
     public static $classMap = array (
@@ -289,6 +322,7 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
         'ezcBaseConfigurationInitializer' => __DIR__ . '/..' . '/zetacomponents/base/src/interfaces/configuration_initializer.php',
         'ezcBaseDoubleClassRepositoryPrefixException' => __DIR__ . '/..' . '/zetacomponents/base/src/exceptions/double_class_repository_prefix.php',
         'ezcBaseException' => __DIR__ . '/..' . '/zetacomponents/base/src/exceptions/exception.php',
+        'ezcBaseExportable' => __DIR__ . '/..' . '/zetacomponents/base/src/interfaces/exportable.php',
         'ezcBaseExtensionNotFoundException' => __DIR__ . '/..' . '/zetacomponents/base/src/exceptions/extension_not_found.php',
         'ezcBaseFeatures' => __DIR__ . '/..' . '/zetacomponents/base/src/features.php',
         'ezcBaseFile' => __DIR__ . '/..' . '/zetacomponents/base/src/file.php',
@@ -352,6 +386,7 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
         'ezcMailMultipartReportParser' => __DIR__ . '/..' . '/zetacomponents/mail/src/parser/parts/multipart_report_parser.php',
         'ezcMailNoSuchMessageException' => __DIR__ . '/..' . '/zetacomponents/mail/src/exceptions/no_such_message.php',
         'ezcMailOffsetOutOfRangeException' => __DIR__ . '/..' . '/zetacomponents/mail/src/exceptions/offset_out_of_range.php',
+        'ezcMailOptions' => __DIR__ . '/..' . '/zetacomponents/mail/src/options/mail_options.php',
         'ezcMailParser' => __DIR__ . '/..' . '/zetacomponents/mail/src/parser/parser.php',
         'ezcMailParserOptions' => __DIR__ . '/..' . '/zetacomponents/mail/src/options/parser_options.php',
         'ezcMailParserSet' => __DIR__ . '/..' . '/zetacomponents/mail/src/parser/interfaces/parser_set.php',
@@ -397,10 +432,11 @@ class ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitbf1d65642e26d59a4e3a84ae29d7004d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit188b9eabfe4090f2e62fb6879322428c::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit188b9eabfe4090f2e62fb6879322428c::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit188b9eabfe4090f2e62fb6879322428c::$prefixesPsr0;
+            $loader->fallbackDirsPsr0 = ComposerStaticInit188b9eabfe4090f2e62fb6879322428c::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit188b9eabfe4090f2e62fb6879322428c::$classMap;
 
         }, null, ClassLoader::class);
     }

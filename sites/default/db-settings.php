@@ -30,7 +30,7 @@ if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
 } else {
     # Development server
     $host = 'localhost';
-    $site_root = '/Users/ken/Documents/SIA/server275-site';
+    $site_root = '/Users/ken/src/SIA/server275-site';
     $civi_database = 'singersin_combined';
 }
 

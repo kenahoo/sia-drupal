@@ -55,7 +55,7 @@ $flerb = function($dbs) {
       foreach(array('password', 'database', 'host', 'user') as $key) {
         $key2 = $key=='user' ? 'username' : $key;
         if (isset($vals[$key])) {
-          // print("Setting $key=$cnf[$key]<br>");
+          // print("Setting $key=$vals[$key]<br>");
           $dbs[$key2] = $vals[$key];
         }
       }

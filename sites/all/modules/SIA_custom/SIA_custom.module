@@ -80,6 +80,8 @@ function singer_list() {
     $left = '';
     $right = '';
     foreach ($arr as $vp => $p) {
+        if ($vp == '')  continue;
+
         $chunk = "<strong>{$vp}</strong>:\n";
 
         foreach ($p as $name)

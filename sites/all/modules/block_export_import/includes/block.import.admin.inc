@@ -120,8 +120,8 @@ function block_export_import_blocks_import_form_submit($form, &$form_state) {
           // the blocks creation process.
           $message = "";
 
-          // It is use to verify related module are enabled or not if not
-          // enabled then it throw an error,for a particular block.
+          // It is use to verify related module are enabled or not if not enabled then
+          // it throw an error,for a particular block.
           $bypass_phpfilter = TRUE;
           if ((int) $visibility === 2) {
             if (!$php_filter) {
@@ -255,7 +255,7 @@ function _block_export_import_block_update($form_state, $bdata, $bfields, $bsfie
   db_delete('block_role')->condition('module', 'block')->condition('delta', $block_id)->execute();
 
   // Call to override the block visibility settings (content type and roles).
-  if (array_key_exists('visibility_settings', $block_custom)) {
+  if (array_key_exists('visibility_settings', $bdata)) {
     _block_export_import_import_visibility_settings($bdata, $block_id);
   }
 

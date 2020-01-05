@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -302,7 +286,7 @@ FROM   civicrm_prevnext_cache pn
     $count = 0;
     while ($dao->fetch()) {
       if (self::is_serialized($dao->data)) {
-        $main[$count] = unserialize($dao->data);
+        $main[$count] = CRM_Utils_String::unserialize($dao->data);
       }
       else {
         $main[$count] = $dao->data;
@@ -334,7 +318,7 @@ FROM   civicrm_prevnext_cache pn
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@unserialize($string) !== FALSE);
+    return (@CRM_Utils_String::unserialize($string) !== FALSE);
   }
 
   /**
@@ -507,7 +491,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
     foreach ($prevNextId as $id) {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
-        $originalData = unserialize($dao->data);
+        $originalData = CRM_Utils_String::unserialize($dao->data);
         $srcFields = ['ID', 'Name'];
         $swapFields = ['srcID', 'srcName', 'dstID', 'dstName'];
         $data = array_diff_assoc($originalData, array_fill_keys($swapFields, 1));

@@ -1,40 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -286,9 +271,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // we do not want to display recently viewed items, so turn off
     $this->assign('displayRecent', FALSE);
-    // Contribution page values are cleared from session, so can't use normal Printer Friendly view.
-    // Use Browser Print instead.
-    $this->assign('browserPrint', TRUE);
 
     // action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -346,6 +328,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->_values['is_pay_later'] = FALSE;
         }
       }
+      if ($isPayLater) {
+        $this->setPayLaterLabel($this->_values['pay_later_text']);
+      }
 
       if ($isMonetary) {
         $this->_paymentProcessorIDs = array_filter(explode(
@@ -358,7 +343,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // get price info
       // CRM-5095
-      CRM_Price_BAO_PriceSet::initSet($this, $this->_id, 'civicrm_contribution_page');
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
+      CRM_Price_BAO_PriceSet::initSet($this, 'civicrm_contribution_page', FALSE, $priceSetId);
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = [
@@ -471,7 +457,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Utils_Array::value('cancelSubscriptionUrl', $this->_values)
     );
 
-    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $this->_values['title']));
+    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
+
+    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $title));
     $this->_defaults = [];
 
     $this->_amount = $this->get('amount');
@@ -1389,6 +1377,30 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       return $this->_paymentProcessor['object'];
     }
     return new CRM_Core_Payment_Manual();
+  }
+
+  /**
+   * Get the amount for the main contribution.
+   *
+   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
+   * winds up here as the main spaghetti shrinks.
+   *
+   * If there is a separate membership contribution this is the 'other one'. Otherwise there
+   * is only one.
+   *
+   * @param $params
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getMainContributionAmount($params) {
+    if (!empty($params['selectMembership'])) {
+      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
+        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
+      }
+    }
+    return $params['amount'] ?? 0;
   }
 
 }

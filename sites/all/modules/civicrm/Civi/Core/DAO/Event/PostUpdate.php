@@ -18,15 +18,22 @@ namespace Civi\Core\DAO\Event;
 class PostUpdate extends \Symfony\Component\EventDispatcher\Event {
 
   /**
-   * @var DAO Object
+   * @var \CRM_Core_DAO
    */
   public $object;
 
   /**
-   * @param $object
+   * @var mixed
    */
-  public function __construct($object) {
+  public $result;
+
+  /**
+   * @param $object
+   * @param $result
+   */
+  public function __construct($object, $result) {
     $this->object = $object;
+    $this->result = $result;
   }
 
 }

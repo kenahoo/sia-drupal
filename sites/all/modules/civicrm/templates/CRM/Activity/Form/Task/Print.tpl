@@ -20,7 +20,7 @@
   <tr class="columnheader">
     <td>{ts}Type{/ts}</td>
     <td>{ts}Subject{/ts}</td>
-    <td>{ts}Added By{/ts}</td>
+    <td>{ts}Added by{/ts}</td>
     <td>{ts}With{/ts}</td>
     <td>{ts}Assigned to{/ts}</td>
     <td>{ts}Date{/ts}</td>
@@ -67,7 +67,7 @@
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 {else}
    <div class="messages status no-popup">
-       <div class="icon inform-icon"></div>
+       {icon icon="fa-info-circle"}{/icon}
          {ts}There are no records selected for Print.{/ts}
     </div>
 {/if}

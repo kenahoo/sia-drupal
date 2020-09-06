@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -170,7 +168,7 @@ class CRM_Member_Task extends CRM_Core_Task {
    */
   public static function getTask($value) {
     self::tasks();
-    if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
+    if (!$value || empty(self::$_tasks[$value])) {
       // Make the print task the default
       $value = self::TASK_PRINT;
     }

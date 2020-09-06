@@ -196,10 +196,13 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Reset the serialized array and recompute.
    * use with care
+   *
+   * @deprecated
    */
   public function reset() {
-    $query = "UPDATE civicrm_domain SET config_backend = null";
-    CRM_Core_DAO::executeQuery($query);
+    // This is what it used to do. However, it hasn't meant anything since 4.6.
+    // $query = "UPDATE civicrm_domain SET config_backend = null";
+    // CRM_Core_DAO::executeQuery($query);
   }
 
   /**
@@ -242,7 +245,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $domain = defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1;
     }
 
-    return $domain;
+    return (int) $domain;
   }
 
   /**
@@ -268,7 +271,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * Do general cleanup of caches, temp directories and temp tables
-   * CRM-8739
+   * @see https://issues.civicrm.org/jira/browse/CRM-8739
    *
    * @param bool $sessionReset
    */
@@ -346,10 +349,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       CRM_Core_DAO::executeQuery($query);
     }
 
-    if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
-      return $adapter::clearDBCache();
-    }
-
     // also delete all the import and export temp tables
     self::clearTempTables();
   }
@@ -418,7 +417,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         $urlVar = 'task';
       }
 
-      $path = CRM_Utils_Array::value($urlVar, $_GET);
+      $path = $_GET[$urlVar] ?? NULL;
     }
 
     if ($path && preg_match('/^civicrm\/upgrade(\/.*)?$/', $path)) {
@@ -557,7 +556,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
 
     // OK, this looks new.
-    Civi::service('dispatcher')->dispatch(\Civi\Core\Event\SystemInstallEvent::EVENT_NAME, new \Civi\Core\Event\SystemInstallEvent());
+    Civi::dispatcher()->dispatch('civi.core.install', new \Civi\Core\Event\SystemInstallEvent());
     Civi::settings()->set('installed', 1);
   }
 

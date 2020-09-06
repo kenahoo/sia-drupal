@@ -72,10 +72,10 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     /**
      * set the button names
      */
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
+    $this->sortNameOnly = TRUE;
 
     parent::preProcess();
 
@@ -161,8 +161,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
-
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 

@@ -62,7 +62,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
 
     //validate case configuration.
@@ -75,10 +75,10 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     /**
      * set the button names
      */
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
+    $this->sortNameOnly = TRUE;
 
     parent::preProcess();
 
@@ -202,8 +202,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
-    // @todo - stop changing formValues - respect submitted form values, change a working array.
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);

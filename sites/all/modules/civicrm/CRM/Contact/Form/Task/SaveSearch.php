@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $modeValue = CRM_Contact_Form_Search::getModeValue(CRM_Utils_Array::value('component_mode', $values, CRM_Contact_BAO_Query::MODE_CONTACTS));
     $className = $modeValue['taskClassName'];
     $taskList = $className::taskTitles();
-    $this->_task = CRM_Utils_Array::value('task', $values);
+    $this->_task = $values['task'] ?? NULL;
     $this->assign('taskName', CRM_Utils_Array::value($this->_task, $taskList));
   }
 
@@ -74,11 +74,11 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $formValues = $this->controller->exportValues();
 
     // the name and description are actually stored with the group and not the saved search
-    $this->add('text', 'title', ts('Name'),
+    $this->add('text', 'title', ts('Group Title'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'), TRUE
     );
 
-    $this->addElement('textarea', 'description', ts('Description'),
+    $this->addElement('textarea', 'description', ts('Group Description'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'description')
     );
 
@@ -121,7 +121,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $this->addDefaultButtons(ts('Save Smart Group'));
       $this->assign('partiallySelected', $formValues['radio_ts'] != 'ts_all');
     }
-    $this->addRule('title', ts('Name already exists in Database.'),
+    $this->addRule('title', ts('Group Title already exists in Database.'),
       'objectExists', ['CRM_Contact_DAO_Group', $groupID, 'title']
     );
   }

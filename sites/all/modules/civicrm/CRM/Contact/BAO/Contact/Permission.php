@@ -270,19 +270,18 @@ AND    $operationClause
     WHERE    $permission
     AND ac.user_id IS NULL
     ";*/
-    $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
-         $from
-WHERE    $permission";
+    $sql = " $from WHERE    $permission";
     $useTempTable = self::getUseTemporaryTable();
     if ($useTempTable) {
       $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
       $tempTable = $aclContactsTempTable->getName();
-      $aclContactsTempTable->createWithColumns('user_id int, contact_id int, operation varchar(255), UNIQUE UI_user_contact_operation (user_id,contact_id,operation)');
-      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (user_id, contact_id, operation) {$sql}");
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT user_id, contact_id, operation FROM {$tempTable}");
+      $aclContactsTempTable->createWithColumns('contact_id int, UNIQUE INDEX UI_contact (contact_id)');
+      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (contact_id) SELECT DISTINCT contact_a.id {$sql}");
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT {$userID}, contact_id, '{$operation}' FROM {$tempTable}");
       $aclContactsTempTable->drop();
     }
     else {
+      $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql;
       CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
     }
 
@@ -308,17 +307,16 @@ WHERE    $permission";
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
-      if (is_array($contactAlias)) {
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
         $wheres = [];
-        foreach ($contactAlias as $alias) {
+        foreach ((array) $contactAlias as $alias) {
           // CRM-6181
           $wheres[] = "$alias.is_deleted = 0";
         }
         return [NULL, '(' . implode(' AND ', $wheres) . ')'];
       }
       else {
-        // CRM-6181
-        return [NULL, "$contactAlias.is_deleted = 0"];
+        return [NULL, '( 1 )'];
       }
     }
 
@@ -333,14 +331,17 @@ WHERE    $permission";
       }
 
       $fromClause = implode(" ", $clauses);
-      $whereClase = NULL;
+      $whereClause = NULL;
     }
     else {
       $fromClause = " INNER JOIN civicrm_acl_contact_cache aclContactCache ON {$contactAlias}.id = aclContactCache.contact_id ";
-      $whereClase = " aclContactCache.user_id = $contactID AND $contactAlias.is_deleted = 0";
+      $whereClause = " aclContactCache.user_id = $contactID";
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
+        $whereClause .= " AND $contactAlias.is_deleted = 0";
+      }
     }
 
-    return [$fromClause, $whereClase];
+    return [$fromClause, $whereClause];
   }
 
   /**

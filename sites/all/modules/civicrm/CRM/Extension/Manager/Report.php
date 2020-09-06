@@ -24,7 +24,10 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
    */
   public function __construct() {
     parent::__construct(TRUE);
-    $this->groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
+  }
+
+  public function getGroupId() {
+    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
       self::REPORT_GROUP_NAME, 'id', 'name'
     );
   }
@@ -51,9 +54,8 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       throw new CRM_Core_Exception(ts('Component for which you are trying to install the extension (%1) is currently disabled.', [1 => $info->typeInfo['component']]));
     }
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-      ['option_group_id' => $this->groupId]
+      ['option_group_id' => $this->getGroupId()]
     );
-    $ids = [];
     $params = [
       'label' => $info->label . ' (' . $info->key . ')',
       'value' => $info->typeInfo['reportUrl'],
@@ -61,11 +63,11 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       'weight' => $weight,
       'description' => $info->label . ' (' . $info->key . ')',
       'component_id' => $compId,
-      'option_group_id' => $this->groupId,
+      'option_group_id' => $this->getGroupId(),
       'is_active' => 1,
     ];
 
-    $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
+    $optionValue = CRM_Core_BAO_OptionValue::add($params);
   }
 
   /**

@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * This class generates form components for processing a case
  *
  */
@@ -48,8 +40,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -66,7 +56,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviGrant', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $this->setPageTitle(ts('Grant'));
@@ -271,6 +261,16 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       'civicrm_grant',
       $this->_id
     );
+    $moneyFields = [
+      'amount_total',
+      'amount_granted',
+      'amount_requested',
+    ];
+    foreach ($moneyFields as $field) {
+      if (isset($params[$field])) {
+        $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
+      }
+    }
 
     $grant = CRM_Grant_BAO_Grant::create($params, $ids);
 

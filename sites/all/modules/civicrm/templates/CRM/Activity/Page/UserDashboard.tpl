@@ -19,7 +19,7 @@
                 <tr class="columnheader">
                     <th>{ts}Type{/ts}</th>
                     <th>{ts}Subject{/ts}</th>
-                    <th>{ts}Added By{/ts}</th>
+                    <th>{ts}Added by{/ts}</th>
                     <th>{ts}With{/ts}</th>
                     <th>{ts}Date{/ts}</th>
                     <th>{ts}Status{/ts}</th>
@@ -47,7 +47,7 @@ q="action=view&reset=1&id=`$row.activity_id`&cid=`$row.contact_id`&context=dashb
         {/strip}
     {else}
         <div class="messages status no-popup">
-           <div class="icon inform-icon"></div>&nbsp;
+           {icon icon="fa-info-circle"}{/icon}
                  {ts}There are no scheduled activities assigned to you.{/ts}
 
         </div>

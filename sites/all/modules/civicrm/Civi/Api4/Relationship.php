@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -24,15 +22,19 @@ namespace Civi\Api4;
 /**
  * Relationship entity.
  *
+ * @see https://docs.civicrm.org/user/en/latest/organising-your-data/relationships/
+ *
  * @package Civi\Api4
  */
 class Relationship extends Generic\DAOEntity {
 
   /**
-   * @return \Civi\Api4\Action\Relationship\Get
+   * @param bool $checkPermissions
+   * @return Action\Relationship\Get
    */
-  public static function get() {
-    return new \Civi\Api4\Action\Relationship\Get(static::class, __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Relationship\Get(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

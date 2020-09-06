@@ -82,15 +82,15 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL}>&raquo; {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
       {if $group.saved_search_id}
         <br />
         {if $group.mapping_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
         {elseif $group.search_custom_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
         {else}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
         {/if}
 
       {/if}
@@ -99,12 +99,12 @@
 
   {literal}
   <script type="text/javascript">
-    {/literal}{if $freezeMailignList}{literal}
-    cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').prop('disabled',true);
+    {/literal}{if $freezeMailingList}{literal}
+    cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailingList}{literal}]"]').prop('disabled',true);
     {/literal}{/if}{literal}
-    {/literal}{if $hideMailignList}{literal}
-    cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
-    cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
+    {/literal}{if $hideMailingList}{literal}
+    cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
+    cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}
   </script>
   {/literal}

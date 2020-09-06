@@ -14,18 +14,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
-
 
 namespace Civi\Api4;
 
 /**
  * EntityTag - links tags to contacts, activities, etc.
  *
+ * @see \Civi\Api4\Tag
+ *
  * @package Civi\Api4
  */
-class EntityTag extends Generic\DAOEntity {
+class EntityTag extends Generic\BridgeEntity {
 
 }

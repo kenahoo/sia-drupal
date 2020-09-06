@@ -356,7 +356,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
 
   $params['financial_type_id']['api.aliases'] = ['contribution_type_id'];
   $params['payment_instrument_id']['api.aliases'] = ['contribution_payment_instrument', 'payment_instrument'];
-  $params['contact_id'] = CRM_Utils_Array::value('contribution_contact_id', $params);
+  $params['contact_id'] = $params['contribution_contact_id'] ?? NULL;
   $params['contact_id']['api.aliases'] = ['contribution_contact_id'];
   $params['is_template']['api.default'] = 0;
   unset($params['contribution_contact_id']);
@@ -393,7 +393,7 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $ids = $values = [];
+  $ids = [];
   $allowedParams = [
     'receipt_from_email',
     'receipt_from_name',
@@ -404,8 +404,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
-  $input['is_email_receipt'] = TRUE;
-  CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
+  CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id']);
 }
 
 /**
@@ -488,7 +487,8 @@ function civicrm_api3_contribution_completetransaction($params) {
   elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
-  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  $input['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
+
   if (!empty($params['fee_amount'])) {
     $input['fee_amount'] = $params['fee_amount'];
   }
@@ -594,6 +594,14 @@ function civicrm_api3_contribution_repeattransaction($params) {
     throw new API_Exception(
       'A valid original contribution ID is required', 'invalid_data');
   }
+  // We don't support repeattransaction without a related recurring contribution.
+  if (empty($contribution->contribution_recur_id)) {
+    throw new API_Exception(
+      'Repeattransaction API can only be used in the context of contributions that have a contribution_recur_id.',
+      'invalid_data'
+    );
+  }
+
   $original_contribution = clone $contribution;
   $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
@@ -672,11 +680,10 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
   }
-  $input['card_type_id'] = CRM_Utils_Array::value('card_type_id', $params);
-  $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
-  $transaction = new CRM_Core_Transaction();
-  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
-     $contribution, CRM_Utils_Array::value('is_post_payment_create', $params));
+  $input['card_type_id'] = $params['card_type_id'] ?? NULL;
+  $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
+  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects,
+    $params['is_post_payment_create'] ?? NULL);
 }
 
 /**
@@ -710,6 +717,7 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
       'optionGroupName' => 'contribution_status',
     ],
     'api.required' => TRUE,
+    'api.default' => 'Pending',
   ];
   $params['receive_date'] = [
     'title' => 'Contribution Receive Date',

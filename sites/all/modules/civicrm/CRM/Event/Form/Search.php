@@ -84,7 +84,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     /**
      * set the button names
      */
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
@@ -100,7 +99,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -127,6 +126,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -189,7 +189,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $taskParams['ssID'] = isset($this->_ssID) ? $this->_ssID : NULL;
+      $taskParams['ssID'] = $this->_ssID ?? NULL;
       $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
 
       if (isset($this->_ssID)) {
@@ -285,11 +285,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["participant_test"] = 0;
     }
 
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -302,8 +299,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->controller->resetPage($formName);
       return;
     }
-
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
     $selector = new CRM_Event_Selector_Search($this->_queryParams,
       $this->_action,
@@ -363,9 +358,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-    $formValues = $this->getFormValues();
+    $this->setFormValues();
 
-    $this->submit($formValues);
+    $this->submit($this->_formValues);
   }
 
   /**
@@ -382,29 +377,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
-    $event = CRM_Utils_Request::retrieve('event', 'Positive');
-    if ($event) {
-      $this->_formValues['event_id'] = $event;
-      $this->_formValues['event_name'] = CRM_Event_PseudoConstant::event($event, TRUE);
-    }
-
-    $status = CRM_Utils_Request::retrieve('status', 'String');
-
-    if (isset($status)) {
-      if ($status === 'true') {
-        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
-      }
-      elseif ($status === 'false') {
-        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
-      }
-      elseif (is_numeric($status)) {
-        $statusTypes = (int) $status;
-      }
-      elseif (is_array($status) && !array_key_exists('IN', $status)) {
-        $statusTypes = array_keys($status);
-      }
-      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? ['IN' => array_keys($statusTypes)] : $statusTypes;
-    }
 
     $role = CRM_Utils_Request::retrieve('role', 'String');
 
@@ -463,10 +435,33 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array
    *   the default array reference
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
-    parent::setDefaultValues();
-    return $this->_formValues;
+    $this->_defaults = array_merge(parent::setDefaultValues(), (array) $this->_formValues);
+    $event = CRM_Utils_Request::retrieve('event', 'Positive');
+    if ($event) {
+      $this->_defaults['event_id'] = $event;
+      $this->_defaults['event_name'] = CRM_Event_PseudoConstant::event($event, TRUE);
+    }
+
+    $status = CRM_Utils_Request::retrieve('status', 'String');
+    if (isset($status)) {
+      if ($status === 'true') {
+        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
+      }
+      elseif ($status === 'false') {
+        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
+      }
+      elseif (is_numeric($status)) {
+        $statusTypes = (int) $status;
+      }
+      elseif (is_array($status) && !array_key_exists('IN', $status)) {
+        $statusTypes = array_keys($status);
+      }
+      $this->_defaults['participant_status_id'] = is_array($statusTypes) ? array_keys($statusTypes) : $statusTypes;
+    }
+    return $this->_defaults;
   }
 
 }

@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+
 /**
  * This class generates form components generic to recurring contributions.
  *
@@ -132,7 +133,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
     $this->_defaults['is_notify'] = 1;
     foreach ($this->editableScheduleFields as $field) {
-      $this->_defaults[$field] = isset($this->_subscriptionDetails->$field) ? $this->_subscriptionDetails->$field : NULL;
+      $this->_defaults[$field] = $this->_subscriptionDetails->$field ?? NULL;
     }
 
     return $this->_defaults;
@@ -205,10 +206,15 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $params['id'] = $this->_subscriptionDetails->recur_id;
     $message = '';
 
-    $params['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
+    $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
     $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
-      $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+      try {
+        $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+      }
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        CRM_Core_Error::statusBounce($e->getMessage());
+      }
     }
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);

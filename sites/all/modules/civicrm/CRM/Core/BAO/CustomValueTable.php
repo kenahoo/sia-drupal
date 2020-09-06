@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_BAO_CustomValueTable {
 
@@ -47,25 +45,31 @@ class CRM_Core_BAO_CustomValueTable {
         $set = [];
         $params = [];
         $count = 1;
-        foreach ($fields as $field) {
-          if (!$sqlOP) {
-            $entityID = $field['entity_id'];
-            $hookID = $field['custom_group_id'];
-            $isMultiple = $field['is_multiple'];
-            if (array_key_exists('id', $field)) {
-              $sqlOP = "UPDATE $tableName ";
-              $where = " WHERE  id = %{$count}";
-              $params[$count] = [$field['id'], 'Integer'];
-              $count++;
-              $hookOP = 'edit';
-            }
-            else {
-              $sqlOP = "INSERT INTO $tableName ";
-              $where = NULL;
-              $hookOP = 'create';
-            }
-          }
 
+        $firstField = reset($fields);
+        $entityID = $firstField['entity_id'];
+        $hookID = $firstField['custom_group_id'];
+        $isMultiple = $firstField['is_multiple'];
+        if (array_key_exists('id', $firstField)) {
+          $sqlOP = "UPDATE $tableName ";
+          $where = " WHERE  id = %{$count}";
+          $params[$count] = [$firstField['id'], 'Integer'];
+          $count++;
+          $hookOP = 'edit';
+        }
+        else {
+          $sqlOP = "INSERT INTO $tableName ";
+          $where = NULL;
+          $hookOP = 'create';
+        }
+
+        CRM_Utils_Hook::customPre($hookOP,
+          $hookID,
+          $entityID,
+          $fields
+        );
+
+        foreach ($fields as $field) {
           // fix the value before we store it
           $value = $field['value'];
           $type = $field['type'];
@@ -92,7 +96,7 @@ class CRM_Core_BAO_CustomValueTable {
                       CRM_Core_PseudoConstant::stateProvinceAbbreviation(), TRUE
                     );
                   }
-                  $validStates[] = CRM_Utils_Array::value('state_province_id', $states);
+                  $validStates[] = $states['state_province_id'] ?? NULL;
                 }
                 $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
                   $validStates
@@ -132,7 +136,7 @@ class CRM_Core_BAO_CustomValueTable {
                       CRM_Core_PseudoConstant::countryIsoCode(), TRUE
                     );
                   }
-                  $validCountries[] = CRM_Utils_Array::value('country_id', $countries);
+                  $validCountries[] = $countries['country_id'] ?? NULL;
                 }
                 $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
                   $validCountries
@@ -153,7 +157,7 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'File':
               if (!$field['file_id']) {
-                CRM_Core_Error::fatal();
+                throw new CRM_Core_Exception('Missing parameter file_id');
               }
 
               // need to add/update civicrm_entity_file
@@ -217,7 +221,7 @@ class CRM_Core_BAO_CustomValueTable {
             $count++;
           }
 
-          $fieldExtends = CRM_Utils_Array::value('extends', $field);
+          $fieldExtends = $field['extends'] ?? NULL;
           if (
             CRM_Utils_Array::value('entity_table', $field) == 'civicrm_contact'
             || $fieldExtends == 'Contact'
@@ -225,14 +229,14 @@ class CRM_Core_BAO_CustomValueTable {
             || $fieldExtends == 'Organization'
             || $fieldExtends == 'Household'
           ) {
-            $paramFieldsExtendContactForEntities[$entityID]['custom_' . CRM_Utils_Array::value('custom_field_id', $field)] = CRM_Utils_Array::value('custom_field_id', $field);
+            $paramFieldsExtendContactForEntities[$entityID]['custom_' . CRM_Utils_Array::value('custom_field_id', $field)] = $field['custom_field_id'] ?? NULL;
           }
         }
 
         if (!empty($set)) {
           $setClause = [];
           foreach ($set as $n => $v) {
-            $setClause[] = "$n = $v";
+            $setClause[] = "`$n` = $v";
           }
           $setClause = implode(',', $setClause);
           if (!$where) {
@@ -318,7 +322,7 @@ class CRM_Core_BAO_CustomValueTable {
         return 'datetime';
 
       default:
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Invalid Field Type');
     }
   }
 
@@ -345,7 +349,7 @@ class CRM_Core_BAO_CustomValueTable {
           'custom_group_id' => $customValue['custom_group_id'],
           'table_name' => $customValue['table_name'],
           'column_name' => $customValue['column_name'],
-          'is_multiple' => CRM_Utils_Array::value('is_multiple', $customValue),
+          'is_multiple' => $customValue['is_multiple'] ?? NULL,
           'file_id' => $customValue['file_id'],
         ];
 
@@ -415,12 +419,13 @@ class CRM_Core_BAO_CustomValueTable {
    *   Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
    *                                   Empty array if no custom values found.
+   * @throws CRM_Core_Exception
    */
   public static function &getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
-      CRM_Core_Error::fatal('Please file an issue with the backtrace');
+      throw new CRM_Core_Exception('Please file an issue with the backtrace');
       return NULL;
     }
 
@@ -473,7 +478,7 @@ AND    $cond
       }
       $fields[$dao->table_name][] = $dao->fieldID;
       $select[$dao->table_name][] = "{$dao->column_name} AS custom_{$dao->fieldID}";
-      $isMultiple[$dao->table_name] = $dao->is_multiple ? TRUE : FALSE;
+      $isMultiple[$dao->table_name] = (bool) $dao->is_multiple;
       $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
@@ -573,6 +578,7 @@ SELECT cg.table_name  as table_name ,
        cg.extends     as extends,
        cf.column_name as column_name,
        cf.id          as cf_id      ,
+       cf.html_type   as html_type  ,
        cf.data_type   as data_type
 FROM   civicrm_custom_group cg,
        civicrm_custom_field cf
@@ -586,6 +592,10 @@ AND    cf.id IN ( $fieldIDList )
     while ($dao->fetch()) {
       $dataType = $dao->data_type == 'Date' ? 'Timestamp' : $dao->data_type;
       foreach ($fieldValues[$dao->cf_id] as $fieldValue) {
+        // Serialize array values
+        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($dao)) {
+          $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
+        }
         // Format null values correctly
         if ($fieldValue['value'] === NULL || $fieldValue['value'] === '') {
           switch ($dataType) {

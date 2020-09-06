@@ -122,16 +122,13 @@ WHERE  email = %2
     }
 
     $contact_id = $q->contact_id;
-    $transaction = new CRM_Core_Transaction();
 
     $mailing_id = civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
 
     $groupObject = new CRM_Contact_BAO_Group();
-    $groupTableName = $groupObject->getTableName();
 
     $mailingObject = new CRM_Mailing_BAO_Mailing();
-    $mailingTableName = $mailingObject->getTableName();
 
     // We need a mailing id that points to the mailing that defined the recipients.
     // This is usually just the passed-in mailing_id, however in the case of AB
@@ -175,7 +172,8 @@ WHERE  email = %2
     $mailings = [];
 
     while ($do->fetch()) {
-      if ($do->entity_table === $groupTableName) {
+      // @todo this is should be a temporary measure until we stop storing the translated table name in the database
+      if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
         if ($do->group_type == 'Base') {
           $base_groups[$do->entity_id] = NULL;
         }
@@ -183,7 +181,8 @@ WHERE  email = %2
           $groups[$do->entity_id] = NULL;
         }
       }
-      elseif ($do->entity_table === $mailingTableName) {
+      elseif (substr($do->entity_table, 0, 15) === 'civicrm_mailing') {
+        // @todo this is should be a temporary measure until we stop storing the translated table name in the database
         $mailings[] = $do->entity_id;
       }
     }
@@ -202,10 +201,12 @@ WHERE  email = %2
       $mailings = [];
 
       while ($do->fetch()) {
-        if ($do->entity_table === $groupTableName) {
+        // @todo this is should be a temporary measure until we stop storing the translated table name in the database
+        if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
           $groups[$do->entity_id] = TRUE;
         }
-        elseif ($do->entity_table === $mailing) {
+        elseif (substr($do->entity_table, 0, 15) === 'civicrm_mailing') {
+          // @todo this is should be a temporary measure until we stop storing the translated table name in the database
           $mailings[] = $do->entity_id;
         }
       }
@@ -260,7 +261,7 @@ WHERE  email = %2
         $groups[$do->group_id] = $do->title;
       }
     }
-
+    $transaction = new CRM_Core_Transaction();
     $contacts = [$contact_id];
     foreach ($groups as $group_id => $group_name) {
       $notremoved = FALSE;
@@ -364,8 +365,6 @@ WHERE  email = %2
       }
     }
 
-    $message = new Mail_mime("\n");
-
     list($addresses, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
@@ -376,37 +375,30 @@ WHERE  email = %2
       $html = CRM_Utils_Token::replaceUnsubscribeTokens($html, $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
       $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
-      $message->setHTMLBody($html);
     }
     if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
       $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceUnsubscribeTokens($text, $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
       $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
-      $message->setTxtBody($text);
     }
 
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
-    $headers = [
-      'Subject' => $component->subject,
-      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
-      'To' => $eq->email,
-      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+    $params = [
+      'subject' => $component->subject,
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'toEmail' => $eq->email,
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'html' => $html,
+      'text' => $text,
     ];
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($headers, 'u', $job, $queue_id, $eq->hash);
-
-    $b = CRM_Utils_Mail::setMimeParams($message);
-    $h = $message->headers($headers);
-
-    $mailer = \Civi::service('pear_mail');
-
-    if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($eq->email, $h, $b);
-      unset($errorScope);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', $job, $queue_id, $eq->hash);
+    if (CRM_Core_BAO_MailSettings::includeMessageId()) {
+      $params['messageId'] = $params['Message-ID'];
     }
+    CRM_Utils_Mail::send($params);
   }
 
   /**

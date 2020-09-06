@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 /*
  * Settings metadata file
@@ -33,10 +31,9 @@ return [
     'html_type' => 'text',
     'default' => 'https://civicrm.org/extdir/ver={ver}|cms={uf}',
     'add' => '4.3',
-    'title' => 'Extension Repo URL',
+    'title' => ts('Extension Repo URL'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => '',
   ],
 ];

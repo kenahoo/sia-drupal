@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
 
@@ -168,7 +166,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
           continue;
         }
 
-        $expirationTime = CRM_Utils_Array::value('expiration_time', $values);
+        $expirationTime = $values['expiration_time'] ?? NULL;
         if ($expirationTime && array_key_exists($values['status_id'], $pendingStatuses)) {
 
           //get the expiration and registration pending time.

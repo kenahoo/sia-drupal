@@ -14,10 +14,7 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
-
 
 namespace Civi\Api4;
 
@@ -25,6 +22,8 @@ namespace Civi\Api4;
  * MappingField entity.
  *
  * This represents one field in a Mapping collection.
+ *
+ * @see \Civi\Api4\Mapping
  *
  * @package Civi\Api4
  */

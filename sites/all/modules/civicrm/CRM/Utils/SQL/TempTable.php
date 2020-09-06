@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
  *   - All temp tables start with "civicrm_tmp".
@@ -125,12 +124,24 @@ class CRM_Utils_SQL_TempTable {
     $sql = sprintf('%s %s %s AS %s',
       $this->toSQL('CREATE'),
       $this->memory ? self::MEMORY : self::INNODB,
-      $this->utf8 ? self::UTF8 : '',
+      $this->getUtf8String(),
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
     return $this;
+  }
+
+  /**
+   * Get the utf8 string for the table.
+   *
+   * Our tables are either utf8_unicode_ci OR utf8mb8_unicode_ci - check the contact table
+   * to see which & use the matching one.
+   *
+   * @return string
+   */
+  public function getUtf8String() {
+    return $this->utf8 ? ('COLLATE ' . CRM_Core_BAO_SchemaHandler::getInUseCollation()) : '';
   }
 
   /**
@@ -146,7 +157,7 @@ class CRM_Utils_SQL_TempTable {
       $this->toSQL('CREATE'),
       $columns,
       $this->memory ? self::MEMORY : self::INNODB,
-      $this->utf8 ? self::UTF8 : ''
+      $this->getUtf8String()
     );
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
@@ -252,7 +263,7 @@ class CRM_Utils_SQL_TempTable {
    */
   public function setCategory($category) {
     if ($category && !preg_match(self::CATEGORY_REGEXP, $category) || strlen($category) > self::CATEGORY_LENGTH) {
-      throw new \RuntimeException("Malformed temp table category");
+      throw new \RuntimeException("Malformed temp table category $category");
     }
     $this->category = $category;
     return $this;

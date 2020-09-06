@@ -31,7 +31,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     // to override standard implementations -- which is
     // handy for testing/mocking.
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         ['onApiResolve', Events::W_EARLY],
       ],
     ];
@@ -61,7 +61,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     // Load result class based on @return annotation in the execute() method.
     $reflection = new \ReflectionClass($action);
     $doc = ReflectionUtils::getCodeDocs($reflection->getMethod('execute'), 'Method');
-    $resultClass = \CRM_Utils_Array::value('return', $doc, '\\Civi\\Api4\\Generic\\Result');
+    $resultClass = $doc['return'][0] ?? '\\Civi\\Api4\\Generic\\Result';
     $result = new $resultClass();
     $result->action = $action->getActionName();
     $result->entity = $action->getEntityName();
@@ -116,7 +116,8 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
       }
     }
     elseif (is_string($val) && strlen($val) > 1 && substr($val, 0, 1) === '$') {
-      $val = \CRM_Utils_Array::pathGet($result, explode('.', substr($val, 1)));
+      $key = substr($val, 1);
+      $val = $result[$key] ?? \CRM_Utils_Array::pathGet($result, explode('.', $key));
     }
   }
 

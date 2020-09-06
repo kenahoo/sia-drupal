@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -279,6 +277,17 @@ class Joinable {
       }
     }
     return $this->entityFields;
+  }
+
+  /**
+   * @return array
+   */
+  public function getEntityFieldNames() {
+    $fieldNames = [];
+    foreach ($this->getEntityFields() as $fieldSpec) {
+      $fieldNames[] = $fieldSpec->getName();
+    }
+    return $fieldNames;
   }
 
   /**

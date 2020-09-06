@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Utils_Get {
 
@@ -25,7 +23,7 @@ class CRM_Report_Utils_Get {
    * @return mixed|null
    */
   public static function getTypedValue($name, $type) {
-    $value = CRM_Utils_Array::value($name, $_GET);
+    $value = $_GET[$name] ?? NULL;
     if ($value === NULL) {
       return NULL;
     }
@@ -188,7 +186,7 @@ class CRM_Report_Utils_Get {
    * @param $defaults
    */
   public static function processChart(&$defaults) {
-    $chartType = CRM_Utils_Array::value("charts", $_GET);
+    $chartType = $_GET["charts"] ?? NULL;
     if (in_array($chartType, [
       'barChart',
       'pieChart',

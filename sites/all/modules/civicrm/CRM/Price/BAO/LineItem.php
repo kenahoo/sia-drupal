@@ -32,7 +32,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @throws \Exception
    */
   public static function create(&$params) {
-    $id = CRM_Utils_Array::value('id', $params);
+    $id = $params['id'] ?? NULL;
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
       $op = CRM_Core_Action::UPDATE;
@@ -45,8 +45,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
-      $entity_id = CRM_Utils_Array::value('entity_id', $params);
-      $entity_table = CRM_Utils_Array::value('entity_table', $params);
+      $entity_id = $params['entity_id'] ?? NULL;
+      $entity_table = $params['entity_table'] ?? NULL;
       unset($params['entity_id'], $params['entity_table']);
     }
     else {
@@ -181,14 +181,13 @@ WHERE li.contribution_id = %1";
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
-   * @param bool $invoice
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE, $invoice = FALSE) {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE) {
     $whereClause = $fromClause = NULL;
-    $selectClause = "
-      SELECT    li.id,
+    $selectClause = '
+      SELECT li.id,
       li.label,
       li.contribution_id,
       li.qty,
@@ -206,29 +205,19 @@ WHERE li.contribution_id = %1";
       li.price_field_value_id,
       li.financial_type_id,
       li.tax_amount,
-      pfv.description";
+      pfv.description';
 
-    $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
+    $condition = "li.entity_id = civicrm_%2.id AND li.entity_table = 'civicrm_%2'";
     if ($relatedEntity) {
-      $condition = "li.contribution_id = %2.id ";
+      $condition = 'li.contribution_id = civicrm_%2.id ';
     }
 
     $fromClause = "
-      FROM      civicrm_%2 as %2
+      FROM civicrm_%2
       LEFT JOIN civicrm_line_item li ON ({$condition})
-      LEFT JOIN civicrm_price_field_value pfv ON ( pfv.id = li.price_field_value_id )
+      LEFT JOIN civicrm_price_field_value pfv ON (pfv.id = li.price_field_value_id)
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
-    $whereClause = "
-      WHERE     %2.id = %1";
-
-    // CRM-16250 get additional participant's fee selection details only for invoice PDF (if any)
-    if ($entity == 'participant' && $invoice) {
-      $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
-      if (!empty($additionalParticipantIDs)) {
-        $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
-      }
-    }
-
+    $whereClause = " WHERE civicrm_%2.id = %1";
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
     if ($isQuick) {
@@ -253,7 +242,7 @@ WHERE li.contribution_id = %1";
 
     $getTaxDetails = FALSE;
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
 
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
@@ -297,7 +286,7 @@ WHERE li.contribution_id = %1";
     }
     if ($invoicing) {
       // @todo - this is an inappropriate place to be doing form level assignments.
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $taxTerm = Civi::settings()->get('tax_term');
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('taxTerm', $taxTerm);
       $smarty->assign('getTaxDetails', $getTaxDetails);
@@ -340,7 +329,7 @@ WHERE li.contribution_id = %1";
     else {
       CRM_Price_BAO_PriceFieldValue::getValues($fid, $options, 'weight', TRUE);
     }
-    $fieldTitle = CRM_Utils_Array::value('label', $fields);
+    $fieldTitle = $fields['label'] ?? NULL;
     if (!$fieldTitle) {
       $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $fid, 'label');
     }
@@ -353,21 +342,21 @@ WHERE li.contribution_id = %1";
       $values[$oid] = [
         'price_field_id' => $fid,
         'price_field_value_id' => $oid,
-        'label' => CRM_Utils_Array::value('label', $options[$oid]),
+        'label' => $options[$oid]['label'] ?? NULL,
         'field_title' => $fieldTitle,
-        'description' => CRM_Utils_Array::value('description', $options[$oid]),
+        'description' => $options[$oid]['description'] ?? NULL,
         'qty' => $qty,
         'unit_price' => $price,
         'line_total' => $qty * $price,
         'participant_count' => $qty * $participantsPerField,
-        'max_value' => CRM_Utils_Array::value('max_value', $options[$oid]),
-        'membership_type_id' => CRM_Utils_Array::value('membership_type_id', $options[$oid]),
-        'membership_num_terms' => CRM_Utils_Array::value('membership_num_terms', $options[$oid]),
-        'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
+        'max_value' => $options[$oid]['max_value'] ?? NULL,
+        'membership_type_id' => $options[$oid]['membership_type_id'] ?? NULL,
+        'membership_num_terms' => $options[$oid]['membership_num_terms'] ?? NULL,
+        'auto_renew' => $options[$oid]['auto_renew'] ?? NULL,
         'html_type' => $fields['html_type'],
-        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
+        'financial_type_id' => $options[$oid]['financial_type_id'] ?? NULL,
         'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid], 0),
-        'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $options[$oid]),
+        'non_deductible_amount' => $options[$oid]['non_deductible_amount'] ?? NULL,
       ];
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
@@ -402,7 +391,7 @@ WHERE li.contribution_id = %1";
    * Process price set and line items.
    *
    * @param int $entityId
-   * @param array $lineItem
+   * @param array $lineItems
    *   Line item array.
    * @param object $contributionDetails
    * @param string $entityTable
@@ -410,16 +399,17 @@ WHERE li.contribution_id = %1";
    *
    * @param bool $update
    *
-   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
-    if (!$entityId || !is_array($lineItem)
-      || CRM_Utils_System::isNull($lineItem)
+  public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
+    if (!$entityId || !is_array($lineItems)
+      || CRM_Utils_System::isNull($lineItems)
     ) {
       return;
     }
 
-    foreach ($lineItem as $priceSetId => &$values) {
+    foreach ($lineItems as $priceSetId => &$values) {
       if (!$priceSetId) {
         continue;
       }
@@ -455,18 +445,18 @@ WHERE li.contribution_id = %1";
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
-        $lineItems = CRM_Price_BAO_LineItem::create($line);
+        $createdLineItem = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
+          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
+            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE);
           }
         }
       }
     }
     if (!$update && $contributionDetails) {
-      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItem, $contributionDetails);
+      CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionDetails);
     }
   }
 
@@ -543,7 +533,7 @@ WHERE li.contribution_id = %1";
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
       $totalAmount = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
-      $financialType = CRM_Utils_Array::value('financial_type_id', $params);
+      $financialType = $params['financial_type_id'] ?? NULL;
       foreach ($priceSetDetails as $values) {
         if ($entityTable == 'membership') {
           if ($isRelatedID != $values['membership_type_id']) {
@@ -603,7 +593,7 @@ WHERE li.contribution_id = %1";
    *   These are per the way the form processes them - ie
    *   ['price_1' => 1, 'price_2' => 8]
    *   This would mean price field id 1, option 1 (or 1 unit if using is_enter_qty).
-   * @param float|NULL $overrideAmount
+   * @param float|null $overrideAmount
    *   Optional override of the amount.
    *
    * @param int|null $financialTypeID
@@ -664,8 +654,9 @@ WHERE li.contribution_id = %1";
     $lineItems
   ) {
     $entityTable = "civicrm_" . $entity;
+    $newLineItems = [];
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
-      $params, $lineItems
+      $params, $newLineItems
     );
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();
@@ -1172,7 +1163,7 @@ WHERE li.contribution_id = %1";
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
   protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
-    $paidAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
+    $paidAmount = (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
     $balanceAmt = $updatedAmount - $paidAmount;
 
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1181,26 +1172,21 @@ WHERE li.contribution_id = %1";
     $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-    $adjustedTrxn = $skip = FALSE;
+    $adjustedTrxn = FALSE;
     if ($balanceAmt) {
-      if ($balanceAmt > 0 && $paidAmount != 0) {
-        $contributionStatusVal = $partiallyPaidStatusId;
-      }
-      elseif ($balanceAmt < 0 && $paidAmount != 0) {
-        $contributionStatusVal = $pendingRefundStatusId;
-      }
-      elseif ($paidAmount == 0) {
+      if ($paidAmount === 0.0) {
         //skip updating the contribution status if no payment is made
-        $skip = TRUE;
         $updatedContributionDAO->cancel_date = 'null';
         $updatedContributionDAO->cancel_reason = NULL;
       }
+      else {
+        $updatedContributionDAO->contribution_status_id = $balanceAmt > 0 ? $partiallyPaidStatusId : $pendingRefundStatusId;
+      }
+
       // update contribution status and total amount without trigger financial code
       // as this is handled in current BAO function used for change selection
       $updatedContributionDAO->id = $contributionId;
-      if (!$skip) {
-        $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
-      }
+
       $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
       $updatedContributionDAO->fee_amount = 0;
       $updatedContributionDAO->tax_amount = $taxAmount;

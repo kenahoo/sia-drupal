@@ -55,6 +55,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -66,7 +68,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $this->assign('action', $this->_action);
@@ -203,7 +205,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $showAdditionalInfo = FALSE;
-    $this->_formType = CRM_Utils_Array::value('formType', $_GET);
+    $this->_formType = $_GET['formType'] ?? NULL;
 
     $defaults = [];
 
@@ -219,7 +221,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       ];
       // see if we need to include this paneName in the current form
       if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-        CRM_Utils_Array::value("hidden_{$type}", $defaults)
+        !empty($defaults["hidden_{$type}"])
       ) {
         $showAdditionalInfo = TRUE;
         $allPanes[$name]['open'] = 'true';
@@ -444,12 +446,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       'campaign_id',
     ];
     foreach ($fields as $f) {
-      $params[$f] = CRM_Utils_Array::value($f, $formValues);
+      $params[$f] = $formValues[$f] ?? NULL;
     }
 
     // format amount
     $params['amount'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('amount', $formValues));
-    $params['currency'] = CRM_Utils_Array::value('currency', $formValues);
+    $params['currency'] = $formValues['currency'] ?? NULL;
     $params['original_installment_amount'] = ($params['amount'] / $params['installments']);
 
     $dates = ['create_date', 'start_date', 'acknowledge_date', 'cancel_date'];

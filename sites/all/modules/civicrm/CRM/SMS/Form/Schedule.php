@@ -52,11 +52,13 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     // on page refresh.
     $this->setAttribute('autocomplete', 'off');
 
-    $sendOptions = [
-      $this->createElement('radio', NULL, NULL, ts('Send immediately'), 'send_immediate', ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;']),
-      $this->createElement('radio', NULL, NULL, ts('Send at:'), 'send_later', ['id' => 'send_later']),
-    ];
-    $this->addGroup($sendOptions, 'send_option', '', '<br>');
+    $this->addRadio('send_option', '', [
+      'send_immediate' => ts('Send immediately'),
+      'send_later' => ts('Send at:'),
+    ], [], '<br>', FALSE, [
+      'send_immediate' => ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;'],
+      'send_later' => ['id' => 'send_later'],
+    ]);
 
     $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => time()]);
 
@@ -131,9 +133,9 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   public function postProcess() {
     $params = [];
 
-    $params['mailing_id'] = $ids['mailing_id'] = $this->_mailingID;
+    $params['id'] = $this->_mailingID;
 
-    if (empty($params['mailing_id'])) {
+    if (empty($params['id'])) {
       CRM_Core_Error::statusBounce(ts('Could not find a mailing id'));
     }
 
@@ -157,7 +159,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     }
 
     // Build the mailing object.
-    CRM_Mailing_BAO_Mailing::create($params, $ids);
+    CRM_Mailing_BAO_Mailing::create($params);
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',

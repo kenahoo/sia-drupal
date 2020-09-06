@@ -14,15 +14,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
-
 
 namespace Civi\Api4;
 
 /**
  * Group entity.
+ *
+ * @see https://docs.civicrm.org/user/en/latest/organising-your-data/groups-and-tags/#groups
  *
  * @package Civi\Api4
  */

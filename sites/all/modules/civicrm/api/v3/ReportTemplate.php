@@ -97,6 +97,9 @@ function civicrm_api3_report_template_delete($params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['report_id', 'instance_id']);
@@ -180,6 +183,10 @@ function _civicrm_api3_report_template_getrows($params) {
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
+  if (isset($metadata['metadata']['sql'])) {
+    // Update for stats queries.
+    $metadata['metadata']['sql'] = $reportInstance->getReportSql();
+  }
   $reportInstance->cleanUpTemporaryTables();
   return civicrm_api3_create_success($stats, $params, 'ReportTemplate', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }

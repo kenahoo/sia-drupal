@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -24,16 +22,15 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * Update one or more records with new values.
+ * Update one or more $ENTITY with new values.
  *
- * Use the where clause (required) to select them.
+ * Use the `where` clause (required) to select them.
  */
 class BasicUpdateAction extends AbstractUpdateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicUpdateAction $thisAction) => array
+   *   Function(array $item, BasicUpdateAction $thisAction): array
    */
   private $setter;
 
@@ -45,7 +42,6 @@ class BasicUpdateAction extends AbstractUpdateAction {
    * @param string|array $select
    *   One or more fields to select from each matching item.
    * @param callable $setter
-   *   Function(array $item, BasicUpdateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $select = 'id', $setter = NULL) {
     parent::__construct($entityName, $actionName, $select);
@@ -61,12 +57,9 @@ class BasicUpdateAction extends AbstractUpdateAction {
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function _run(Result $result) {
+    $this->formatWriteValues($this->values);
     foreach ($this->getBatchRecords() as $item) {
       $result[] = $this->writeRecord($this->values + $item);
-    }
-
-    if (!$result->count()) {
-      throw new \API_Exception('Cannot ' . $this->getActionName() . ' ' . $this->getEntityName() . ', no records found with ' . $this->whereClauseToString());
     }
   }
 
@@ -84,6 +77,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
    */
   protected function writeRecord($item) {
     if (is_callable($this->setter)) {
+      $this->addCallbackToDebugOutput($this->setter);
       return call_user_func($this->setter, $item, $this);
     }
     throw new NotImplementedException('Setter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());

@@ -54,7 +54,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     CRM_Utils_Hook::pre($op, 'MailingJob', CRM_Utils_Array::value('id', $params), $params);
 
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
-    $jobDAO->copyValues($params, TRUE);
+    $jobDAO->copyValues($params);
     $jobDAO->save();
     if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
@@ -432,6 +432,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $now = time();
       $params = [];
       $count = 0;
+      // dev/core#1768 Get the mail sync interval.
+      $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
       while ($recipients->fetch()) {
         // CRM-18543: there are situations when both the email and phone are null.
         // Skip the recipient in this case.
@@ -453,7 +455,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           $recipients->phone_id,
         ];
         $count++;
-        if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
+        // dev/core#1768 Mail sync interval is now configurable.
+        if ($count % $mail_sync_interval == 0) {
           CRM_Mailing_Event_BAO_Queue::bulkCreate($params, $now);
           $count = 0;
           $params = [];
@@ -576,6 +579,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $returnProperties = $mailing->getReturnProperties();
     $params = $targetParams = $deliveredParams = [];
     $count = 0;
+    // dev/core#1768 Get the mail sync interval.
+    $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
     $retryGroup = FALSE;
 
     // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
@@ -708,7 +713,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $targetParams[] = $field['contact_id'];
 
         $count++;
-        if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
+        // dev/core#1768 Mail sync interval is now configurable.
+        if ($count % $mail_sync_interval == 0) {
           $this->writeToDB(
             $deliveredParams,
             $targetParams,
@@ -781,7 +787,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
 
     // Register 5xx SMTP response code (permanent failure) as bounce.
-    if (isset($code{0}) && $code{0} === '5') {
+    if (isset($code[0]) && $code[0] === '5') {
       return FALSE;
     }
 

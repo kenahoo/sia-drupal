@@ -24,11 +24,11 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         // TODO decide if we really want to override others
         ['onApiResolve', Events::W_EARLY],
       ],
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         // TODO decide if we really want to override others
         ['onApiAuthorize', Events::W_EARLY],
       ],
@@ -41,7 +41,11 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   private $apiKernel;
 
   /**
-   * @var array (string $entityName => array(string $actionName))
+   * List of all entities and their supported actions
+   *
+   * array(string $entityName => string[] $actionNames).
+   *
+   * @var array
    */
   private $actions;
 
@@ -130,7 +134,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public function getActionNames($version, $entity) {
     $entity = _civicrm_api_get_camel_name($entity, $version);
-    return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
+    return $this->actions[$entity] ?? $this->actions['*'];
   }
 
 }

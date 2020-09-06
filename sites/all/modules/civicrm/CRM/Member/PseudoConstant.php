@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -96,7 +94,7 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
 
     $value = NULL;
     if ($id) {
-      $value = CRM_Utils_Array::value($id, self::$membershipStatus[$cacheKey]);
+      $value = self::$membershipStatus[$cacheKey][$id] ?? NULL;
     }
     else {
       $value = self::$membershipStatus[$cacheKey];

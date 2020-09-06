@@ -49,13 +49,14 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
     // add select for groups
     // Get hierarchical listing of groups, respecting ACLs for CRM-16836.
-    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
+    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;');
     if (!empty($searchOptions['groups'])) {
       $this->addField('group', [
         'entity' => 'group_contact',
         'label' => ts('in'),
         'placeholder' => ts('- any group -'),
         'options' => $groupHierarchy,
+        'type' => 'Select2',
       ]);
     }
 
@@ -83,7 +84,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   public function setDefaultValues() {
     $defaults = [];
 
-    $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
+    $defaults['sort_name'] = $this->_formValues['sort_name'] ?? NULL;
     foreach (self::$csv as $v) {
       if (!empty($this->_formValues[$v]) && is_array($this->_formValues[$v])) {
         $tmpArray = array_keys($this->_formValues[$v]);

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\SettingsBag;
+
 /**
  * Base class for incremental upgrades
  */
@@ -138,13 +140,11 @@ class CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
+    $locales = CRM_Core_I18n::getMultilingual();
     $queries = [];
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
-      if ($domain->locales) {
+      if ($locales) {
         if ($localizable) {
-          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
             if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
               $queries[] = "ALTER TABLE `$table` ADD COLUMN `{$column}_{$locale}` $properties";
@@ -162,8 +162,7 @@ class CRM_Upgrade_Incremental_Base {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
       }
     }
-    if ($domain->locales) {
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    if ($locales) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version, TRUE);
     }
     return TRUE;
@@ -195,11 +194,16 @@ class CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function updateContributeSettings($ctx) {
-    $settings = Civi::settings()->get('contribution_invoice_settings');
-    $metadata = \Civi\Core\SettingsMetadata::getMetadata();
-    $conversions = array_intersect_key((array) $settings, $metadata);
-    foreach ($conversions as $key => $conversion) {
-      Civi::settings()->set($key, $conversion);
+    // Use a direct query as api now does some handling on this.
+    $settings = CRM_Core_DAO::executeQuery("SELECT value, domain_id FROM civicrm_setting WHERE name = 'contribution_invoice_settings'");
+
+    while ($settings->fetch()) {
+      $contributionSettings = (array) CRM_Utils_String::unserialize($settings->value);
+      foreach (array_merge(SettingsBag::getContributionInvoiceSettingKeys(), ['deferred_revenue_enabled' => 'deferred_revenue_enabled']) as $possibleKeyName => $settingName) {
+        if (!empty($contributionSettings[$possibleKeyName]) && empty(Civi::settings($settings->domain_id)->getExplicit($settingName))) {
+          Civi::settings($settings->domain_id)->set($settingName, $contributionSettings[$possibleKeyName]);
+        }
+      }
     }
     return TRUE;
   }
@@ -291,10 +295,8 @@ class CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function rebuildMultilingalSchema($ctx, $version = NULL) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if ($domain->locales) {
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version);
     }
     return TRUE;

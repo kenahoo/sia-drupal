@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -24,35 +22,73 @@ namespace Civi\Api4;
 /**
  * Retrieves information about all Api4 entities.
  *
+ * @see \Civi\Api4\Generic\AbstractEntity
+ *
  * @package Civi\Api4
  */
 class Entity extends Generic\AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return Action\Entity\Get
    */
-  public static function get() {
-    return new Action\Entity\Get('Entity', __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Entity\Get('Entity', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Generic\BasicGetFieldsAction
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
    */
-  public static function getFields() {
-    return new \Civi\Api4\Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function() {
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function() {
       return [
-        ['name' => 'name'],
-        ['name' => 'description'],
-        ['name' => 'comment'],
+        [
+          'name' => 'name',
+          'description' => 'Entity name',
+        ],
+        [
+          'name' => 'title',
+          'description' => 'Localized title',
+        ],
+        [
+          'name' => 'type',
+          'description' => 'Base class for this entity',
+          'options' => ['DAOEntity' => 'DAOEntity', 'BasicEntity' => 'BasicEntity', 'BridgeEntity' => 'BridgeEntity', 'AbstractEntity' => 'AbstractEntity'],
+        ],
+        [
+          'name' => 'description',
+          'description' => 'Description from docblock',
+        ],
+        [
+          'name' => 'comment',
+          'description' => 'Comments from docblock',
+        ],
+        [
+          'name' => 'icon',
+          'description' => 'crm-i icon class associated with this entity',
+        ],
+        [
+          'name' => 'dao',
+          'description' => 'Class name for dao-based entities',
+        ],
+        [
+          'name' => 'see',
+          'data_type' => 'Array',
+          'description' => 'Any @see annotations from docblock',
+        ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return Action\Entity\GetLinks
    */
-  public static function getLinks() {
-    return new Action\Entity\GetLinks('Entity', __FUNCTION__);
+  public static function getLinks($checkPermissions = TRUE) {
+    return (new Action\Entity\GetLinks('Entity', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**

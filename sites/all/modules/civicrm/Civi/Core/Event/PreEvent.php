@@ -25,11 +25,13 @@ class PreEvent extends GenericHookEvent {
    * @param \Civi\Core\Event\PreEvent $event
    */
   public static function dispatchSubevent(PreEvent $event) {
-    \Civi::service('dispatcher')->dispatch("hook_civicrm_pre::" . $event->entity, $event);
+    \Civi::dispatcher()->dispatch("hook_civicrm_pre::" . $event->entity, $event);
   }
 
   /**
-   * @var string 'create'|'edit'|'delete' etc
+   * One of: 'create'|'edit'|'delete'
+   *
+   * @var string
    */
   public $action;
 

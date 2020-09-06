@@ -10,14 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
 namespace Civi\Api4\Action\CustomValue;
 
 use Civi\Api4\Service\Spec\SpecFormatter;
@@ -32,7 +24,7 @@ class GetFields extends \Civi\Api4\Generic\DAOGetFieldsAction {
     $fields = $this->_itemsToGet('name');
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $spec = $gatherer->getSpec('Custom_' . $this->getCustomGroup(), $this->getAction(), $this->includeCustom);
+    $spec = $gatherer->getSpec('Custom_' . $this->getCustomGroup(), $this->getAction(), $this->includeCustom, $this->values);
     return SpecFormatter::specToArray($spec->getFields($fields), $this->loadOptions);
   }
 

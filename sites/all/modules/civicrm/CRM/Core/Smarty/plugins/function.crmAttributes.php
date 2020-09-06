@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC
- * $Id$
  *
  */
 
@@ -27,6 +26,6 @@
  * @return string
  */
 function smarty_function_crmAttributes($params, &$smarty) {
-  $attributes = isset($params['a']) ? $params['a'] : [];
+  $attributes = $params['a'] ?? [];
   return CRM_Utils_String::htmlAttributes($attributes);
 }

@@ -53,7 +53,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         if (!CRM_Core_Permission::check('access all cases and activities')) {
           $userCases = CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any']);
           if (!array_key_exists($this->_id, $userCases)) {
-            CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+            CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
           }
         }
       }
@@ -63,7 +63,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
     else {
       if ($this->_action & CRM_Core_Action::VIEW) {
-        CRM_Core_Error::fatal('Contact Id is required for view action.');
+        CRM_Core_Error::statusBounce('Contact Id is required for view action.');
       }
     }
 

@@ -9,7 +9,7 @@ namespace CiviDrupal {
    * @package CiviDrupal
    * @group e2e
    */
-  class HookTest extends \PHPUnit_Framework_TestCase implements EndToEndInterface {
+  class HookTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface {
 
     public function testFoo() {
       $arg1 = 'hello';
@@ -21,7 +21,7 @@ namespace CiviDrupal {
 
       \CRM_Utils_Hook::singleton()
         ->invoke(
-          2,
+          ['arg1', 'arg2'],
           $arg1,
           $arg2,
           \CRM_Utils_Hook::$_nullObject,

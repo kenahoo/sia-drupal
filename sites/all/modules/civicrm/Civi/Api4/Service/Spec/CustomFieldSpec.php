@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -36,11 +34,6 @@ class CustomFieldSpec extends FieldSpec {
    * @var string
    */
   protected $tableName;
-
-  /**
-   * @var string
-   */
-  protected $columnName;
 
   /**
    * @inheritDoc
@@ -112,24 +105,6 @@ class CustomFieldSpec extends FieldSpec {
    */
   public function setCustomTableName($customFieldColumnName) {
     $this->tableName = $customFieldColumnName;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getCustomFieldColumnName() {
-    return $this->columnName;
-  }
-
-  /**
-   * @param string $customFieldColumnName
-   *
-   * @return $this
-   */
-  public function setCustomFieldColumnName($customFieldColumnName) {
-    $this->columnName = $customFieldColumnName;
 
     return $this;
   }

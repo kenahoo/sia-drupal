@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -464,7 +462,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
 
         foreach ($valueParts as $val) {
           if (CRM_Utils_Rule::integer($val)) {
-            $groupTypeValues[$val] = CRM_Utils_Array::value($val, $valueLabels);
+            $groupTypeValues[$val] = $valueLabels[$val] ?? NULL;
           }
         }
 

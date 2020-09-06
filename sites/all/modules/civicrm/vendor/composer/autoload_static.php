@@ -4,15 +4,18 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
+class ComposerStaticInit191eca689b99b98f3334e35c02d03840
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
         '3919eeb97e98d4648304477f8ef734ba' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/Random.php',
+        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '5636a0a89fc28f9cfa8624493b142015' => __DIR__ . '/..' . '/civicrm/civicrm-setup/civicrm-setup-autoload.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '9e4824c5afbdc1482b6025ce3d4dfde8' => __DIR__ . '/..' . '/league/csv/src/functions_include.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
@@ -30,16 +33,21 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         ),
         'Z' => 
         array (
-            'Zend\\Validator\\' => 15,
-            'Zend\\Stdlib\\' => 12,
             'Zend\\Escaper\\' => 13,
         ),
         'W' => 
         array (
             'When\\' => 5,
         ),
+        'T' => 
+        array (
+            'TYPO3\\PharStreamWrapper\\' => 24,
+        ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php72\\' => 23,
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Component\\Process\\' => 26,
@@ -55,13 +63,14 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Container\\' => 14,
             'Psr\\Cache\\' => 10,
             'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\Common\\' => 17,
         ),
         'M' => 
         array (
-            'MimeType\\' => 9,
+            'MimeTyper\\' => 10,
             'MJS\\TopSort\\Tests\\' => 18,
             'MJS\\TopSort\\' => 12,
         ),
@@ -87,8 +96,14 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         'C' => 
         array (
             'Civi\\Cxn\\Rpc\\' => 13,
+            'Civi\\' => 5,
             'Cache\\TagInterop\\' => 17,
             'Cache\\IntegrationTests\\' => 23,
+        ),
+        'B' => 
+        array (
+            'Brick\\Money\\' => 12,
+            'Brick\\Math\\' => 11,
         ),
     );
 
@@ -101,14 +116,6 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         array (
             0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
         ),
-        'Zend\\Validator\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-validator/src',
-        ),
-        'Zend\\Stdlib\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-stdlib/src',
-        ),
         'Zend\\Escaper\\' => 
         array (
             0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',
@@ -116,6 +123,22 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         'When\\' => 
         array (
             0 => __DIR__ . '/..' . '/tplaner/when/src',
+        ),
+        'TYPO3\\PharStreamWrapper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/typo3/phar-stream-wrapper/src',
+        ),
+        'Symfony\\Polyfill\\Php72\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
+        ),
+        'Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Polyfill\\Intl\\Idn\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
         ),
         'Symfony\\Polyfill\\Iconv\\' => 
         array (
@@ -165,6 +188,10 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
         'Psr\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
@@ -177,9 +204,9 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         array (
             0 => __DIR__ . '/..' . '/phpoffice/common/src/Common',
         ),
-        'MimeType\\' => 
+        'MimeTyper\\' => 
         array (
-            0 => __DIR__ . '/..' . '/katzien/php-mime-type/src',
+            0 => __DIR__ . '/..' . '/adrienrn/php-mimetyper/src',
         ),
         'MJS\\TopSort\\Tests\\' => 
         array (
@@ -221,6 +248,12 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         array (
             0 => __DIR__ . '/..' . '/civicrm/civicrm-cxn-rpc/src',
         ),
+        'Civi\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/',
+            1 => __DIR__ . '/../..' . '/Civi',
+            2 => __DIR__ . '/../..' . '/setup/src',
+        ),
         'Cache\\TagInterop\\' => 
         array (
             0 => __DIR__ . '/..' . '/cache/tag-interop',
@@ -228,6 +261,14 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         'Cache\\IntegrationTests\\' => 
         array (
             0 => __DIR__ . '/..' . '/cache/integration-tests/src',
+        ),
+        'Brick\\Money\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/brick/money/src',
+        ),
+        'Brick\\Math\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/brick/math/src',
         ),
     );
 
@@ -263,10 +304,6 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
             array (
                 0 => __DIR__ . '/../..' . '/packages',
             ),
-            'PEAR' => 
-            array (
-                0 => __DIR__ . '/..' . '/pear/pear_exception',
-            ),
         ),
         'N' => 
         array (
@@ -286,6 +323,7 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
             'Mail' => 
             array (
                 0 => __DIR__ . '/..' . '/pear/mail',
+                1 => __DIR__ . '/..' . '/pear/mail_mime',
             ),
         ),
         'L' => 
@@ -302,6 +340,13 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
                 0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
             ),
         ),
+        'D' => 
+        array (
+            'Dflydev\\ApacheMimeTypes' => 
+            array (
+                0 => __DIR__ . '/..' . '/dflydev/apache-mime-types/src',
+            ),
+        ),
         'C' => 
         array (
             'Crypt' => 
@@ -314,8 +359,7 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
             ),
             'Civi\\' => 
             array (
-                0 => __DIR__ . '/../..' . '/',
-                1 => __DIR__ . '/../..' . '/tests/phpunit',
+                0 => __DIR__ . '/../..' . '/tests/phpunit',
             ),
             'Civi' => 
             array (
@@ -346,10 +390,10 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         'CallbackParameterToReference' => __DIR__ . '/..' . '/electrolinux/phpquery/phpQuery/phpQuery/Callback.php',
         'CallbackReturnReference' => __DIR__ . '/..' . '/electrolinux/phpquery/phpQuery/phpQuery/Callback.php',
         'CallbackReturnValue' => __DIR__ . '/..' . '/electrolinux/phpquery/phpQuery/phpQuery/Callback.php',
-        'Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
         'DOMDocumentWrapper' => __DIR__ . '/..' . '/electrolinux/phpquery/phpQuery/phpQuery/DOMDocumentWrapper.php',
         'DOMEvent' => __DIR__ . '/..' . '/electrolinux/phpquery/phpQuery/phpQuery/DOMEvent.php',
         'Datamatrix' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
+        'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
         'HTML5_Data' => __DIR__ . '/..' . '/dompdf/dompdf/lib/html5lib/Data.php',
         'HTML5_InputStream' => __DIR__ . '/..' . '/dompdf/dompdf/lib/html5lib/InputStream.php',
         'HTML5_Parser' => __DIR__ . '/..' . '/dompdf/dompdf/lib/html5lib/Parser.php',
@@ -357,6 +401,7 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
         'HTML5_TreeBuilder' => __DIR__ . '/..' . '/dompdf/dompdf/lib/html5lib/TreeBuilder.php',
         'ICallbackNamed' => __DIR__ . '/..' . '/electrolinux/phpquery/phpQuery/phpQuery/Callback.php',
         'PDF417' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
+        'PEAR_Exception' => __DIR__ . '/..' . '/pear/pear_exception/PEAR/Exception.php',
         'PclZip' => __DIR__ . '/..' . '/pclzip/pclzip/pclzip.lib.php',
         'QRcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
         'TCPDF' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf.php',
@@ -486,11 +531,11 @@ class ComposerStaticInit629c66822b0ba40cbff2236d7c311b04
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit629c66822b0ba40cbff2236d7c311b04::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit629c66822b0ba40cbff2236d7c311b04::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit629c66822b0ba40cbff2236d7c311b04::$prefixesPsr0;
-            $loader->fallbackDirsPsr0 = ComposerStaticInit629c66822b0ba40cbff2236d7c311b04::$fallbackDirsPsr0;
-            $loader->classMap = ComposerStaticInit629c66822b0ba40cbff2236d7c311b04::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$prefixesPsr0;
+            $loader->fallbackDirsPsr0 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$classMap;
 
         }, null, ClassLoader::class);
     }

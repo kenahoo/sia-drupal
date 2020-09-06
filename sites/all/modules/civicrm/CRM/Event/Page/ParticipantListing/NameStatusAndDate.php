@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page {
 
@@ -35,7 +33,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
       'participant_listing_id'
     );
     if (!$this->_participantListingID) {
-      CRM_Core_Error::fatal(ts("The Participant Listing feature is not currently enabled for this event."));
+      CRM_Core_Error::statusBounce(ts("The Participant Listing feature is not currently enabled for this event."));
     }
 
     // retrieve Event Title and include it in page title
@@ -86,7 +84,7 @@ LIMIT    $offset, $rowCount";
     $object = CRM_Core_DAO::executeQuery($query, $params);
     $statusLookup = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     while ($object->fetch()) {
-      $status = CRM_Utils_Array::value($object->status_id, $statusLookup);
+      $status = $statusLookup[$object->status_id] ?? NULL;
       $row = [
         'id' => $object->contact_id,
         'participantID' => $object->participant_id,

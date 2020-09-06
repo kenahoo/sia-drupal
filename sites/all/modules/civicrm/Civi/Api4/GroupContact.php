@@ -14,10 +14,7 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
-
 
 namespace Civi\Api4;
 
@@ -27,29 +24,37 @@ namespace Civi\Api4;
  * A contact can either be "Added" "Removed" or "Pending" in a group.
  * CiviCRM only considers them to be "in" a group if their status is "Added".
  *
+ * @see \Civi\Api4\Group
+ *
  * @package Civi\Api4
  */
-class GroupContact extends Generic\DAOEntity {
+class GroupContact extends Generic\BridgeEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return Action\GroupContact\Create
    */
-  public static function create() {
-    return new Action\GroupContact\Create(__CLASS__, __FUNCTION__);
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\GroupContact\Create(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return Action\GroupContact\Save
    */
-  public static function save() {
-    return new Action\GroupContact\Save(__CLASS__, __FUNCTION__);
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\GroupContact\Save(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return Action\GroupContact\Update
    */
-  public static function update() {
-    return new Action\GroupContact\Update(__CLASS__, __FUNCTION__);
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\GroupContact\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

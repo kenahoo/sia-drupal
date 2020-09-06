@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -24,16 +22,16 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * Create a new object from supplied values.
+ * Create a new $ENTITY from supplied values.
  *
- * This function will create 1 new object. It cannot be used to update existing objects. Use the Update or Replace actions for that.
+ * This action will create 1 new $ENTITY.
+ * It cannot be used to update existing $ENTITIES; use the `Update` or `Replace` actions for that.
  */
 class BasicCreateAction extends AbstractCreateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicCreateAction $thisAction) => array
+   *   Function(array $item, BasicCreateAction $thisAction): array
    */
   private $setter;
 
@@ -43,7 +41,6 @@ class BasicCreateAction extends AbstractCreateAction {
    * @param string $entityName
    * @param string $actionName
    * @param callable $setter
-   *   Function(array $item, BasicCreateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $setter = NULL) {
     parent::__construct($entityName, $actionName);
@@ -57,6 +54,7 @@ class BasicCreateAction extends AbstractCreateAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    $this->formatWriteValues($this->values);
     $this->validateValues();
     $result->exchangeArray([$this->writeRecord($this->values)]);
   }
@@ -75,6 +73,7 @@ class BasicCreateAction extends AbstractCreateAction {
    */
   protected function writeRecord($item) {
     if (is_callable($this->setter)) {
+      $this->addCallbackToDebugOutput($this->setter);
       return call_user_func($this->setter, $item, $this);
     }
     throw new NotImplementedException('Setter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());

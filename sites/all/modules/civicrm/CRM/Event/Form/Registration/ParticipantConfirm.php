@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,10 +21,11 @@
  *
  */
 class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Registration {
-  // optional credit card return status code
+
   /**
-   * CRM-6060
+   * Optional credit card return status code
    * @var string
+   * @see https://issues.civicrm.org/jira/browse/CRM-6060
    */
   protected $_cc = NULL;
 
@@ -50,9 +49,9 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       );
     }
 
-    $this->_participantStatusId = CRM_Utils_Array::value('status_id', $values);
-    $this->_eventId = CRM_Utils_Array::value('event_id', $values);
-    $csContactId = CRM_Utils_Array::value('contact_id', $values);
+    $this->_participantStatusId = $values['status_id'] ?? NULL;
+    $this->_eventId = $values['event_id'] ?? NULL;
+    $csContactId = $values['contact_id'] ?? NULL;
 
     // make sure we have right permission to edit this user
     $this->_csContactID = NULL;
@@ -98,7 +97,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
       //need to confirm that though participant confirming
       //registration - but is there enough space to confirm.
-      $emptySeats = CRM_Event_BAO_Participant::pendingToConfirmSpaces($this->_eventId);
+      $emptySeats = CRM_Event_BAO_Participant::eventFull($this->_eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
       $additonalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
       $requireSpace = 1 + count($additonalIds);
       if ($emptySeats !== NULL && ($requireSpace > $emptySeats)) {

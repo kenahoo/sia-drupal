@@ -85,17 +85,9 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
+  public function validateData($input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
-    // make sure contact exists and is valid
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->id = $ids['contact'];
-    if (!$contact->find(TRUE)) {
-      CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: " . print_r($input, TRUE));
-      echo "Failure: Could not find contact record: {$ids['contact']}<p>";
-      return FALSE;
-    }
-
+    // Check if the contribution exists
     // make sure contribution exists and is valid
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
@@ -104,6 +96,29 @@ class CRM_Core_Payment_BaseIPN {
       echo "Failure: Could not find contribution record for {$contribution->id}<p>";
       return FALSE;
     }
+
+    // make sure contact exists and is valid
+    // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $contribution->contact_id;
+    $contact->find(TRUE);
+    if ($contact->id != $ids['contact']) {
+      // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
+      CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
+      echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
+      $ids['contact'] = $contribution->contact_id;
+    }
+
+    if (!empty($ids['contributionRecur'])) {
+      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
+      $contributionRecur->id = $ids['contributionRecur'];
+      if (!$contributionRecur->find(TRUE)) {
+        CRM_Core_Error::debug_log_message("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
+        echo "Failure: Could not find contribution recur record: {$ids['ContributionRecur']}<p>";
+        return FALSE;
+      }
+    }
+
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
 
@@ -143,7 +158,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool|array
    */
-  public function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
+  public function loadObjects($input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
     if (empty($error_handling)) {
       // default options are that we log an error & echo it out
       // note that we should refactor this error handling into error code @ some point
@@ -160,7 +175,7 @@ class CRM_Core_Payment_BaseIPN {
     else {
       //legacy support - functions are 'used' to be able to pass in a DAO
       $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = CRM_Utils_Array::value('contribution', $ids);
+      $contribution->id = $ids['contribution'] ?? NULL;
       $contribution->find(TRUE);
       $objects['contribution'] = &$contribution;
     }
@@ -199,7 +214,7 @@ class CRM_Core_Payment_BaseIPN {
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  public function failed(&$objects, &$transaction, $input = []) {
+  public function failed(&$objects, $transaction = NULL, $input = []) {
     $contribution = &$objects['contribution'];
     $memberships = [];
     if (!empty($objects['membership'])) {
@@ -209,21 +224,9 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    $addLineItems = FALSE;
-    if (empty($contribution->id)) {
-      $addLineItems = TRUE;
-    }
+    $addLineItems = empty($contribution->id);
     $participant = &$objects['participant'];
-
-    // CRM-15546
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ]);
-    $contribution->contribution_status_id = $contributionStatuses['Failed'];
-    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
-    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
-    $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
+    $contribution->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Failed');
     $contribution->save();
 
     // Add line items for recurring payments.
@@ -251,7 +254,9 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    $transaction->commit();
+    if ($transaction) {
+      $transaction->commit();
+    }
     Civi::log()->debug("Setting contribution status to Failed");
     return TRUE;
   }
@@ -259,15 +264,18 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Handled pending contribution status.
    *
+   * @deprecated
+   *
    * @param array $objects
    * @param object $transaction
    *
    * @return bool
    */
   public function pending(&$objects, &$transaction) {
+    CRM_Core_Error::deprecatedFunctionWarning('This function will be removed at some point');
     $transaction->commit();
-    Civi::log()->debug("Returning since contribution status is Pending");
-    echo "Success: Returning since contribution status is pending<p>";
+    Civi::log()->debug('Returning since contribution status is Pending');
+    echo 'Success: Returning since contribution status is pending<p>';
     return TRUE;
   }
 
@@ -281,7 +289,7 @@ class CRM_Core_Payment_BaseIPN {
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  public function cancelled(&$objects, &$transaction, $input = []) {
+  public function cancelled(&$objects, $transaction = NULL, $input = []) {
     $contribution = &$objects['contribution'];
     $memberships = [];
     if (!empty($objects['membership'])) {
@@ -307,7 +315,7 @@ class CRM_Core_Payment_BaseIPN {
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
     $contribution->cancel_date = self::$_now;
-    $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
+    $contribution->cancel_reason = $input['reasonCode'] ?? NULL;
     $contribution->save();
 
     // Add line items for recurring payments.
@@ -335,7 +343,9 @@ class CRM_Core_Payment_BaseIPN {
         $this->cancelParticipant($participant->id);
       }
     }
-    $transaction->commit();
+    if ($transaction) {
+      $transaction->commit();
+    }
     Civi::log()->debug("Setting contribution status to Cancelled");
     return TRUE;
   }
@@ -343,15 +353,18 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Rollback unhandled outcomes.
    *
+   * @deprecated
+   *
    * @param array $objects
    * @param CRM_Core_Transaction $transaction
    *
    * @return bool
    */
   public function unhandled(&$objects, &$transaction) {
+    CRM_Core_Error::deprecatedFunctionWarning('This function will be removed at some point');
     $transaction->rollback();
-    Civi::log()->debug("Returning since contribution status is not handled");
-    echo "Failure: contribution status is not handled<p>";
+    Civi::log()->debug('Returning since contribution status is not handled');
+    echo 'Failure: contribution status is not handled<p>';
     return FALSE;
   }
 
@@ -456,18 +469,16 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    * @param array $ids
    * @param array $objects
-   * @param CRM_Core_Transaction $transaction
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function completeTransaction(&$input, &$ids, &$objects, &$transaction) {
-    $contribution = &$objects['contribution'];
-
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $contribution);
+  public function completeTransaction(&$input, &$ids, &$objects) {
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
   }
 
   /**
+   * @deprecated
    * Get site billing ID.
    *
    * @param array $ids
@@ -475,6 +486,7 @@ class CRM_Core_Payment_BaseIPN {
    * @return bool
    */
   public function getBillingID(&$ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_LocationType::getBilling()');
     $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     if (!$ids['billing']) {
       CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', [1 => 'Billing']));
@@ -497,21 +509,14 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $ids
    *   Related object IDs.
    * @param array $objects
-   * @param array $values
-   *   Values related to objects that have already been loaded.
-   * @param bool $recur
-   *   Is it part of a recurring contribution.
-   * @param bool $returnMessageText
-   *   Should text be returned instead of sent. This.
-   *   is because the function is also used to generate pdfs
    *
-   * @return array
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,
-      $returnMessageText);
+  public function sendMail($input, $ids, $objects) {
+    CRM_Core_Error::deprecatedFunctionWarning('this should be done via completetransaction api');
+    civicrm_api3('Contribution', 'sendconfirmation', [
+      'id' => $objects['contribution']->id,
+    ]);
   }
 
 }

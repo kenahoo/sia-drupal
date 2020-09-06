@@ -35,6 +35,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @throws Exception
    */
   public static function create($params) {
+    // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
+    if (empty($params['id']) && empty($params['payment_instrument_id'])) {
+      $params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', [
+        'id' => $params['payment_processor_type_id'],
+        'return' => 'payment_instrument_id',
+      ]);
+    }
     $processor = new CRM_Financial_DAO_PaymentProcessor();
     $processor->copyValues($params);
 
@@ -42,7 +49,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $ppTypeDAO = new CRM_Financial_DAO_PaymentProcessorType();
       $ppTypeDAO->id = $params['payment_processor_type_id'];
       if (!$ppTypeDAO->find(TRUE)) {
-        CRM_Core_Error::fatal(ts('Could not find payment processor meta information'));
+        throw new CRM_Core_Exception(ts('Could not find payment processor meta information'));
       }
 
       // also copy meta fields from the info DAO
@@ -187,7 +194,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   public static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+      throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessor();
@@ -255,8 +262,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return int
    */
   public static function defaultComparison($processor1, $processor2) {
-    $p1 = CRM_Utils_Array::value('is_default', $processor1);
-    $p2 = CRM_Utils_Array::value('is_default', $processor2);
+    $p1 = $processor1['is_default'] ?? NULL;
+    $p2 = $processor2['is_default'] ?? NULL;
     if ($p1 == $p2) {
       return 0;
     }
@@ -271,11 +278,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param bool $reset
    * @param bool $isCurrentDomainOnly
    *   Do we only want to load payment processors associated with the current domain.
+   * @param bool|NULL $isActive
+   *   Do we only want active processors, only inactive (FALSE) or all processors (NULL)
    *
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE) {
+  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE, $isActive = TRUE) {
 
     $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . $isCurrentDomainOnly . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
@@ -286,10 +295,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
     $retrievalParameters = [
-      'is_active' => TRUE,
       'options' => ['sort' => 'is_default DESC, name', 'limit' => 0],
       'api.payment_processor_type.getsingle' => 1,
     ];
+    if (isset($isActive)) {
+      // We use isset because we don't want to set the is_active parameter at all is $isActive is NULL
+      $retrievalParameters['is_active'] = $isActive;
+    }
     if ($isCurrentDomainOnly) {
       $retrievalParameters['domain_id'] = CRM_Core_Config::domainID();
     }
@@ -328,7 +340,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         }
       }
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
-      $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processor);
+      $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processors['values'][$processor['id']]);
     }
 
     // Add the pay-later pseudo-processor.
@@ -370,23 +382,28 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @return array
    *   available processors
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getPaymentProcessors($capabilities = [], $ids = FALSE) {
-    $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : [];
     if (is_array($ids)) {
-      $processors = self::getAllPaymentProcessors('all', FALSE, FALSE);
-      if (in_array('TestMode', $capabilities)) {
+      if (in_array('TestMode', $capabilities, TRUE)) {
+        $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : [];
+        $allProcessors = self::getAllPaymentProcessors('all', FALSE, FALSE, NULL);
         $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
         foreach ($possibleLiveIDs as $possibleLiveID) {
-          if (isset($processors[$possibleLiveID]) && ($liveProcessorName = $processors[$possibleLiveID]['name']) != FALSE) {
+          if (isset($allProcessors[$possibleLiveID]) && ($liveProcessorName = $allProcessors[$possibleLiveID]['name']) != FALSE) {
             foreach ($testProcessors as $index => $testProcessor) {
-              if ($testProcessor['name'] == $liveProcessorName) {
+              if ($testProcessor['name'] === $liveProcessorName) {
                 $ids[] = $testProcessor['id'];
               }
             }
           }
         }
         $processors = $testProcessors;
+      }
+      else {
+        $processors = self::getAllPaymentProcessors('all', FALSE, FALSE);
       }
     }
     else {
@@ -400,7 +417,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       }
       // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
       // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
-      if (!is_a($processor['object'], 'CRM_Core_Payment')) {
+      if (!$processor['object'] instanceof \CRM_Core_Payment) {
         unset($processors[$index]);
         continue;
       }
@@ -441,7 +458,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $capabilitiesString = implode('', $capabilities);
     if (!isset(\Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString])) {
       $result = self::getPaymentProcessors($capabilities);
-      \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString] = (!empty($result) && array_keys($result) !== [0]) ? TRUE : FALSE;
+      \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString] = (!empty($result) && array_keys($result) !== [0]);
     }
     return \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString];
   }
@@ -525,7 +542,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
 
     }
 
-    $ppID = (isset($dao->ppID1) && $dao->ppID1) ? $dao->ppID1 : (isset($dao->ppID2) ? $dao->ppID2 : NULL);
+    $ppID = (isset($dao->ppID1) && $dao->ppID1) ? $dao->ppID1 : ($dao->ppID2 ?? NULL);
     $mode = (isset($dao->is_test) && $dao->is_test) ? 'test' : 'live';
     if (!$ppID || $type == 'id') {
       $result = $ppID;

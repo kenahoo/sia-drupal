@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
 
@@ -35,7 +33,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       'participant_listing_id'
     );
     if (!$this->_participantListingID) {
-      CRM_Core_Error::fatal(ts('The Participant Listing feature is not currently enabled for this event.'));
+      CRM_Core_Error::statusBounce(ts('The Participant Listing feature is not currently enabled for this event.'));
     }
 
     // retrieve Event Title and include it in page title
@@ -66,7 +64,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       )
     );
     if ($className == 'CRM_Event_Page_ParticipantListing') {
-      CRM_Core_Error::fatal(ts("Participant listing code file cannot be '%1'",
+      CRM_Core_Error::statusBounce(ts("Participant listing code file cannot be '%1'",
         array(1 => $className)
       ));
     }
@@ -77,7 +75,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       ) . '.php';
     $error = include_once $classFile;
     if ($error == FALSE) {
-      CRM_Core_Error::fatal('Participant listing code file: ' . $classFile . ' does not exist. Please verify your custom particpant listing settings in CiviCRM administrative panel.');
+      CRM_Core_Error::statusBounce('Participant listing code file: ' . $classFile . ' does not exist. Please verify your custom particpant listing settings in CiviCRM administrative panel.');
     }
 
     $participantListingClass = new $className();

@@ -366,7 +366,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   public static function checkPermission($item) {
     if (!empty($item['permission'])) {
       $permissions = explode(',', $item['permission']);
-      $operator = CRM_Utils_Array::value('operator', $item);
+      $operator = $item['operator'] ?? NULL;
       $hasPermission = FALSE;
       foreach ($permissions as $key) {
         $key = trim($key);
@@ -468,14 +468,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $contactID;
       if ($contact->find(TRUE)) {
-        CRM_Core_BAO_Setting::setItem(
-          $newKey,
-          CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-          'navigation',
-          NULL,
-          $contactID,
-          $contactID
-        );
+        Civi::contactSettings($contactID)->set('navigation', $newKey);
       }
     }
 
@@ -493,7 +486,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $referenceID = (int) str_replace("node_", "", $params['ref_id']);
     $position = $params['ps'];
     $type = $params['type'];
-    $label = CRM_Utils_Array::value('data', $params);
+    $label = $params['data'] ?? NULL;
 
     switch ($type) {
       case "move":

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_Page_File extends CRM_Core_Page {
 
@@ -124,7 +122,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       'image/pjpeg' => 'image/jpeg',
 
     ];
-    return isset($badTypes[$type]) ? $badTypes[$type] : $type;
+    return $badTypes[$type] ?? $type;
   }
 
 }

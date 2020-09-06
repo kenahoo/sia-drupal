@@ -27,17 +27,21 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
     // to override standard implementations -- which is
     // handy for testing/mocking.
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         ['onApiResolve', Events::W_EARLY],
       ],
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         ['onApiAuthorize', Events::W_EARLY],
       ],
     ];
   }
 
   /**
-   * @var array (string $name => array('perm' => string, 'callback' => callable))
+   * List of adhoc actions
+   *
+   * array(string $ame => array('perm' => string, 'callback' => callable))
+   *
+   * @var array
    */
   protected $actions = [];
 

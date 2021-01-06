@@ -91,12 +91,14 @@ abstract class DAOEntity extends AbstractEntity {
   }
 
   /**
+   * @param bool $plural
+   *   Whether to return a plural title.
    * @return string
    */
-  protected static function getEntityTitle() {
+  protected static function getEntityTitle($plural = FALSE) {
     $name = static::getEntityName();
     $dao = \CRM_Core_DAO_AllCoreTables::getFullName($name);
-    return $dao ? $dao::getEntityTitle() : $name;
+    return $dao ? $dao::getEntityTitle($plural) : $name;
   }
 
   /**
@@ -106,6 +108,7 @@ abstract class DAOEntity extends AbstractEntity {
     $info = parent::getInfo();
     $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
     if ($dao) {
+      $info['paths'] = $dao::getEntityPaths();
       $info['icon'] = $dao::$_icon;
       $info['dao'] = $dao;
     }

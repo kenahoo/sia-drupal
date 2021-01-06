@@ -50,7 +50,11 @@ class Entity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'title',
-          'description' => 'Localized title',
+          'description' => 'Localized title (singular)',
+        ],
+        [
+          'name' => 'title_plural',
+          'description' => 'Localized title (plural)',
         ],
         [
           'name' => 'type',
@@ -72,6 +76,11 @@ class Entity extends Generic\AbstractEntity {
         [
           'name' => 'dao',
           'description' => 'Class name for dao-based entities',
+        ],
+        [
+          'name' => 'paths',
+          'data_type' => 'Array',
+          'description' => 'System paths for accessing this entity',
         ],
         [
           'name' => 'see',

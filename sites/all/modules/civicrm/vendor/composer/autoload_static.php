@@ -4,21 +4,22 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit191eca689b99b98f3334e35c02d03840
+class ComposerStaticInit318e3bf7bd127d791a6a578c0d058285
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
-        '3919eeb97e98d4648304477f8ef734ba' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/Random.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
+        '3919eeb97e98d4648304477f8ef734ba' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/Random.php',
         '9e4824c5afbdc1482b6025ce3d4dfde8' => __DIR__ . '/..' . '/league/csv/src/functions_include.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'bad842bce63596a608e2623519fb382c' => __DIR__ . '/..' . '/xkerman/restricted-unserialize/src/function.php',
     );
 
@@ -26,6 +27,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         'x' => 
         array (
             'xKerman\\Restricted\\' => 19,
+        ),
+        't' => 
+        array (
+            'tubalmartin\\CssMin\\' => 19,
         ),
         'c' => 
         array (
@@ -50,6 +55,7 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Symfony\\Component\\VarDumper\\' => 28,
             'Symfony\\Component\\Process\\' => 26,
             'Symfony\\Component\\Finder\\' => 25,
             'Symfony\\Component\\Filesystem\\' => 29,
@@ -57,6 +63,7 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
             'Symfony\\Component\\DependencyInjection\\' => 38,
             'Symfony\\Component\\Config\\' => 25,
             'Svg\\' => 4,
+            'ScssPhp\\ScssPhp\\' => 16,
         ),
         'P' => 
         array (
@@ -67,6 +74,7 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
             'Psr\\Cache\\' => 10,
             'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\Common\\' => 17,
+            'Padaliyajay\\PHPAutoprefixer\\' => 28,
         ),
         'M' => 
         array (
@@ -76,6 +84,7 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         ),
         'L' => 
         array (
+            'League\\OAuth2\\Client\\' => 21,
             'League\\Csv\\' => 11,
             'LastCall\\DownloadsPlugin\\' => 25,
         ),
@@ -96,9 +105,11 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         'C' => 
         array (
             'Civi\\Cxn\\Rpc\\' => 13,
+            'Civi\\CompilePlugin\\' => 19,
             'Civi\\' => 5,
             'Cache\\TagInterop\\' => 17,
             'Cache\\IntegrationTests\\' => 23,
+            'CCL\\' => 4,
         ),
         'B' => 
         array (
@@ -111,6 +122,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         'xKerman\\Restricted\\' => 
         array (
             0 => __DIR__ . '/..' . '/xkerman/restricted-unserialize/src',
+        ),
+        'tubalmartin\\CssMin\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tubalmartin/cssmin/src',
         ),
         'cweagans\\Composer\\' => 
         array (
@@ -148,6 +163,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Symfony\\Component\\VarDumper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/var-dumper',
+        ),
         'Symfony\\Component\\Process\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
@@ -175,6 +194,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         'Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg',
+        ),
+        'ScssPhp\\ScssPhp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/scssphp/scssphp/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
@@ -204,6 +227,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         array (
             0 => __DIR__ . '/..' . '/phpoffice/common/src/Common',
         ),
+        'Padaliyajay\\PHPAutoprefixer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/padaliyajay/php-autoprefixer/src',
+        ),
         'MimeTyper\\' => 
         array (
             0 => __DIR__ . '/..' . '/adrienrn/php-mimetyper/src',
@@ -215,6 +242,11 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         'MJS\\TopSort\\' => 
         array (
             0 => __DIR__ . '/..' . '/marcj/topsort/src',
+        ),
+        'League\\OAuth2\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/oauth2-client/src',
+            1 => __DIR__ . '/..' . '/league/oauth2-google/src',
         ),
         'League\\Csv\\' => 
         array (
@@ -248,6 +280,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         array (
             0 => __DIR__ . '/..' . '/civicrm/civicrm-cxn-rpc/src',
         ),
+        'Civi\\CompilePlugin\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/civicrm/composer-compile-plugin/src',
+        ),
         'Civi\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
@@ -261,6 +297,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         'Cache\\IntegrationTests\\' => 
         array (
             0 => __DIR__ . '/..' . '/cache/integration-tests/src',
+        ),
+        'CCL\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/civicrm/composer-compile-lib/src',
         ),
         'Brick\\Money\\' => 
         array (
@@ -328,6 +368,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
         ),
         'L' => 
         array (
+            'Lurker' => 
+            array (
+                0 => __DIR__ . '/..' . '/totten/lurkerlite/src',
+            ),
             'Log' => 
             array (
                 0 => __DIR__ . '/..' . '/pear/log',
@@ -345,6 +389,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
             'Dflydev\\ApacheMimeTypes' => 
             array (
                 0 => __DIR__ . '/..' . '/dflydev/apache-mime-types/src',
+            ),
+            'DB' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/db',
             ),
         ),
         'C' => 
@@ -364,6 +412,10 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
             'Civi' => 
             array (
                 0 => __DIR__ . '/../..' . '/',
+            ),
+            'CCL' => 
+            array (
+                0 => __DIR__ . '/..' . '/civicrm/composer-compile-lib',
             ),
             'CA_Config' => 
             array (
@@ -531,11 +583,11 @@ class ComposerStaticInit191eca689b99b98f3334e35c02d03840
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$prefixesPsr0;
-            $loader->fallbackDirsPsr0 = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$fallbackDirsPsr0;
-            $loader->classMap = ComposerStaticInit191eca689b99b98f3334e35c02d03840::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit318e3bf7bd127d791a6a578c0d058285::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit318e3bf7bd127d791a6a578c0d058285::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit318e3bf7bd127d791a6a578c0d058285::$prefixesPsr0;
+            $loader->fallbackDirsPsr0 = ComposerStaticInit318e3bf7bd127d791a6a578c0d058285::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit318e3bf7bd127d791a6a578c0d058285::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -287,19 +287,6 @@ SET    version = '$version'
   }
 
   /**
-   * @param $version
-   *
-   * @return bool
-   */
-  public function checkVersion($version) {
-    $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-      $version, 'id',
-      'version'
-    );
-    return (bool) $domainID;
-  }
-
-  /**
    * @return array
    * @throws Exception
    */
@@ -793,6 +780,8 @@ SET    version = '$version'
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
+    // Force a rebuild of CiviCRM asset cache in case things have changed.
+    \Civi::service('asset_builder')->clear(FALSE);
   }
 
   /**

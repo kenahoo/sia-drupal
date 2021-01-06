@@ -95,9 +95,9 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       $paramsField = ['id' => $this->_fid];
       CRM_Core_BAO_CustomField::retrieve($paramsField, $fieldDefaults);
-
       if ($fieldDefaults['html_type'] == 'CheckBox'
-        || $fieldDefaults['html_type'] == 'Multi-Select'
+        // Multi-Select
+        || ($fieldDefaults['html_type'] == 'Select' && $fieldDefaults['serialize'] == 1)
       ) {
         if (!empty($fieldDefaults['default_value'])) {
           $defaultCheckValues = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -201,10 +201,14 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
           'reset=1&action=browse&fid=' . $this->_fid . '&gid=' . $this->_gid,
           TRUE, NULL, FALSE
         );
-        $this->addElement('button',
+        $this->addElement('xbutton',
           'done',
-          ts('Done'),
-          ['onclick' => "location.href='$url'", 'class' => 'crm-form-submit cancel', 'crm-icon' => 'fa-times']
+          CRM_Core_Page::crmIcon('fa-times') . ' ' . ts('Done'),
+          [
+            'type' => 'button',
+            'onclick' => "location.href='$url'",
+            'class' => 'crm-form-submit cancel',
+          ]
         );
       }
     }
@@ -416,7 +420,8 @@ SELECT count(*)
       $customField->find(TRUE) &&
       (
         $customField->html_type == 'CheckBox' ||
-        $customField->html_type == 'Multi-Select'
+        // Multi Value Select
+        ($customField->html_type == 'Select' && $customField->serialize == 1)
       )
     ) {
       $defVal = explode(

@@ -81,10 +81,21 @@ abstract class AbstractEntity {
   /**
    * Overridable function to return a localized title for this entity.
    *
+   * @param bool $plural
+   *   Whether to return a plural title.
    * @return string
    */
-  protected static function getEntityTitle() {
+  protected static function getEntityTitle($plural = FALSE) {
     return static::getEntityName();
+  }
+
+  /**
+   * Overridable function to return menu paths related to this entity.
+   *
+   * @return array
+   */
+  protected static function getEntityPaths() {
+    return [];
   }
 
   /**
@@ -121,7 +132,9 @@ abstract class AbstractEntity {
     $info = [
       'name' => static::getEntityName(),
       'title' => static::getEntityTitle(),
+      'title_plural' => static::getEntityTitle(TRUE),
       'type' => self::stripNamespace(get_parent_class(static::class)),
+      'paths' => static::getEntityPaths(),
     ];
     $reflection = new \ReflectionClass(static::class);
     $info += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);

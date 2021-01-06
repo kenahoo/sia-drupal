@@ -157,11 +157,18 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       CRM_Contact_BAO_Individual::format($params, $contact);
     }
 
-    if (strlen($contact->display_name) > 128) {
-      $contact->display_name = substr($contact->display_name, 0, 128);
+    // Note that copyValues() above might already call this, via
+    // CRM_Utils_String::ellipsify(), but e.g. for Individual it gets put
+    // back or altered by Individual::format() just above, so we need to
+    // check again.
+    // Note also orgs will get ellipsified, but if we do that here then
+    // some existing tests on individual fail.
+    // Also api v3 will enforce org naming length by failing, v4 will truncate.
+    if (mb_strlen($contact->display_name, 'UTF-8') > 128) {
+      $contact->display_name = mb_substr($contact->display_name, 0, 128, 'UTF-8');
     }
-    if (strlen($contact->sort_name) > 128) {
-      $contact->sort_name = substr($contact->sort_name, 0, 128);
+    if (mb_strlen($contact->sort_name, 'UTF-8') > 128) {
+      $contact->sort_name = mb_substr($contact->sort_name, 0, 128, 'UTF-8');
     }
 
     $privacy = $params['privacy'] ?? NULL;
@@ -370,9 +377,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         CRM_Core_BAO_Note::add($noteParams);
       }
     }
-
-    // update the UF user_unique_id if that has changed
-    CRM_Core_BAO_UFMatch::updateUFName($contact->id);
 
     if (!empty($params['custom']) &&
       is_array($params['custom'])
@@ -1543,14 +1547,17 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             [
               'name' => 'organization_name',
               'title' => ts('Current Employer'),
+              'type' => CRM_Utils_Type::T_STRING,
             ],
         ]);
 
+        // This probably would be added anyway by appendPseudoConstantsToFields.
         $locationType = [
           'location_type' => [
             'name' => 'location_type',
             'where' => 'civicrm_location_type.name',
             'title' => ts('Location Type'),
+            'type' => CRM_Utils_Type::T_STRING,
           ],
         ];
 
@@ -1559,12 +1566,17 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'name' => 'im_provider',
             'where' => 'civicrm_im.provider_id',
             'title' => ts('IM Provider'),
+            'type' => CRM_Utils_Type::T_STRING,
           ],
         ];
 
+        $phoneFields = CRM_Core_DAO_Phone::export();
+        // This adds phone_type to the exportable fields and make it available for export.
+        // with testing the same can be done to the other entities.
+        CRM_Core_DAO::appendPseudoConstantsToFields($phoneFields);
         $locationFields = array_merge($locationType,
           CRM_Core_DAO_Address::export(),
-          CRM_Core_DAO_Phone::export(),
+          $phoneFields,
           CRM_Core_DAO_Email::export(),
           $IMProvider,
           CRM_Core_DAO_IM::export(TRUE),
@@ -1605,7 +1617,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             );
           }
         }
-        $fields['current_employer_id']['title'] = ts('Current Employer ID');
         //fix for CRM-791
         if ($export) {
           $fields = array_merge($fields, [
@@ -2559,33 +2570,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       $email = $dao->email;
     }
     return $email;
-  }
-
-  /**
-   * Function to get primary OpenID of the contact.
-   *
-   * @param int $contactID
-   *   Contact id.
-   *
-   * @return string
-   *   >openid   OpenID if present else null
-   */
-  public static function getPrimaryOpenId($contactID) {
-    // fetch the primary OpenID
-    $query = "
-SELECT    civicrm_openid.openid as openid
-FROM      civicrm_contact
-LEFT JOIN civicrm_openid ON ( civicrm_contact.id = civicrm_openid.contact_id )
-WHERE     civicrm_contact.id = %1
-AND       civicrm_openid.is_primary = 1";
-    $p = [1 => [$contactID, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-
-    $openId = NULL;
-    if ($dao->fetch()) {
-      $openId = $dao->openid;
-    }
-    return $openId;
   }
 
   /**
@@ -3551,6 +3535,9 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         if ($dao->fetch()) {
           $dao->is_primary = 1;
           $dao->save();
+          if ($type === 'Email') {
+            CRM_Core_BAO_UFMatch::updateUFName($dao->contact_id);
+          }
         }
       }
     }

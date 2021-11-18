@@ -18,20 +18,19 @@
                     <th>{ts}Financial Type{/ts}</th>
                     <th>{ts}Received date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
+                    <th>{ts}Balance{/ts}</th>
                     <th>{ts}Status{/ts}</th>
                     {if $isIncludeInvoiceLinks}
                       <th></th>
                     {/if}
-                    {foreach from=$row.buttons item=button}
-                      <th></th>
-                    {/foreach}
+                    <th></th>
                 </tr>
 
                 {foreach from=$contribute_rows item=row}
                     <tr id='rowid{$row.contribution_id}'
-                        class="{cycle values="odd-row,even-row"}{if $row.cancel_date} disabled{/if}">
-                        <td>{$row.total_amount|crmMoney:$row.currency} {if $row.amount_level && !is_array($row.amount_level)} - {$row.amount_level} {/if}
-                            {if $row.contribution_recur_id}
+                        class="{cycle values="odd-row,even-row"}{if !empty($row.cancel_date)} disabled{/if}">
+                        <td>{$row.total_amount|crmMoney:$row.currency} {if !empty($row.amount_level) && !is_array($row.amount_level)} - {$row.amount_level} {/if}
+                            {if !empty($row.contribution_recur_id)}
                                 <br/>
                                 {ts}(Recurring Contribution){/ts}
                             {/if}
@@ -39,6 +38,7 @@
                         <td>{$row.financial_type}</td>
                         <td>{$row.receive_date|truncate:10:''|crmDate}</td>
                         <td>{$row.receipt_date|truncate:10:''|crmDate}</td>
+                        <td>{$row.balance_amount|crmMoney:$row.currency}</td>
                         <td>{$row.contribution_status}</td>
                         {if $isIncludeInvoiceLinks}
                           <td>
@@ -49,24 +49,28 @@
                             {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-                                    <i class="crm-i fa-print" aria-hidden="true"></i>
-                                    {if $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled' }
-                                        <span>{ts}Print Invoice{/ts}</span>
+                                    <i class="crm-i fa-download" aria-hidden="true"></i>
+                                    {if empty($row.contribution_status_name) || (!empty($row.contribution_status_name) && $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled') }
+                                        <span>{ts}Download Invoice{/ts}</span>
                                     {else}
-                                        <span>{ts}Print Invoice and Credit Note{/ts}</span>
+                                        <span>{ts}Download Invoice and Credit Note{/ts}</span>
                                     {/if}
                                 </a>
                             {/if}
                           </td>
                         {/if}
+                        {if !empty($row.buttons)}
+                        <td>
                         {foreach from=$row.buttons item=button}
-                          <td><a class="{$button.class}" href="{$button.url}"><span class='nowrap'>{$button.label}</span></a></td>
+                          <a class="{$button.class}" href="{$button.url}"><span class='nowrap'>{$button.label}</span></a>
                         {/foreach}
+                        </td>
+                        {/if}
                     </tr>
                 {/foreach}
             </table>
         {/strip}
-        {if $contributionSummary.total.count gt 12}
+        {if !empty($contributionSummary.total) and $contributionSummary.total.count gt 12}
             {ts}Contact us for information about contributions prior to those listed above.{/ts}
         {/if}
     {else}
@@ -77,7 +81,7 @@
     {/if}
 
 
-    {if $honor}
+    {if !empty($honor)}
         {if $honorRows}
             {strip}
                 <div class="help">
@@ -110,7 +114,7 @@
         {/if}
     {/if}
 
-    {if $recur}
+    {if !empty($recur)}
         {if $recurRows}
             {strip}
                 <div><label>{ts}Recurring Contribution(s){/ts}</label></div>

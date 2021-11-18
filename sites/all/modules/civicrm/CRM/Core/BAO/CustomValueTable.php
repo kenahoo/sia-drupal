@@ -37,19 +37,15 @@ class CRM_Core_BAO_CustomValueTable {
     $VS = CRM_Core_DAO::VALUE_SEPARATOR;
 
     foreach ($customParams as $tableName => $tables) {
-      foreach ($tables as $index => $fields) {
-        $sqlOP = NULL;
+      foreach ($tables as $fields) {
         $hookID = NULL;
-        $hookOP = NULL;
         $entityID = NULL;
-        $isMultiple = FALSE;
         $set = [];
         $params = [];
         $count = 1;
 
         $firstField = reset($fields);
-        $entityID = $firstField['entity_id'];
-        $hookID = $firstField['custom_group_id'];
+        $entityID = (int) $firstField['entity_id'];
         $isMultiple = $firstField['is_multiple'];
         if (array_key_exists('id', $firstField)) {
           $sqlOP = "UPDATE $tableName ";
@@ -64,8 +60,9 @@ class CRM_Core_BAO_CustomValueTable {
           $hookOP = 'create';
         }
 
-        CRM_Utils_Hook::customPre($hookOP,
-          $hookID,
+        CRM_Utils_Hook::customPre(
+          $hookOP,
+          (int) $firstField['custom_group_id'],
           $entityID,
           $fields
         );
@@ -158,7 +155,8 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'File':
               if (!$field['file_id']) {
-                throw new CRM_Core_Exception('Missing parameter file_id');
+                $value = 'null';
+                break;
               }
 
               // need to add/update civicrm_entity_file
@@ -231,17 +229,17 @@ class CRM_Core_BAO_CustomValueTable {
             // would be 'String' for a concatenated set of integers.
             // However, the god-forsaken timestamp hack also needs to be kept
             // if value is NULL.
-            $params[$count] = [$value, ($value && $field['is_multiple']) ? 'String' : $type];
+            $params[$count] = [$value, ($value && $field['serialize']) ? 'String' : $type];
             $count++;
           }
 
           $fieldExtends = $field['extends'] ?? NULL;
           if (
-            CRM_Utils_Array::value('entity_table', $field) == 'civicrm_contact'
-            || $fieldExtends == 'Contact'
-            || $fieldExtends == 'Individual'
-            || $fieldExtends == 'Organization'
-            || $fieldExtends == 'Household'
+            CRM_Utils_Array::value('entity_table', $field) === 'civicrm_contact'
+            || $fieldExtends === 'Contact'
+            || $fieldExtends === 'Individual'
+            || $fieldExtends === 'Organization'
+            || $fieldExtends === 'Household'
           ) {
             $paramFieldsExtendContactForEntities[$entityID]['custom_' . CRM_Utils_Array::value('custom_field_id', $field)] = $field['custom_field_id'] ?? NULL;
           }
@@ -273,7 +271,7 @@ class CRM_Core_BAO_CustomValueTable {
           CRM_Core_DAO::executeQuery($query, $params);
 
           CRM_Utils_Hook::custom($hookOP,
-            $hookID,
+            (int) $firstField['custom_group_id'],
             $entityID,
             $fields
           );
@@ -363,7 +361,10 @@ class CRM_Core_BAO_CustomValueTable {
           'custom_group_id' => $customValue['custom_group_id'],
           'table_name' => $customValue['table_name'],
           'column_name' => $customValue['column_name'],
-          'is_multiple' => $customValue['is_multiple'] ?? NULL,
+          // is_multiple refers to the custom group, serialize refers to the field.
+          // @todo is_multiple can be null - does that mean anything different from 0?
+          'is_multiple' => $customValue['is_multiple'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customValue['custom_group_id'], 'is_multiple'),
+          'serialize' => $customValue['serialize'] ?? (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customValue['custom_field_id'], 'serialize'),
           'file_id' => $customValue['file_id'],
         ];
 
@@ -398,15 +399,16 @@ class CRM_Core_BAO_CustomValueTable {
    * @param $entityTable
    * @param int $entityID
    * @param $customFieldExtends
+   * @param $parentOperation
    */
-  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends) {
+  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends, $parentOperation = NULL) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $entityID,
       $customFieldExtends
     );
 
     if (!empty($customData)) {
-      self::store($customData, $entityTable, $entityID);
+      self::store($customData, $entityTable, $entityID, $parentOperation);
     }
   }
 
@@ -593,7 +595,8 @@ SELECT cg.table_name  as table_name ,
        cf.column_name as column_name,
        cf.id          as cf_id      ,
        cf.html_type   as html_type  ,
-       cf.data_type   as data_type
+       cf.data_type   as data_type  ,
+       cf.serialize   as serialize
 FROM   civicrm_custom_group cg,
        civicrm_custom_field cf
 WHERE  cf.custom_group_id = cg.id
@@ -651,6 +654,7 @@ AND    cf.id IN ( $fieldIDList )
           'table_name' => $dao->table_name,
           'column_name' => $dao->column_name,
           'is_multiple' => $dao->is_multiple,
+          'serialize' => $dao->serialize,
           'extends' => $dao->extends,
         ];
 

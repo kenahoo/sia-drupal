@@ -15,10 +15,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Email;
+
 /**
  * This class contains functions for email handling.
  */
-class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
+class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Test\HookInterface {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Create email address.
@@ -71,13 +74,25 @@ WHERE  contact_id = {$params['contact_id']}
 
     $email->save();
 
-    if ($email->is_primary) {
-      // update the UF user email if that has changed
-      CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
+    $contactId = (int) ($email->contact_id ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'contact_id'));
+    if ($contactId && $email->is_primary) {
+      $address = $email->email ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'email');
+      self::updateContactName($contactId, $address);
     }
 
     CRM_Utils_Hook::post($hook, 'Email', $email->id, $email);
     return $email;
+  }
+
+  /**
+   * Event fired after modifying an Email.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action !== 'delete' && !empty($event->object->is_primary) && !empty($event->object->contact_id)) {
+      // update the UF user email if that has changed
+      CRM_Core_BAO_UFMatch::updateUFName($event->object->contact_id);
+    }
   }
 
   /**
@@ -333,12 +348,14 @@ AND    reset_date IS NULL
   /**
    * Call common delete function.
    *
-   * @param int $id
+   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
    *
+   * @param int $id
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -359,6 +376,42 @@ AND    reset_date IS NULL
       }
     }
     return $contactFields;
+  }
+
+  /**
+   *
+   *
+   * @param int $contactId
+   * @param string $primaryEmail
+   */
+  public static function updateContactName($contactId, string $primaryEmail) {
+    if (is_string($primaryEmail) && $primaryEmail !== '' &&
+      !CRM_Contact_BAO_Contact::hasName(['id' => $contactId])
+    ) {
+      CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name', $primaryEmail);
+      CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $contactId, 'sort_name', $primaryEmail);
+    }
+  }
+
+  /**
+   * Get default text for a message with the signature from the email sender populated.
+   *
+   * @param int $emailID
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getEmailSignatureDefaults(int $emailID): array {
+    // Add signature
+    $defaultEmail = Email::get(FALSE)
+      ->addSelect('signature_html', 'signature_text')
+      ->addWhere('id', '=', $emailID)->execute()->first();
+    return [
+      'html_message' => empty($defaultEmail['signature_html']) ? '' : '<br/><br/>--' . $defaultEmail['signature_html'],
+      'text_message' => empty($defaultEmail['signature_text']) ? '' : "\n\n--\n" . $defaultEmail['signature_text'],
+    ];
   }
 
 }

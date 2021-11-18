@@ -50,12 +50,6 @@
     {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
   {/if}
 
-  {if $displayCaptchaWarning}
-    <div class="messages status no-popup">
-      {ts}To display reCAPTCHA on form you must get an API key from<br /> <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>{/ts}
-    </div>
-  {/if}
-
   {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
     {capture assign="buttonTitle"}{ts}Configure Contribution Page{/ts}{/capture}
     {crmButton target="_blank" p="civicrm/admin/contribute/settings" q="reset=1&action=update&id=`$contributionPageID`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
@@ -141,18 +135,20 @@
       {/if}
       {/crmRegion}
 
-      {if $form.is_recur}
+      {if !empty($form.is_recur)}
         <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
           <div class="label">&nbsp;</div>
           <div class="content">
-            {$form.is_recur.html} {$form.is_recur.label} {ts}every{/ts}
+            {$form.is_recur.html} {$form.is_recur.label}
             {if $is_recur_interval}
               {$form.frequency_interval.html}
             {/if}
-            {if $one_frequency_unit}
-              {$frequency_unit}
-            {else}
-              {$form.frequency_unit.html}
+            {if !$all_text_recur}
+              {if $one_frequency_unit}
+                {$form.frequency_interval.label}
+              {else}
+                {$form.frequency_unit.html}
+              {/if}
             {/if}
             {if $is_recur_installments}
               <span id="recur_installments_num">
@@ -203,7 +199,7 @@
             <div class="crm-public-form-item crm-section honor_block_text-section">
               {$honor_block_text}
             </div>
-          {if $form.soft_credit_type_id.html}
+          {if !empty($form.soft_credit_type_id.html)}
             <div class="crm-public-form-item crm-section {$form.soft_credit_type_id.name}-section">
               <div class="content" >
                 {$form.soft_credit_type_id.html}
@@ -260,7 +256,7 @@
       {* end of ccid loop *}
     {/if}
 
-    {if $form.payment_processor_id.label}
+    {if !empty($form.payment_processor_id.label)}
       {* PP selection only works with JS enabled, so we hide it initially *}
       <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>

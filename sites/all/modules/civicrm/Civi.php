@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Core\Format;
+
 /**
  * Class Civi
  *
@@ -82,10 +84,16 @@ class Civi {
   }
 
   /**
-   * @return \CRM_Core_Error_Log
+   * Find or create a logger.
+   *
+   * @param string $channel
+   *   Symbolic name (or channel) of the intended log.
+   *   This should correlate to a service "log.{NAME}".
+   *
+   * @return \Psr\Log\LoggerInterface
    */
-  public static function log() {
-    return Civi\Core\Container::singleton()->get('psr_log');
+  public static function log($channel = 'default') {
+    return \Civi\Core\Container::singleton()->get('psr_log_manager')->getLog($channel);
   }
 
   /**
@@ -95,6 +103,15 @@ class Civi {
    */
   public static function paths() {
     return \Civi\Core\Container::getBootService('paths');
+  }
+
+  /**
+   * Obtain the formatting object.
+   *
+   * @return \Civi\Core\Format
+   */
+  public static function format(): Format {
+    return new Civi\Core\Format();
   }
 
   /**

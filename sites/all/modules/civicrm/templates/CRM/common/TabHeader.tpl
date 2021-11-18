@@ -9,11 +9,11 @@
 *}
 {* enclose all tabs and its content in a block *}
 <div class="crm-block crm-content-block">
-  {if $tabHeader and count($tabHeader)}
+  {if !empty($tabHeader) and count($tabHeader)}
     <div id="mainTabContainer">
     <ul>
        {foreach from=$tabHeader key=tabName item=tabValue}
-          <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all{if !$tabValue.valid} disabled{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}" {$tabValue.extra}>
+          <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all{if !$tabValue.valid} disabled{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}" {if isset($tabValue.extra)}{$tabValue.extra}{/if}>
           {if $tabValue.active}
              <a href="{if !empty($tabValue.template)}#panel_{$tabName}{else}{$tabValue.link}{/if}" title="{$tabValue.title|escape}{if !$tabValue.valid} ({ts}disabled{/ts}){/if}">
                {if !empty($tabValue.icon)}<i class="{$tabValue.icon}"></i>{/if}

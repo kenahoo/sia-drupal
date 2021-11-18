@@ -75,13 +75,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
     if ($name === NULL) {
-      CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name should be provided.\n");
+      CRM_Core_Error::deprecatedWarning("Deprecated: Group='$group'. Name should be provided.\n");
     }
     if ($componentID !== NULL) {
-      CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name='$name'. Component should be omitted\n");
+      CRM_Core_Error::deprecatedWarning("Deprecated: Group='$group'. Name='$name'. Component should be omitted\n");
     }
     if ($defaultValue !== NULL) {
-      CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name='$name'. Defaults should come from metadata\n");
+      CRM_Core_Error::deprecatedWarning("Deprecated: Group='$group'. Name='$name'. Defaults should come from metadata\n");
     }
     return $name ? $settings->get($name) : $settings->all();
   }
@@ -96,7 +96,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return array
    */
-  public static function getItems(&$params, $domains = NULL, $settingsToReturn) {
+  public static function getItems(&$params, $domains, $settingsToReturn) {
     $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
       $domains[] = $originalDomain;
@@ -272,13 +272,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   value of the setting to be set
    * @param array $fieldSpec
    *   Metadata for given field (drawn from the xml)
+   * @param bool $convertToSerializedString
+   *   Deprecated mode
    *
    * @return bool
    * @throws \API_Exception
    */
-  public static function validateSetting(&$value, array $fieldSpec) {
+  public static function validateSetting(&$value, array $fieldSpec, $convertToSerializedString = TRUE) {
     // Deprecated guesswork - should use $fieldSpec['serialize']
-    if ($fieldSpec['type'] == 'String' && is_array($value)) {
+    if ($convertToSerializedString && $fieldSpec['type'] == 'String' && is_array($value)) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     if (empty($fieldSpec['validate_callback'])) {

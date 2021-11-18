@@ -131,7 +131,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
-    $this->assertMyContact($this->getLebowskiCID(), NULL, $response);
+    $this->assertMyContact($this->getLebowskiCID(), NULL, $credType, $flowType, $response);
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
@@ -162,7 +162,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
@@ -196,12 +196,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Request OK. Policy requires site_key, and we have one.
     \Civi::settings()->set("authx_guards", ['site_key']);
     $response = $http->send($request->withHeader('X-Civi-Key', CIVICRM_SITE_KEY));
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
 
     // Request OK. Policy does not require site_key, and we do not have one
     \Civi::settings()->set("authx_guards", []);
     $response = $http->send($request);
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
 
     // Request fails. Policy requires site_key, but we don't have the wrong value.
     \Civi::settings()->set("authx_guards", ['site_key']);
@@ -240,12 +240,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $response = $http->post('civicrm/authx/login', [
       'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
     ]);
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
     $this->assertHasCookies($response);
 
     // Phase 3: We can use cookies to request other pages
     $response = $http->get('civicrm/authx/id');
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
     $response = $http->get('civicrm/user');
     $this->assertDashboardOk();
 
@@ -304,7 +304,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertEquals(0, $cookieJar->count());
     $response = $http->send($request);
     $this->assertTrue($cookieJar->count() >= 1);
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
 
     // FIXME: Assert that re-using cookies yields correct result.
   }
@@ -350,10 +350,10 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $response = $http->post('civicrm/authx/login', [
       'form_params' => ['_authx' => $this->credApikey($this->getDemoCID())],
     ]);
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'api_key', 'login', $response);
     $this->assertHasCookies($response);
     $response = $http->get('civicrm/authx/id');
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'api_key', 'login', $response);
 
     // Phase 2: Make a single, stateless request with different creds
     /** @var \Psr\Http\Message\RequestInterface $request */
@@ -367,7 +367,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Phase 3: Original session is still valid
     $response = $http->get('civicrm/authx/id');
-    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'api_key', 'login', $response);
   }
 
   /**
@@ -393,7 +393,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         case 'L':
           $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getLebowskiCID());
           $response = $http->send($request);
-          $this->assertMyContact($this->getLebowskiCID(), NULL, $response, 'Expected Lebowski in step #' . $i);
+          $this->assertMyContact($this->getLebowskiCID(), NULL, 'api_key', 'header', $response, 'Expected Lebowski in step #' . $i);
           $actualSteps .= 'L';
           break;
 
@@ -407,7 +407,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         case 'D':
           $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getDemoCID());
           $response = $http->send($request);
-          $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response, 'Expected demo in step #' . $i);
+          $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'api_key', 'header', $response, 'Expected demo in step #' . $i);
           $actualSteps .= 'D';
           break;
 
@@ -421,6 +421,46 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
 
     $this->assertEquals($actualSteps, $planSteps);
+  }
+
+  /**
+   * Civi's test suite includes middleware that will add JWT tokens to outgoing requests.
+   *
+   * This test tries a few permutations with different principals ("demo", "Lebowski"),
+   * different identifier fields (authx_user, authx_contact_id), and different
+   * flows (param/header/xheader).
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function testJwtMiddleware() {
+    // HTTP GET with a specific user. Choose flow automatically.
+    $response = $this->createGuzzle()->get('civicrm/authx/id', [
+      'authx_user' => $GLOBALS['_CV']['DEMO_USER'],
+    ]);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', 'param', $response);
+
+    // HTTP GET with a specific contact. Choose flow automatically.
+    $response = $this->createGuzzle()->get('civicrm/authx/id', [
+      'authx_contact_id' => $this->getDemoCID(),
+    ]);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', 'param', $response);
+
+    // HTTP POST with a specific contact. Per-client default.
+    $response = $this->createGuzzle([
+      'authx_contact_id' => $this->getLebowskiCID(),
+    ])->post('civicrm/authx/id');
+    $this->assertMyContact($this->getLebowskiCID(), NULL, 'jwt', 'param', $response);
+
+    // Using explicit flow options...
+    foreach (['param', 'xheader', 'header'] as $flowType) {
+      \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
+      $response = $this->createGuzzle()->get('civicrm/authx/id', [
+        'authx_contact_id' => $this->getDemoCID(),
+        'authx_flow' => $flowType,
+      ]);
+      $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', $flowType, $response);
+    }
   }
 
   /**
@@ -463,15 +503,23 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    *   The expected contact ID
    * @param int|null $uid
    *   The expected user ID
+   * @param string $credType
+   * @param string $flow
    * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public function assertMyContact($cid, $uid, ResponseInterface $response): void {
+  public function assertMyContact($cid, $uid, $credType, $flow, ResponseInterface $response): void {
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
     $j = json_decode((string) $response->getBody(), 1);
     $formattedFailure = $this->formatFailure($response);
     $this->assertEquals($cid, $j['contact_id'], "Response did not give expected contact ID\n" . $formattedFailure);
     $this->assertEquals($uid, $j['user_id'], "Response did not give expected user ID\n" . $formattedFailure);
+    if ($flow !== NULL) {
+      $this->assertEquals($flow, $j['flow'], "Response did not give expected flow type\n" . $formattedFailure);
+    }
+    if ($credType !== NULL) {
+      $this->assertEquals($credType, $j['cred'], "Response did not give expected cred type\n" . $formattedFailure);
+    }
   }
 
   /**

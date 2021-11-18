@@ -95,13 +95,7 @@ class CRM_Core_Smarty extends Smarty {
       exit();
     }
 
-    //Check for safe mode CRM-2207
-    if (ini_get('safe_mode')) {
-      $this->use_sub_dirs = FALSE;
-    }
-    else {
-      $this->use_sub_dirs = TRUE;
-    }
+    $this->use_sub_dirs = TRUE;
 
     $customPluginsDir = NULL;
     if (isset($config->customPHPPathDir)) {
@@ -147,6 +141,10 @@ class CRM_Core_Smarty extends Smarty {
     $this->load_filter('pre', 'resetExtScope');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
+
+    if ($config->debug) {
+      $this->error_reporting = E_ALL;
+    }
   }
 
   /**
@@ -154,6 +152,8 @@ class CRM_Core_Smarty extends Smarty {
    *
    * Method providing static instance of SmartTemplate, as
    * in Singleton pattern.
+   *
+   * @return \CRM_Core_Smarty
    */
   public static function &singleton() {
     if (!isset(self::$_singleton)) {

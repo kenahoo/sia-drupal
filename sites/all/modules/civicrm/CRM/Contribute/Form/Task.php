@@ -62,8 +62,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    *
    * @param array $contributionIds
    */
-  public function setContributionIds($contributionIds) {
-    $this->_contributionIds = $contributionIds;
+  public function setContributionIds(array $contributionIds): void {
+    $this->ids = $contributionIds;
   }
 
   /**
@@ -102,6 +102,15 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
         'name' => ts('Cancel'),
       ],
     ]);
+  }
+
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  public function getTokenSchema(): array {
+    return ['contributionId', 'contactId'];
   }
 
 }

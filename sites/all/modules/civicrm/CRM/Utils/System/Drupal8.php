@@ -49,7 +49,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($user_register_conf != 'visitors' && !$user->hasPermission('administer users')) {
       $account->block();
     }
-    elseif ($verify_mail_conf) {
+    else {
       $account->activate();
     }
 
@@ -82,10 +82,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     //      self-registers.
     //    - 'register_pending_approval': Welcome message, user pending admin
     //      approval.
-    // @Todo: Should we only send off emails if $params['notify'] is set?
     switch (TRUE) {
       case $user_register_conf == 'admin_only' || $user->isAuthenticated():
-        _user_mail_notify('register_admin_created', $account);
+        if (!empty($params['notify'])) {
+          _user_mail_notify('register_admin_created', $account);
+        }
         break;
 
       case $user_register_conf == 'visitors':
@@ -658,7 +659,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return NULL;
     }
 
-    return \Drupal::languageManager()->getCurrentLanguage()->getId();
+    return \Drupal::languageManager()->getConfigOverrideLanguage()->getId();
   }
 
   /**

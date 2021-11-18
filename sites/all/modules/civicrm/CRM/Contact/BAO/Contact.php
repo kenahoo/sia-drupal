@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
+class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Test\HookInterface {
 
   /**
    * SQL function used to format the phone_numeric field via trigger.
@@ -381,7 +381,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contact', $contact->id);
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contact', $contact->id, $isEdit ? 'edit' : 'create');
     }
 
     $transaction->commit();
@@ -428,6 +428,48 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     return $contact;
+  }
+
+  /**
+   * Check if a contact has a name.
+   *
+   * - Individuals need a first_name or last_name
+   * - Organizations need organization_name
+   * - Households need household_name
+   *
+   * @param array $contact
+   * @return bool
+   */
+  public static function hasName(array $contact): bool {
+    $nameFields = [
+      'Individual' => ['first_name', 'last_name'],
+      'Organization' => ['organization_name'],
+      'Household' => ['household_name'],
+    ];
+    // Casting to int filters out the string 'null'
+    $cid = (int) ($contact['id'] ?? NULL);
+    $contactType = $contact['contact_type'] ?? NULL;
+    if (!$contactType && $cid) {
+      $contactType = CRM_Core_DAO::getFieldValue(__CLASS__, $cid, 'contact_type');
+    }
+    if (!$contactType || !isset($nameFields[$contactType])) {
+      throw new CRM_Core_Exception('No contact_type given to ' . __CLASS__ . '::' . __FUNCTION__);
+    }
+    foreach ($nameFields[$contactType] as $field) {
+      if (isset($contact[$field]) && is_string($contact[$field]) && $contact[$field] !== '') {
+        return TRUE;
+      }
+    }
+    // For existing contacts, look up name from database
+    if ($cid) {
+      foreach ($nameFields[$contactType] as $field) {
+        $value = $contact[$field] ?? CRM_Core_DAO::getFieldValue(__CLASS__, $cid, $field);
+        if (isset($value) && $value !== '') {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -1021,7 +1063,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     }
 
     //delete the contact id from recently view
-    CRM_Utils_Recent::delContact($id);
+    CRM_Utils_Recent::del(['contact_id' => $id]);
     self::updateContactCache($id, empty($restore));
 
     // delete any prevnext/dupe cache entry
@@ -1572,7 +1614,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         else {
           foreach (CRM_Contact_BAO_ContactType::basicTypes() as $type) {
             $fields = array_merge($fields,
-              CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, $checkPermissions, $withMultiRecord)
+              CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, $checkPermissions ? CRM_Core_Permission::VIEW : FALSE, $withMultiRecord)
             );
           }
         }
@@ -3469,53 +3511,31 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Delete a contact-related object that has an 'is_primary' field.
-   *
-   * Ensures that is_primary gets assigned to another object if available
-   * Also calls pre/post hooks
-   *
-   * @param string $type
-   * @param int $id
-   *
-   * @return bool
+   * Event fired after modifying any entity.
+   * @param \Civi\Core\Event\PostEvent $event
    */
-  public static function deleteObjectWithPrimary($type, $id) {
-    if (!$id || !is_numeric($id)) {
-      return FALSE;
-    }
-    $daoName = "CRM_Core_DAO_$type";
-    $obj = new $daoName();
-    $obj->id = $id;
-    $obj->find();
-
-    if ($obj->fetch()) {
-      CRM_Utils_Hook::pre('delete', $type, $id);
-      $contactId = $obj->contact_id;
-      $obj->delete();
-    }
-    else {
-      return FALSE;
-    }
-    // is_primary is only relavent if this field belongs to a contact
-    if ($contactId) {
-      $dao = new $daoName();
-      $dao->contact_id = $contactId;
+  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // Handle deleting a related entity with is_primary
+    $hasPrimary = ['Address', 'Email', 'IM', 'OpenID', 'Phone'];
+    if (
+      $event->action === 'delete' && $event->id &&
+      in_array($event->entity, $hasPrimary) &&
+      !empty($event->object->is_primary) &&
+      !empty($event->object->contact_id)
+    ) {
+      $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($event->entity);
+      $dao = new $daoClass();
+      $dao->contact_id = $event->object->contact_id;
       $dao->is_primary = 1;
       // Pick another record to be primary (if one isn't already)
       if (!$dao->find(TRUE)) {
         $dao->is_primary = 0;
-        $dao->find();
-        if ($dao->fetch()) {
-          $dao->is_primary = 1;
-          $dao->save();
-          if ($type === 'Email') {
-            CRM_Core_BAO_UFMatch::updateUFName($dao->contact_id);
-          }
+        if ($dao->find(TRUE)) {
+          $baoClass = CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass);
+          $baoClass::writeRecord(['id' => $dao->id, 'is_primary' => 1]);
         }
       }
     }
-    CRM_Utils_Hook::post('delete', $type, $id, $obj);
-    return TRUE;
   }
 
   /**
@@ -3684,6 +3704,35 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       ['key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'],
       ['key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'],
     ];
+  }
+
+  /**
+   * @param string $entityName
+   * @param string $action
+   * @param array $record
+   * @param $userID
+   * @return bool
+   * @see CRM_Core_DAO::checkAccess
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
+    switch ($action) {
+      case 'create':
+        return CRM_Core_Permission::check('add contacts', $userID);
+
+      case 'get':
+        $actionType = CRM_Core_Permission::VIEW;
+        break;
+
+      case 'delete':
+        $actionType = CRM_Core_Permission::DELETE;
+        break;
+
+      default:
+        $actionType = CRM_Core_Permission::EDIT;
+        break;
+    }
+
+    return CRM_Contact_BAO_Contact_Permission::allow($record['id'], $actionType, $userID);
   }
 
 }

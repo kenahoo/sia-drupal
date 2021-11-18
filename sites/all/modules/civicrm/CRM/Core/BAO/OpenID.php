@@ -19,6 +19,7 @@
  * This class contains function for Open Id
  */
 class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Create or update OpenID record.
@@ -120,12 +121,14 @@ ORDER BY
   /**
    * Call common delete function.
    *
-   * @param int $id
+   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
    *
+   * @param int $id
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }

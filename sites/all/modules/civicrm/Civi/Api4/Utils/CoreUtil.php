@@ -10,15 +10,11 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Utils;
 
+use Civi\API\Request;
+use Civi\Api4\Entity;
+use Civi\Api4\Event\CreateApi4RequestEvent;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -34,14 +30,8 @@ class CoreUtil {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
       return 'CRM_Core_BAO_CustomValue';
     }
-    $dao = self::getApiClass($entityName)::getInfo()['dao'] ?? NULL;
-    if (!$dao) {
-      return NULL;
-    }
-    $bao = str_replace("DAO", "BAO", $dao);
-    // Check if this entity actually has a BAO. Fall back on the DAO if not.
-    $file = strtr($bao, '_', '/') . '.php';
-    return stream_resolve_include_path($file) ? $bao : $dao;
+    $dao = AllCoreTables::getFullName($entityName);
+    return $dao ? AllCoreTables::getBAOClassName($dao) : NULL;
   }
 
   /**
@@ -49,12 +39,33 @@ class CoreUtil {
    * @return string|\Civi\Api4\Generic\AbstractEntity
    */
   public static function getApiClass($entityName) {
-    if (strpos($entityName, 'Custom_') === 0) {
-      return 'Civi\Api4\CustomValue';
-    }
-    // Because "Case" is a reserved php keyword
-    $className = 'Civi\Api4\\' . ($entityName === 'Case' ? 'CiviCase' : $entityName);
-    return class_exists($className) ? $className : NULL;
+    $e = new CreateApi4RequestEvent($entityName);
+    \Civi::dispatcher()->dispatch('civi.api4.createRequest', $e);
+    return $e->className;
+  }
+
+  /**
+   * Get item from an entity's getInfo array
+   *
+   * @param string $entityName
+   * @param string $keyToReturn
+   * @return mixed
+   */
+  public static function getInfoItem(string $entityName, string $keyToReturn) {
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', $entityName)
+      ->addSelect($keyToReturn)
+      ->execute()->first();
+    return $info ? $info[$keyToReturn] ?? NULL : NULL;
+  }
+
+  /**
+   * Get name of unique identifier, typically "id"
+   * @param string $entityName
+   * @return string
+   */
+  public static function getIdFieldName(string $entityName): string {
+    return self::getInfoItem($entityName, 'primary_key')[0] ?? 'id';
   }
 
   /**
@@ -80,12 +91,14 @@ class CoreUtil {
    */
   public static function getApiNameFromTableName($tableName) {
     $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
-    if (!$entityName) {
-      $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
-      return $customGroup ? "Custom_$customGroup" : NULL;
+    // Real entities
+    if ($entityName) {
+      // Verify class exists
+      return self::getApiClass($entityName) ? $entityName : NULL;
     }
-    // Verify class exists
-    return self::getApiClass($entityName) ? $entityName : NULL;
+    // Multi-value custom group pseudo-entities
+    $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
+    return self::isCustomEntity($customGroup) ? "Custom_$customGroup" : NULL;
   }
 
   /**
@@ -96,6 +109,8 @@ class CoreUtil {
     $operators[] = 'CONTAINS';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
+    $operators[] = 'REGEXP';
+    $operators[] = 'NOT REGEXP';
     return $operators;
   }
 
@@ -135,6 +150,84 @@ class CoreUtil {
       ];
     }
     return NULL;
+  }
+
+  /**
+   * Checks if a custom group exists and is multivalued
+   *
+   * @param $customGroupName
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function isCustomEntity($customGroupName) {
+    return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
+  }
+
+  /**
+   * Check if current user is authorized to perform specified action on a given entity.
+   *
+   * @param \Civi\Api4\Generic\AbstractAction $apiRequest
+   * @param array $record
+   * @param int|string $userID
+   *   Contact ID of the user we are testing,. 0 for the anonymous user.
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, int $userID) {
+
+    // Super-admins always have access to everything
+    if (\CRM_Core_Permission::check('all CiviCRM permissions and ACLs', $userID)) {
+      return TRUE;
+    }
+
+    // For get actions, just run a get and ACLs will be applied to the query.
+    // It's a cheap trick and not as efficient as not running the query at all,
+    // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
+    if (is_a($apiRequest, '\Civi\Api4\Generic\DAOGetAction')) {
+      return (bool) $apiRequest->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
+    }
+
+    $event = new \Civi\Api4\Event\AuthorizeRecordEvent($apiRequest, $record, $userID);
+    \Civi::dispatcher()->dispatch('civi.api4.authorizeRecord', $event);
+
+    // Note: $bao::_checkAccess() is a quasi-listener. TODO: Convert to straight-up listener.
+    if ($event->isAuthorized() === NULL) {
+      $baoName = self::getBAOFromApiName($apiRequest->getEntityName());
+      if ($baoName && method_exists($baoName, '_checkAccess')) {
+        $authorized = $baoName::_checkAccess($event->getEntityName(), $event->getActionName(), $event->getRecord(), $event->getUserID());
+        $event->setAuthorized($authorized);
+      }
+      else {
+        $event->setAuthorized(TRUE);
+      }
+    }
+    return $event->isAuthorized();
+  }
+
+  /**
+   * If the permissions of record $A are based on record $B, then use `checkAccessDelegated($B...)`
+   * to make see if access to $B is permitted.
+   *
+   * @param string $entityName
+   * @param string $actionName
+   * @param array $record
+   * @param int $userID
+   *   Contact ID of the user we are testing, or 0 for the anonymous user.
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, int $userID) {
+    $apiRequest = Request::create($entityName, $actionName, ['version' => 4]);
+    // TODO: Should probably emit civi.api.authorize for checking guardian permission; but in APIv4 with std cfg, this is de-facto equivalent.
+    if (!$apiRequest->isAuthorized()) {
+      return FALSE;
+    }
+    return static::checkAccessRecord($apiRequest, $record, $userID);
   }
 
 }

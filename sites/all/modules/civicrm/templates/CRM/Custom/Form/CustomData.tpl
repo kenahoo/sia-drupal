@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Custom Data form*}
-{if $formEdit}
+{if !empty($formEdit)}
   {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
 {else}
   {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
@@ -23,8 +23,8 @@
         {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
       </div>
     {else}
-     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
-      {if !$skipTitle}
+     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and empty($skipTitle)}collapsed{/if}">
+      {if empty($skipTitle)}
       <div class="crm-accordion-header">
         {$cd_edit.title}
        </div><!-- /.crm-accordion-header -->
@@ -34,7 +34,11 @@
       </div>
      </div>
     {/if}
-    <div id="custom_group_{$group_id}_{$cgCount}"></div>
+    {if isset($cgCount)}
+      <div id="custom_group_{$group_id}_{$cgCount}"></div>
+    {else}
+      <div id="custom_group_{$group_id}"></div>
+    {/if}
   {/foreach}
 
 {/if}

@@ -1,12 +1,14 @@
 {* add campaigns to various components CRM-7362 *}
 
-{if $campaignContext eq 'componentSearch'}
+{if isset($campaignContext) and $campaignContext eq 'componentSearch'}
 
   {* add campaign in component search *}
   <tr class="{$campaignTrClass}">
     {assign var=elementName value=$campaignInfo.elementName}
     <td class="{$campaignTdClass}">
-      {$form.$elementName.label} {$form.$elementName.html}
+      {if isset($form.$elementName)}
+        {$form.$elementName.label} {$form.$elementName.html}
+      {/if}
     </td>
   </tr>
 

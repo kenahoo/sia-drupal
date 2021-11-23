@@ -167,6 +167,10 @@ function SIA_custom_token_info() {
       'name' => t('Singer roster HTML'),
       'description' => t("A detailed table of current singers in the database."),
     );
+    $info['tokens']['sia']['collaborator_concerts'] = array(
+      'name' => t('Collaborator concerts'),
+      'description' => t("A list of concerts this collaborator has participated in."),
+    );
     return $info;
 }
 
@@ -184,24 +188,59 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
                     "<div style=\"float:left;margin:20px\">{$arr[1]}</div>" .
                     "<br  style=\"clear:both\">");
             $replacements[$original] = $val;
-        }
-        if ($name == 'singer_roster_html') {
+        } elseif ($name == 'singer_roster_html') {
           $rows = singer_roster2();
           $val = theme('table',
             array('header' => array('Voice Part', 'Name', 'Phone', 'Address'),
               'rows' => $rows)
           );
           $replacements[$original] = $val;
-        }
-        if ($name == 'list_sync_check') {
+        } elseif ($name == 'list_sync_check') {
           $replacements[$original] = list_sync_check();
-        }
-        if ($name == 'concert_page') {
+        } elseif ($name == 'concert_page') {
           $replacements[$original] = concert_page();
+        } elseif ($name == 'collaborator_concerts') {
+          $replacements[$original] = collaborator_concerts();
         }
     }
 
     return $replacements;
+}
+
+function collaborator_concerts() {
+  # Return list of all concerts this collaborator has been involved in
+
+  $node = menu_get_object();
+  if ($node->type != 'portfolio') {
+    trigger_error("collaborator_concerts() called on non-collaborator page", E_USER_WARNING);
+    return '';
+  }
+
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'node')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->propertyCondition('type', 'concert_portfolio');
+
+  $got = [];
+  foreach ($query->execute() as $entity_type => $entities) {
+    foreach ($entities as $entity_id => $entity) {
+      $concert_node = node_load($entity_id);
+      $collabs = field_get_items('node', $concert_node, 'field_collaborator_node');
+      foreach ($collabs as $c) {
+        if ($c['target_id'] == $node->nid) {
+          $got[] = ('<li><a href="' . url('node/' . $concert_node->nid) . '">' . $concert_node->title . '</a>, ' .
+            date_create($concert_node->field_concert_date[und][0]['value'])->format('F Y') . '</li>');
+        }
+      }
+    }
+  }
+
+  if ($got) {
+    return "<strong>SIA Performances:</strong><ul>" . implode($got, "\n") . "</ul>";
+  } else {
+    return '';
+  }
 }
 
 

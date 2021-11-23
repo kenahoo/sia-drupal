@@ -184,19 +184,16 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
                     "<div style=\"float:left;margin:20px\">{$arr[1]}</div>" .
                     "<br  style=\"clear:both\">");
             $replacements[$original] = $val;
-        }
-        if ($name == 'singer_roster_html') {
+        } elseif ($name == 'singer_roster_html') {
           $rows = singer_roster2();
           $val = theme('table',
             array('header' => array('Voice Part', 'Name', 'Phone', 'Address'),
               'rows' => $rows)
           );
           $replacements[$original] = $val;
-        }
-        if ($name == 'list_sync_check') {
+        } elseif ($name == 'list_sync_check') {
           $replacements[$original] = list_sync_check();
-        }
-        if ($name == 'concert_page') {
+        } elseif ($name == 'concert_page') {
           $replacements[$original] = concert_page();
         }
     }

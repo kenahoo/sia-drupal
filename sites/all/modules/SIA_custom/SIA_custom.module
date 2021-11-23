@@ -207,6 +207,9 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
     return $replacements;
 }
 
+/**
+ * @throws EntityFieldQueryException
+ */
 function collaborator_concerts() {
   # Return list of all concerts this collaborator has been involved in
 
@@ -220,7 +223,8 @@ function collaborator_concerts() {
   $query
     ->entityCondition('entity_type', 'node')
     ->propertyCondition('status', NODE_PUBLISHED)
-    ->propertyCondition('type', 'concert_portfolio');
+    ->propertyCondition('type', 'concert_portfolio')
+    ->fieldOrderBy('field_concert_date', 'value', 'DESC');
 
   $got = [];
   foreach ($query->execute() as $entity_type => $entities) {

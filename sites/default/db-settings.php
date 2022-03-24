@@ -29,8 +29,8 @@ if (preg_match("{^${s275}}", getenv("DOCUMENT_ROOT"))
 
 } else {
   # Development server
-  $host = '127.0.0.1';
-  $site_root = '/Users/ken/src/SIA/server275-site';
+  $host = 'mysql-service';
+  $site_root = '/var/www/html';
   $civi_database = 'singersin_combined';
 }
 

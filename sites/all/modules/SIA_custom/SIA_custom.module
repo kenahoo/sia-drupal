@@ -121,7 +121,6 @@ function civi_group_id($name) {
 }
 
 function concert_page() {
-
   $q = db_select('node')
     ->condition('type', 'concert_portfolio', '=')
     ->condition('status', 1, '=');
@@ -131,17 +130,17 @@ function concert_page() {
   return( drupal_render(node_view(node_load($concert_nid[0]), 'full')) );
 }
 
-function singer_data($groups=['Current Singers']) {
-    civicrm_initialize();
-    $api = new civicrm_api3();
-    $group_list = array_filter(array_map('civi_group_id', $groups), function($x) {return isset($x);});
-    $api->Contact->Get(array('group' => $group_list,
-                             'sequential' => 1,
-                             'rowCount' => 10000,
-                             'return' => 'custom_4,display_name,email,phone,'.
-                                       'street_address,city,state_province,postal_code,id',
-                             'sort'=>'custom_4,last_name,first_name'));
-    return $api;
+function singer_data($groups=['Current Singers']): civicrm_api3 {
+  civicrm_initialize();
+  $api = new civicrm_api3();
+  $group_list = array_filter(array_map('civi_group_id', $groups), function($x) {return isset($x);});
+  $api->Contact->Get([
+    'group' => $group_list,
+    'sequential' => 1,
+    'rowCount' => 10000,
+    'return' => 'custom_4,display_name,email,phone,street_address,city,state_province,postal_code,id',
+    'sort' => 'custom_4,last_name,first_name']);
+  return $api;
 }
 
 function singer_roster2() {
@@ -399,90 +398,94 @@ function mp3_listing($start, $end, $title, $collapsed=true, $dir='sites/default/
   print( collapsible($title, $content, $collapsed) );
 }
 
+class ListSync {
+  public string $drup_group = 'choir member';
+  public array $crm_groups = ['Current Singers', 'Non-Singing Members'];
 
-function list_sync_check() {
-    $drup_group = 'choir member';
+  function show_diffs($a, $b, $message): array {
+    $diffs = array_diff($a, $b);
+    if (!$diffs) {
+      return $diffs;
+    }
+    return [
+      'emails' => $diffs,
+      'html' => theme_item_list([
+        'items' => $diffs,
+        'title' => "$message:",
+        'type' => 'ul',
+        'attributes' => []
+      ])];
+  }
 
-    $show_diffs = function($a, $b, $message) {
-        $diffs = array_diff($a, $b);
-        if (!$diffs) {
-            return $diffs;
-        }
-        return array('emails' => $diffs, 'html' => theme_item_list(array(
-          'items' => $diffs,
-          'title' => "$message:",
-          'type' => 'ul',
-          'attributes' => array()
-        )));
-    };
+  function get_crm(): array {
+    $api = singer_data($this->crm_groups);
+    $emails = array_map(function($c){return $c->email;}, $api->values);
+    asort($emails);
+    return $emails;
+  }
 
-    $get_crm = function() {
-        $api = singer_data(['Current Singers', 'Non-Singing Members']);
-        $emails = array_map(function($c){return $c->email;}, $api->values);
-        asort($emails);
-        return $emails;
-    };
+  function get_drupal(): array {
+    $role = user_role_load_by_name($this->drup_group);
+    $uids = db_select('users_roles', 'ur')
+      ->fields('ur', ['uid'])
+      ->condition('ur.rid', $role->rid, '=')
+      ->execute()
+      ->fetchCol();
+    $users = user_load_multiple($uids);
 
-    $get_drupal = function() use ($drup_group) {
-        $role = user_role_load_by_name($drup_group);
-        $uids = db_select('users_roles', 'ur')
-            ->fields('ur', array('uid'))
-            ->condition('ur.rid', $role->rid, '=')
-            ->execute()
-            ->fetchCol();
-        $users = user_load_multiple($uids);
+    $emails = array();
+    foreach($users as $user) {
+      $emails[] = $user->mail;
+    }
+    asort($emails);
+    return $emails;
+  }
 
-        $emails = array();
-        foreach($users as $user) {
-            $emails[] = $user->mail;
-        }
-        asort($emails);
-        return $emails;
-    };
+  /**
+   * @throws RuntimeException
+   */
+  function get_mailman(): array {
+    global $SITE_CONFIG;
+    $mm = $SITE_CONFIG['mailman'];
+    $cmd = sprintf("%s --ssl --csv %s %s %s",
+      $mm['script'], $mm['host'], $mm['list'], $mm['password']);
+    $handle = popen($cmd, "r");
+    $header = fgetcsv($handle);
+    if (!$handle || !$header) {
+      throw new RuntimeException("Couldn't retrieve info from MailMan");
+    }
 
+    $i = array_search("email address", $header);
 
-    $get_mailman = function() {
-        global $SITE_CONFIG;
-        $mm = $SITE_CONFIG['mailman'];
-        $cmd = sprintf("python %s --url_path /mailman/admin -c %s %s %s",
-                       $mm['script'], $mm['host'], $mm['list'], $mm['password']);
-        $handle = popen($cmd, "r");
-        $header = fgetcsv($handle);
-        if (!$handle || !$header) {
-            throw new Exception("Couldn't retrieve info from MailMan");
-        }
+    $emails = [];
+    while (($data = fgetcsv($handle)) !== FALSE) {
+      $emails[] = $data[$i];
+    }
+    asort($emails);
+    return $emails;
+  }
 
-        $i = array_search("email address", $header);
+  public function as_html(): string {
+    $from_crm = $this->get_crm();
+    $from_drupal = $this->get_drupal();
+    $from_mailman = $this->get_mailman();
 
-        $emails = array();
-        while (($data = fgetcsv($handle)) !== FALSE) {
-            $emails[] = $data[$i];
-        }
-        asort($emails);
-        return $emails;
-    };
-
-    ###################################
-
-
-    $from_crm = $get_crm();
-    $from_drupal = $get_drupal();
-    $from_mailman = $get_mailman();
+    $dg = $this->drup_group;
 
     $out = '';
 
-    if ($result = $show_diffs($from_crm, $from_drupal, "Add to Drupal '$drup_group' group")) {
+    if ($result = $this->show_diffs($from_crm, $from_drupal, "Add to Drupal 'dg' group")) {
       $out .= $result['html'];
-      $out .= "<p>To add to Drupal: drush user-add-role '$drup_group' " . join(",", $result['emails']) . "</p>";
+      $out .= "<p>To add to Drupal: drush user-add-role '$dg' " . join(",", $result['emails']) . "</p>";
     }
-    if ($result = $show_diffs($from_drupal, $from_crm, "Remove from Drupal '$drup_group' group")) {
+    if ($result = $this->show_diffs($from_drupal, $from_crm, "Remove from Drupal 'dg' group")) {
       $out .= $result['html'];
-      $out .= "<p>To remove from Drupal: drush user-remove-role '$drup_group' " . join(",", $result['emails']) . "</p>";
+      $out .= "<p>To remove from Drupal: drush user-remove-role '$dg' " . join(",", $result['emails']) . "</p>";
     }
-    if ($result = $show_diffs($from_crm, $from_mailman, "Add to MailMan list")) {
+    if ($result = $this->show_diffs($from_crm, $from_mailman, "Add to MailMan list")) {
       $out .= $result['html'];
     }
-    if ($result = $show_diffs($from_mailman, $from_crm, "Remove from MailMan list")) {
+    if ($result = $this->show_diffs($from_mailman, $from_crm, "Remove from MailMan list")) {
       $out .= $result['html'];
     }
 
@@ -491,4 +494,10 @@ function list_sync_check() {
     }
 
     return $out;
+  }
+}
+
+function list_sync_check(): string {
+  $ls = new ListSync();
+  return $ls->as_html();
 }

@@ -401,6 +401,11 @@ function mp3_listing($start, $end, $title, $collapsed=true, $dir='sites/default/
 class ListSync {
   public string $drup_group = 'choir member';
   public array $crm_groups = ['Current Singers', 'Non-Singing Members'];
+  public array $mm;
+
+  public function __construct(array $mm) {
+    $this->mm = $mm;
+  }
 
   function show_diffs($a, $b, $message): array {
     $diffs = array_diff($a, $b);
@@ -445,8 +450,7 @@ class ListSync {
    * @throws RuntimeException
    */
   function get_mailman(): array {
-    global $SITE_CONFIG;
-    $mm = $SITE_CONFIG['mailman'];
+    $mm = $this->mm;
     $cmd = sprintf("%s --ssl --csv %s %s %s",
       $mm['script'], $mm['host'], $mm['list'], $mm['password']);
     $handle = popen($cmd, "r");
@@ -493,11 +497,15 @@ class ListSync {
       $out .= "<p><em>Nothing!  Looks like you're good!</em></p>";
     }
 
+    $url = sprintf("https://%s/mailman/admin/%s/members", $this->mm['host'], $this->mm['list']);
+    $out .= "<p>MailMan list is at <a href=\"$url\">$url</a></p>";
+
     return $out;
   }
 }
 
 function list_sync_check(): string {
-  $ls = new ListSync();
+  global $SITE_CONFIG;
+  $ls = new ListSync($SITE_CONFIG['mailman']);
   return $ls->as_html();
 }

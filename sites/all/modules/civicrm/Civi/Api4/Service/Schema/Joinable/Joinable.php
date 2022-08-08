@@ -104,7 +104,7 @@ class Joinable {
    */
   public function getConditionsForJoin(string $baseTableAlias, string $tableAlias) {
     $baseCondition = sprintf(
-      '%s.%s =  %s.%s',
+      '`%s`.`%s` =  `%s`.`%s`',
       $baseTableAlias,
       $this->baseColumn,
       $tableAlias,
@@ -244,7 +244,7 @@ class Joinable {
   }
 
   /**
-   * @param int|NULL $serialize
+   * @param int|null $serialize
    *
    * @return $this
    */

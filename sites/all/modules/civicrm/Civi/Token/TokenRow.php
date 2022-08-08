@@ -144,6 +144,11 @@ class TokenRow {
   /**
    * Update the value of a token.
    *
+   * If you are reading this it probably means you can't follow this function.
+   * Don't worry - I've stared at it & all I see is a bunch of letters. However,
+   * the answer to your problem is almost certainly that you are passing in null
+   * rather than an empty string for 'c'.
+   *
    * @param string|array $a
    * @param string|array $b
    * @param mixed $c
@@ -275,7 +280,7 @@ class TokenRow {
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
-                $htmlTokens[$entity][$field] = is_object($value) ? $value : htmlentities($value);
+                $htmlTokens[$entity][$field] = is_object($value) ? $value : htmlentities($value, ENT_QUOTES);
               }
             }
           }
@@ -350,7 +355,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return bool
    */
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
       || isset($this->tokenProcessor->context[$offset]);
   }
@@ -362,6 +367,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return string
    */
+  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     if (isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])) {
       return $this->tokenProcessor->rowContexts[$this->tokenRow][$offset];
@@ -379,7 +385,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    * @param string $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     $this->tokenProcessor->rowContexts[$this->tokenRow][$offset] = $value;
   }
 
@@ -388,7 +394,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @param mixed $offset
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     unset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset]);
   }
 
@@ -397,6 +403,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return \ArrayIterator
    */
+  #[\ReturnTypeWillChange]
   public function getIterator() {
     return new \ArrayIterator($this->createMergedArray());
   }
@@ -406,7 +413,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    *
    * @return int
    */
-  public function count() {
+  public function count(): int {
     return count($this->createMergedArray());
   }
 

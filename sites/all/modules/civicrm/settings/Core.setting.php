@@ -28,7 +28,7 @@ return [
     'pseudoconstant' => [
       'optionGroupName' => 'contact_view_options',
     ],
-    'default' => '123456789101113',
+    'default' => '1234567891013',
     'add' => '4.1',
     'title' => ts('Viewing Contacts'),
     'is_domain' => '1',
@@ -239,6 +239,20 @@ return [
     'description' => NULL,
     'help_text' => NULL,
   ],
+  'enableBackgroundQueue' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'enableBackgroundQueue',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 0,
+    'add' => '5.51',
+    'title' => ts('Background Queues'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('EXPERIMENTAL: %1', [1 => ts('If enabled, some operations will be transferred to background workers. This requires configuring a background service.')]),
+    'help_text' => NULL,
+  ],
   'defaultExternUrl' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -375,7 +389,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Contact_BAO_GroupContactCache::getModes',
     ],
-    'description' => ts('Should the acl cache be by cron jobs or user actions'),
+    'description' => ts('Should the acl cache be flushed by cron jobs or user actions'),
     'help_text' => ts('In "Opportunistic Flush" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In "Cron Flush" mode, you should schedule a cron job to flush caches if your site uses ACLs; this can improve latency on form-submissions but requires more setup.'),
   ],
   'installed' => [

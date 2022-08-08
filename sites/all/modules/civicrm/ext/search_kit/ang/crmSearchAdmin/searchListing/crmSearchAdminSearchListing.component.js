@@ -3,8 +3,12 @@
 
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminSearchListing', {
-    templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
-    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, formatForSelect2) {
+    bindings: {
+      filters: '<',
+      tabCount: '='
+    },
+    templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
+    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
@@ -12,9 +16,9 @@
 
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
-      this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
-      this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
-      this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
+      this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
+      this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
+        'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -33,6 +37,9 @@
             'modified_id.display_name',
             'created_date',
             'modified_date',
+            'has_base',
+            'base_module:label',
+            'local_modified_date',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
@@ -55,14 +62,37 @@
 
       this.$onInit = function() {
         buildDisplaySettings();
-        this.initializeDisplay($scope, $());
+        this.initializeDisplay($scope, $element);
+        // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
+        $scope.$watch('$ctrl.rowCount', function(val) {
+          if (typeof val === 'number' && angular.equals(['has_base'], getActiveFilters())) {
+            ctrl.tabCount = val;
+          }
+        });
+        // Customize the noResultsText
+        $scope.$watch('$ctrl.filters', function() {
+          ctrl.settings.noResultsText = (angular.equals(['has_base'], getActiveFilters())) ?
+            ts('Welcome to Search Kit. Click the New Search button above to start composing your first search.') :
+            ts('No Saved Searches match filter criteria.');
+        }, true);
       };
+
+      // Get the names of in-use filters
+      function getActiveFilters() {
+        return _.keys(_.pick(ctrl.filters, function(val) {
+          return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
+        }));
+      }
 
       this.onPostRun.push(function(result) {
         _.each(result, function(row) {
-          row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.display_acl_bypass.raw, true);
+          row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          // If main entity doesn't exist, no can edit
+          if (!row.data['api_entity:label']) {
+            row.permissionToEdit = false;
+          }
           // Saves rendering cycles to not show an empty menu of search displays
-          if (!row.display_name.raw) {
+          if (!row.data.display_name) {
             row.openDisplayMenu = false;
           }
         });
@@ -73,55 +103,79 @@
         return encodeURI(angular.toJson(params));
       };
 
-      this.confirmDelete = function(search) {
-        function getConfirmationMsg() {
-          var msg = '<h4>' + _.escape(ts('Permanently delete this saved search?')) + '</h4>' +
+      this.deleteOrRevert = function(row) {
+        var search = row.data,
+          revert = !!search['base_module:label'];
+        function getMessage() {
+          var title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
+            msg = '<h4>' + _.escape(title) + '</h4>' +
             '<ul>';
-          if (search.display_label.view && search.display_label.view.length === 1) {
-            msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
-          } else if (search.display_label.view && search.display_label.view.length > 1) {
-            msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.view.length})) + '</li>';
-          }
-          _.each(search.groups.view, function(smartGroup) {
-            msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
-          });
-          if (search.afform_count) {
-            _.each(ctrl.afforms[search.name.raw], function(afform) {
-              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+          if (revert) {
+            if (search.display_label && search.display_label.length === 1) {
+              msg += '<li>' + _.escape(ts('Includes 1 display which will also be reverted.')) + '</li>';
+            } else if (search.display_label && search.display_label.length > 1) {
+              msg += '<li>' + _.escape(ts('Includes %1 displays which will also be reverted.', {1: search.display_label.length})) + '</li>';
+            }
+            _.each(search.groups, function(smartGroup) {
+              msg += '<li>' + _.escape(ts('Smart group "%1" will be reset to the packaged search criteria.', {1: smartGroup})) + '</li>';
             });
+            if (row.afform_count) {
+              _.each(ctrl.afforms[search.name], function(afform) {
+                msg += '<li><i class="crm-i fa-list-alt"></i> ' + _.escape(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+              });
+            }
+          } else {
+            if (search.display_label && search.display_label.length === 1) {
+              msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
+            } else if (search.display_label && search.display_label.length > 1) {
+              msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.length})) + '</li>';
+            }
+            _.each(search.groups, function (smartGroup) {
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
+            });
+            if (row.afform_count) {
+              _.each(ctrl.afforms[search.name], function (afform) {
+                msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+              });
+            }
           }
           return msg + '</ul>';
         }
 
         var dialog = CRM.confirm({
-          title: ts('Delete %1', {1: search.label.view}),
-          message: getConfirmationMsg(),
+          title: revert ? ts('Revert %1', {1: search.label}) : ts('Delete %1', {1: search.label}),
+          message: getMessage(),
         }).on('crmConfirm:yes', function() {
           $scope.$apply(function() {
-            ctrl.deleteSearch(search);
+            return revert ? ctrl.revertSearch(row) : ctrl.deleteSearch(row);
           });
         }).block();
 
         ctrl.loadAfforms().then(function() {
-          dialog.html(getConfirmationMsg()).unblock();
+          dialog.html(getMessage()).unblock();
         });
       };
 
-      this.deleteSearch = function(search) {
-        crmStatus({start: ts('Deleting...'), success: ts('Search Deleted')},
-          crmApi4('SavedSearch', 'delete', {where: [['id', '=', search.id.raw]]}).then(function() {
-            ctrl.rowCount = null;
-            ctrl.runSearch();
-          })
+      this.deleteSearch = function(row) {
+        ctrl.runSearch(
+          [['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]],
+          {start: ts('Deleting...'), success: ts('Search Deleted')},
+          row
         );
       };
 
-      this.getTags = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
-      };
-
-      this.getEntities = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+      this.revertSearch = function(row) {
+        ctrl.runSearch(
+          [['SavedSearch', 'revert', {
+            where: [['id', '=', row.key]],
+            chain: {
+              revertDisplays: ['SearchDisplay', 'revert', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', true]]}],
+              deleteDisplays: ['SearchDisplay', 'delete', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', false]]}]
+            }
+          }]],
+          {start: ts('Reverting...'), success: ts('Search Reverted')},
+          row
+        );
       };
 
       function buildDisplaySettings() {
@@ -137,10 +191,14 @@
               searchMeta.fieldToColumn('label', {
                 label: true,
                 title: ts('Edit Label'),
-                editable: {entity: 'SavedSearch', id: 'id', name: 'label', value: 'label'}
+                editable: true
               }),
               searchMeta.fieldToColumn('api_entity:label', {
                 label: ts('For'),
+                empty_value: ts('Missing'),
+                cssRules: [
+                  ['font-italic', 'api_entity:label', 'IS EMPTY']
+                ]
               }),
               {
                 type: 'include',
@@ -151,35 +209,67 @@
                 type: 'include',
                 label: ts('Displays'),
                 path: '~/crmSearchAdmin/searchListing/displays.html'
-              },
-              searchMeta.fieldToColumn('GROUP_CONCAT(DISTINCT group.title) AS groups', {
-                label: ts('Smart Group')
-              }),
-              searchMeta.fieldToColumn('created_date', {
-                label: ts('Created'),
-                title: '[created_date]',
-                rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
-              }),
-              searchMeta.fieldToColumn('modified_date', {
-                label: ts('Last Modified'),
-                title: '[modified_date]',
-                rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
-              }),
-              {
-                type: 'include',
-                alignment: 'text-right',
-                path: '~/crmSearchAdmin/searchListing/buttons.html'
               }
             ]
           }
         };
         if (ctrl.afformEnabled) {
-          ctrl.display.settings.columns.splice(4, 0, {
+          ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
             path: '~/crmSearchAdmin/searchListing/afforms.html'
           });
         }
+        ctrl.display.settings.columns.push(
+          searchMeta.fieldToColumn('GROUP_CONCAT(DISTINCT group.title) AS groups', {
+            label: ts('Smart Group')
+          })
+        );
+        if (ctrl.filters.has_base) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('base_module:label', {
+              label: ts('Package'),
+              title: '[base_module]',
+              empty_value: ts('Missing'),
+              cssRules: [
+                ['font-italic', 'base_module:label', 'IS EMPTY']
+              ]
+            })
+          );
+          ctrl.display.settings.columns.push(
+            // Using 'local_modified_date' as the column + an empty_value will only show the rewritten value
+            // if the record has been modified from its packaged state.
+            searchMeta.fieldToColumn('local_modified_date', {
+              label: ts('Modified'),
+              empty_value: ts('No'),
+              title: ts('Whether and when a search was modified from its packaged settings'),
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
+              cssRules: [
+                ['font-italic', 'local_modified_date', 'IS EMPTY']
+              ]
+            })
+          );
+        } else {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('created_date', {
+              label: ts('Created'),
+              title: '[created_date]',
+              rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
+            })
+          );
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('modified_date', {
+              label: ts('Modified'),
+              title: '[modified_date]',
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+            })
+          );
+        }
+        ctrl.display.settings.columns.push({
+          type: 'include',
+          alignment: 'text-right',
+          path: '~/crmSearchAdmin/searchListing/buttons.html'
+        });
         ctrl.settings = ctrl.display.settings;
       }
 
@@ -219,7 +309,7 @@
 
       function updateAfformCounts() {
         _.each(ctrl.results, function(row) {
-          row.afform_count = ctrl.afforms && ctrl.afforms[row.name.raw] && ctrl.afforms[row.name.raw].length || 0;
+          row.afform_count = ctrl.afforms && ctrl.afforms[row.data.name] && ctrl.afforms[row.data.name].length || 0;
         });
       }
 

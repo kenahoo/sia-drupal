@@ -128,6 +128,17 @@ class TokenProcessor {
   }
 
   /**
+   * Add new elements to the field schema.
+   *
+   * @param string|string[] $fieldNames
+   * @return TokenProcessor
+   */
+  public function addSchema($fieldNames) {
+    $this->context['schema'] = array_unique(array_merge($this->context['schema'], (array) $fieldNames));
+    return $this;
+  }
+
+  /**
    * Register a string for which we'll need to merge in tokens.
    *
    * @param string $name
@@ -154,7 +165,7 @@ class TokenProcessor {
   /**
    * Add a row of data.
    *
-   * @param array|NULL $context
+   * @param array|null $context
    *   Optionally, initialize the context for this row.
    *   Ex: ['contact_id' => 123].
    * @return TokenRow
@@ -272,7 +283,7 @@ class TokenProcessor {
    *
    * @param string $field
    *   Ex: 'contactId'.
-   * @param string|NULL $subfield
+   * @param string|null $subfield
    * @return array
    *   Ex: [12, 34, 56].
    */
@@ -459,8 +470,18 @@ class TokenProcessor {
       }
     }
 
-    if ($value instanceof Money && $filter === NULL) {
-      $filter = ['crmMoney'];
+    if ($value instanceof Money) {
+      switch ($filter[0] ?? NULL) {
+        case NULL:
+        case 'crmMoney':
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
+
+        case 'raw':
+          return $value->getAmount();
+
+        default:
+          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
+      }
     }
 
     switch ($filter[0] ?? NULL) {
@@ -473,20 +494,18 @@ class TokenProcessor {
       case 'lower':
         return mb_strtolower($value);
 
-      case 'crmMoney':
-        if ($value instanceof Money) {
-          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
-        }
-
       case 'crmDate':
         if ($value instanceof \DateTime) {
           // @todo cludgey.
           require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
           return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
         }
+        if ($value === '') {
+          return $value;
+        }
 
       default:
-        throw new \CRM_Core_Exception("Invalid token filter: $filter");
+        throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 
@@ -509,6 +528,7 @@ class TokenRowIterator extends \IteratorIterator {
     $this->tokenProcessor = $tokenProcessor;
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return new TokenRow($this->tokenProcessor, parent::key());
   }

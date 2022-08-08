@@ -106,13 +106,13 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Render the expression for insertion into the sql query
    *
-   * @param array $fieldList
+   * @param Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
-  public function render(array $fieldList): string {
+  public function render(Api4SelectQuery $query): string {
     $output = '';
     foreach ($this->args as $arg) {
-      $rendered = $this->renderArg($arg, $fieldList);
+      $rendered = $this->renderArg($arg, $query);
       if (strlen($rendered)) {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
@@ -122,16 +122,16 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * @param array $arg
-   * @param array $fieldList
+   * @param Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
-  private function renderArg($arg, $fieldList): string {
+  private function renderArg($arg, Api4SelectQuery $query): string {
     $rendered = implode(' ', $arg['prefix']);
     foreach ($arg['expr'] ?? [] as $idx => $expr) {
       if (strlen($rendered) || $idx) {
         $rendered .= $idx ? ', ' : ' ';
       }
-      $rendered .= $expr->render($fieldList);
+      $rendered .= $expr->render($query);
     }
     if ($arg['suffix']) {
       $rendered .= (strlen($rendered) ? ' ' : '') . implode(' ', $arg['suffix']);
@@ -182,7 +182,7 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * Get the arguments passed to this sql function instance.
-   * @return array[]
+   * @return array{prefix: array, suffix: array, expr: SqlExpression}[]
    */
   public function getArgs(): array {
     return $this->args;
@@ -193,6 +193,16 @@ abstract class SqlFunction extends SqlExpression {
    */
   public static function getCategory(): string {
     return static::$category;
+  }
+
+  /**
+   * All functions return 'SqlFunction' as their type.
+   *
+   * To get the function name @see SqlFunction::getName()
+   * @return string
+   */
+  public function getType(): string {
+    return 'SqlFunction';
   }
 
   /**

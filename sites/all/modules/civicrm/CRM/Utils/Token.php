@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -211,6 +213,8 @@ class CRM_Utils_Token {
   /**
    * Replace all the domain-level tokens in $str
    *
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param object $domain
@@ -249,6 +253,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use.
+   *
+   * @deprecated
+   *
    * @param string $token
    * @param CRM_Core_BAO_Domain $domain
    * @param bool $html
@@ -365,6 +373,8 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated
    */
   public static function &replaceMailingTokens(
     $str,
@@ -532,6 +542,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param $token
    * @param $addresses
    * @param $urls
@@ -592,6 +604,8 @@ class CRM_Utils_Token {
    * @param bool $returnBlankToken
    *   Return unevaluated token if value is null.
    *
+   * @deprecated
+   *
    * @param bool $escapeSmarty
    *
    * @return string
@@ -634,6 +648,13 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do Not use.
+   *
+   * Only core usage is from a deprecated unused function and
+   * from deprecated BAO_Mailing code (to be replaced by flexmailer).
+   *
+   * @deprecated
+   *
    * @param $token
    * @param $contact
    * @param bool $html
@@ -718,8 +739,12 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * Replace all the hook tokens in $str with information from
    * $contact.
+   *
+   * @deprecated
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -790,6 +815,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use, unused in core.
+   *
+   * @deprecated
+   *
    * @param $token
    * @param $contact
    * @param $category
@@ -826,7 +855,7 @@ class CRM_Utils_Token {
    *
    * @deprecated
    *
-   * @param $str ref to the string that will be scanned and modified
+   * @param string $str ref to the string that will be scanned and modified
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -1115,6 +1144,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use this function.
+   *
    * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
@@ -1133,6 +1164,8 @@ class CRM_Utils_Token {
    * @param int|null $jobID
    *   The mailing list jobID - this is a legacy param.
    *
+   * @deprecated
+   *
    * @return array - e.g [[1 => ['first_name' => 'bob'...], 34 => ['first_name' => 'fred'...]]]
    */
   public static function getTokenDetails(
@@ -1145,7 +1178,7 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('If you hit this in mailing code you should use flexmailer - otherwise use the token processor');
     $params = [];
     foreach ($contactIDs as $contactID) {
       $params[] = [
@@ -1259,6 +1292,8 @@ class CRM_Utils_Token {
    * @param string $jobID
    * @return array
    *   contactDetails with hooks swapped out
+   *
+   * @deprecated
    */
   public static function getAnonymousTokenDetails($contactIDs = [0],
                                            $returnProperties = NULL,
@@ -1303,9 +1338,6 @@ class CRM_Utils_Token {
    *
    * @TODO Remove that inconsistency in usage.
    *
-   * ::replaceContactTokens() may need to be called after this method, to
-   * replace tokens supplied from this method.
-   *
    * @param string $tokenString
    * @param array $contactDetails
    * @param int $contactId
@@ -1317,72 +1349,21 @@ class CRM_Utils_Token {
     if (!$contactDetails && !$contactId) {
       return;
     }
-
     // check if there are any tokens
     $greetingTokens = self::getTokens($tokenString);
-
-    if (!empty($greetingTokens)) {
-      // first use the existing contact object for token replacement
-      if (!empty($contactDetails)) {
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
-      }
-
-      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
-      // check if there are any unevaluated tokens
-      $greetingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, means there are few tokens which are not
-      // evaluated, like custom data etc
-      // so retrieve it from database
-      if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
-        $greetingsReturnProperties = array_flip(CRM_Utils_Array::value('contact', $greetingTokens));
-        $greetingsReturnProperties = array_fill_keys(array_keys($greetingsReturnProperties), 1);
-        $contactParams = ['contact_id' => $contactId];
-
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-
-        // again replace tokens
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString,
-          $greetingDetails,
-          TRUE,
-          $greetingTokens,
-          TRUE,
-          $escapeSmarty
-        );
-      }
-
-      // check if there are still any unevaluated tokens
-      $remainingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens)) {
-        // Fill the return properties array
-        $greetingTokens = $remainingTokens;
-        reset($greetingTokens);
-        $greetingsReturnProperties = [];
-        foreach ($greetingTokens as $value) {
-          $props = array_flip($value);
-          $props = array_fill_keys(array_keys($props), 1);
-          $greetingsReturnProperties = $greetingsReturnProperties + $props;
-        }
-        $contactParams = ['contact_id' => $contactId];
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-        // Prepare variables for calling replaceHookTokens
-        $categories = array_keys($greetingTokens);
-        [$contact] = $greetingDetails;
-        // Replace tokens defined in Hooks.
-        $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
-      }
+    $context = $contactId ? ['contactId' => $contactId] : [];
+    if ($contactDetails) {
+      $context['contact'] = isset($contactDetails[0]) ? reset($contactDetails[0]) : $contactDetails;
+    }
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'smarty' => FALSE,
+      'class' => $className,
+    ]);
+    $tokenProcessor->addRow($context);
+    $tokenProcessor->addMessage('greeting', $tokenString, 'text/plain');
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      $tokenString = $row->render('greeting');
     }
   }
 
@@ -1390,6 +1371,8 @@ class CRM_Utils_Token {
    * At this point, $contactDetails has loaded the contact from the DAO. Any
    * (non-custom) missing fields are null.  By removing them, we can avoid
    * expensive calls to CRM_Contact_BAO_Query.
+   *
+   * @deprecated unused in core
    *
    * @param string $tokenString
    * @param array $contactDetails
@@ -1867,6 +1850,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
+   * Only used from deprecated functions not called by core.
+   *
    * @return array
    *   [legacy_token => new_token]
    */
@@ -1973,6 +1960,18 @@ class CRM_Utils_Token {
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
+        ],
+        'membership_offline_receipt' => [
+          // receipt_text_renewal appears to be long gone.
+          'receipt_text_renewal' => 'receipt_text',
+        ],
+        'pledge_acknowledgement' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
+        ],
+        'pledge_reminder' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
         ],
       ],
     ];

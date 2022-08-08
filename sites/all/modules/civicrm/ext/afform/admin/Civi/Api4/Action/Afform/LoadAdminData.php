@@ -110,7 +110,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       $joins = array_column(\CRM_Utils_Array::findAll($layout, 'af-join'), 'af-join');
       $entities = array_unique(array_merge($entities, $joins));
       $blockTags = array_unique(array_column(\CRM_Utils_Array::findAll($layout, function($el) use ($allAfforms) {
-        return in_array($el['#tag'], $allAfforms);
+        return isset($el['#tag']) && in_array($el['#tag'], $allAfforms);
       }), '#tag'));
       foreach ($blockTags as $blockTag) {
         if (!isset($info['blocks'][$blockTag])) {
@@ -135,7 +135,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     if ($info['definition']['type'] === 'form') {
       if ($newForm) {
         $entities[] = $this->entity;
-        $defaultEntity = AfformAdminMeta::getAfformEntity($this->entity);
+        $defaultEntity = AfformAdminMeta::getMetadata()['entities'][$this->entity] ?? [];
         if (!empty($defaultEntity['boilerplate'])) {
           $scanBlocks($defaultEntity['boilerplate']);
         }
@@ -144,7 +144,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         $scanBlocks($info['definition']['layout']);
       }
 
-      if (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+      if (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
         $entities[] = 'Contact';
       }
 
@@ -153,8 +153,8 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     }
 
     if ($info['definition']['type'] === 'block') {
-      $blockEntity = $info['definition']['join_entity'] ?? $info['definition']['entity_type'];
-      if ($blockEntity !== '*') {
+      $blockEntity = $info['definition']['join_entity'] ?? $info['definition']['entity_type'] ?? NULL;
+      if ($blockEntity) {
         $entities[] = $blockEntity;
       }
       $scanBlocks($info['definition']['layout']);
@@ -174,18 +174,26 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         }
       }
       foreach ($displayTags as $displayTag) {
-        $display = \Civi\Api4\SearchDisplay::get(FALSE)
-          ->addWhere('name', '=', $displayTag['display-name'])
-          ->addWhere('saved_search.name', '=', $displayTag['search-name'])
-          ->addSelect('*', 'type:name', 'type:icon', 'saved_search.name', 'saved_search.api_entity', 'saved_search.api_params')
+        if (isset($displayTag['display-name']) && strlen($displayTag['display-name'])) {
+          $displayGet = \Civi\Api4\SearchDisplay::get(FALSE)
+            ->addWhere('name', '=', $displayTag['display-name'])
+            ->addWhere('saved_search_id.name', '=', $displayTag['search-name']);
+        }
+        else {
+          $displayGet = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+            ->setSavedSearch($displayTag['search-name']);
+        }
+        $display = $displayGet
+          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params')
           ->execute()->first();
-        $display['calc_fields'] = $this->getCalcFields($display['saved_search.api_entity'], $display['saved_search.api_params']);
+        $display['calc_fields'] = $this->getCalcFields($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']);
+        $display['filters'] = empty($displayTag['filters']) ? NULL : (\CRM_Utils_JS::getRawProps($displayTag['filters']) ?: NULL);
         $info['search_displays'][] = $display;
         if ($newForm) {
           $info['definition']['layout'][0]['#children'][] = $displayTag + ['#tag' => $display['type:name']];
         }
-        $entities[] = $display['saved_search.api_entity'];
-        foreach ($display['saved_search.api_params']['join'] ?? [] as $join) {
+        $entities[] = $display['saved_search_id.api_entity'];
+        foreach ($display['saved_search_id.api_params']['join'] ?? [] as $join) {
           $entities[] = explode(' AS ', $join[0])[0];
         }
       }
@@ -197,7 +205,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
 
     // Optimization - since contact fields are a combination of these three,
     // we'll combine them client-side rather than sending them via ajax.
-    elseif (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+    elseif (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
       $entities = array_diff($entities, ['Contact']);
     }
 
@@ -305,6 +313,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       ],
       [
         'name' => 'blocks',
+        'data_type' => 'Array',
+      ],
+      [
+        'name' => 'entities',
         'data_type' => 'Array',
       ],
       [

@@ -2,7 +2,7 @@
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\BasicBatchAction;
+use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * User-configurable forms.
@@ -104,33 +104,11 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Generic\BasicBatchAction
+   * @return Action\Afform\Revert
    */
   public static function revert($checkPermissions = TRUE) {
-    return (new BasicBatchAction('Afform', __FUNCTION__, function($item, BasicBatchAction $action) {
-      $scanner = \Civi::service('afform_scanner');
-      $files = [
-        \CRM_Afform_AfformScanner::METADATA_FILE,
-        \CRM_Afform_AfformScanner::LAYOUT_FILE,
-      ];
-
-      foreach ($files as $file) {
-        $metaPath = $scanner->createSiteLocalPath($item['name'], $file);
-        if (file_exists($metaPath)) {
-          if (!@unlink($metaPath)) {
-            throw new \API_Exception("Failed to remove afform overrides in $file");
-          }
-        }
-      }
-
-      // We may have changed list of files covered by the cache.
-      _afform_clear();
-
-      // FIXME if `server_route` changes, then flush the menu cache.
-      // FIXME if asset-caching is enabled, then flush the asset cache
-
-      return $item;
-    }))->setCheckPermissions($checkPermissions);
+    return (new Action\Afform\Revert('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
@@ -138,7 +116,7 @@ class Afform extends Generic\AbstractEntity {
    * @return Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__, function($self) {
+    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__, function(BasicGetFieldsAction $self) {
       $fields = [
         [
           'name' => 'name',
@@ -188,6 +166,10 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
+          'name' => 'icon',
+          'description' => 'Icon shown in the contact summary tab',
+        ],
+        [
           'name' => 'server_route',
         ],
         [
@@ -222,13 +204,23 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'has_local',
           'type' => 'Extra',
           'data_type' => 'Boolean',
+          'description' => 'Whether a local copy is saved on site',
           'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'has_base',
           'type' => 'Extra',
           'data_type' => 'Boolean',
+          'description' => 'Is provided by an extension',
           'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'base_module',
+          'type' => 'Extra',
+          'data_type' => 'String',
+          'description' => 'Name of extension which provides this form',
+          'readonly' => TRUE,
+          'options' => $self->getLoadOptions() ? \CRM_Core_PseudoConstant::getExtensions() : TRUE,
         ];
         $fields[] = [
           'name' => 'search_displays',
@@ -248,8 +240,8 @@ class Afform extends Generic\AbstractEntity {
    */
   public static function permissions() {
     return [
-      "meta" => ["access CiviCRM"],
-      "default" => ["administer CiviCRM"],
+      'meta' => ['access CiviCRM'],
+      'default' => [['administer CiviCRM', 'administer afform']],
       // These all check form-level permissions
       'get' => [],
       'getOptions' => [],

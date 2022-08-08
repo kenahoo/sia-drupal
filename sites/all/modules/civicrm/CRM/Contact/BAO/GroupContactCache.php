@@ -157,33 +157,6 @@ AND (
   }
 
   /**
-   * Store values into the group contact cache.
-   *
-   * @todo review use of INSERT IGNORE. This function appears to be slower that inserting
-   * with a left join. Also, 200 at once seems too little.
-   *
-   * @param array $groupID
-   * @param array $values
-   */
-  protected static function store($groupID, &$values) {
-    $processed = FALSE;
-
-    // sort the values so we put group IDs in front and hence optimize
-    // mysql storage (or so we think) CRM-9493
-    sort($values);
-
-    // to avoid long strings, lets do BULK_INSERT_COUNT values at a time
-    while (!empty($values)) {
-      $processed = TRUE;
-      $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str = implode(',', $input);
-      $sql = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) VALUES $str;";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-    self::updateCacheTime($groupID, $processed);
-  }
-
-  /**
    * Change the cache_date.
    *
    * @param array $groupID
@@ -336,7 +309,7 @@ WHERE  id IN ( $groupIDs )
    * Remove one or more contacts from the smart group cache.
    *
    * @param int|array $cid
-   * @param null $groupId
+   * @param int|null $groupId
    *
    * @return bool
    *   TRUE if successful.
@@ -388,6 +361,7 @@ WHERE  id IN ( $groupIDs )
       self::clearGroupContactCache([$groupID]);
       self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
       self::releaseGroupLocks([$groupID]);
+      $groupContactsTempTable->drop();
     }
   }
 
@@ -396,7 +370,7 @@ WHERE  id IN ( $groupIDs )
    *
    * The groups are refreshable if both the following conditions are met:
    * 1) the cache date in the database is null or stale
-   * 2) a mysql lock can be aquired for the group.
+   * 2) a mysql lock can be acquired for the group.
    *
    * @param array $groupIDs
    *
@@ -732,6 +706,7 @@ ORDER BY   gc.contact_id, g.children
         self::clearGroupContactCache($lockedGroups);
         self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
         self::releaseGroupLocks($lockedGroups);
+        $groupContactsTempTable->drop();
       }
 
       $smartGroups = implode(',', $smartGroups);
@@ -792,11 +767,14 @@ ORDER BY   gc.contact_id, g.children
   private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs): void {
     $tempTable = $groupContactsTempTable->getName();
 
+    // @fixme: GROUP BY is here to guard against having duplicate contacts in the temptable.
+    //   That used to happen for an unknown reason and probably doesn't anymore so we *should*
+    //   be able to remove GROUP BY here safely.
     CRM_Core_DAO::executeQuery(
-      "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
-        SELECT DISTINCT contact_id, group_id FROM $tempTable
+      "INSERT INTO civicrm_group_contact_cache (contact_id, group_id)
+        SELECT contact_id, group_id FROM $tempTable
+        GROUP BY contact_id,group_id
       ");
-    $groupContactsTempTable->drop();
     foreach ($groupIDs as $groupID) {
       self::updateCacheTime([$groupID], TRUE);
     }

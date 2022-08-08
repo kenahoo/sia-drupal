@@ -920,7 +920,8 @@ AND    u.status = 1
   /**
    * Check if a resource url is within the Backdrop directory and format appropriately.
    *
-   * @param $url (reference)
+   * @param string $url
+   *   URL (reference).
    *
    * @return bool
    *   TRUE for internal paths, FALSE for external. The backdrop_add_js fn is able to add js more
@@ -1066,6 +1067,17 @@ AND    u.status = 1
    */
   public function getCRMDatabasePrefix(): string {
     return str_replace(parent::getCRMDatabasePrefix(), '`', '');
+  }
+
+  /**
+   * Return the CMS-specific UF Group Types for profiles.
+   * @return array
+   */
+  public function getUfGroupTypes() {
+    return [
+      'User Registration' => ts('Backdrop User Registration'),
+      'User Account' => ts('View/Edit Backdrop User Account'),
+    ];
   }
 
 }

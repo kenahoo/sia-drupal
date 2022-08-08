@@ -45,12 +45,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
   ];
 
   /**
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Takes an associative array and creates a participant object.
    *
    * the function extract all the params it needs to initialize the create a
@@ -584,6 +578,10 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * @param bool $checkPermission
    *   Is this a permissioned retrieval?
    *
+   * @deprecated only called from event search, but without most of the details
+   * returned. Event search should call stop using this & get the metadata
+   * a better way.
+   *
    * @return array
    *   array of importable Fields
    */
@@ -614,6 +612,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split status and status id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantStatus = [
         'participant_status' => [
           'title' => ts('Participant Status'),
@@ -625,6 +624,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split role and role id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantRole = [
         'participant_role' => [
           'title' => ts('Participant Role'),
@@ -798,7 +798,7 @@ WHERE  civicrm_participant.id = {$participantId}
    *
    * @param array $defaults
    * @param string $property
-   * @param string $lookup
+   * @param string[] $lookup
    * @param bool $reverse
    *
    * @return bool
@@ -1174,7 +1174,7 @@ UPDATE  civicrm_participant
     }
 
     //thumb rule is if we triggering  primary participant need to triggered additional
-    $allParticipantIds = $primaryANDAdditonalIds = [];
+    $allParticipantIds = $primaryANDAdditionalIds = [];
     foreach ($participantIds as $id) {
       $allParticipantIds[] = $id;
       if (self::isPrimaryParticipant($id)) {
@@ -1187,7 +1187,7 @@ UPDATE  civicrm_participant
         }
         if (!empty($additionalIds)) {
           $allParticipantIds = array_merge($allParticipantIds, $additionalIds);
-          $primaryANDAdditonalIds[$id] = $additionalIds;
+          $primaryANDAdditionalIds[$id] = $additionalIds;
         }
       }
     }
@@ -1197,7 +1197,6 @@ UPDATE  civicrm_participant
 
     //pull required participants, contacts, events  data, if not in hand
     static $eventDetails = [];
-    static $domainValues = [];
     static $contactDetails = [];
 
     $contactIds = $eventIds = $participantDetails = [];
@@ -1235,31 +1234,9 @@ UPDATE  civicrm_participant
       }
     }
 
-    //get the domain values.
-    if (empty($domainValues)) {
-      // making all tokens available to templates.
-      $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = [
-        'domain' => ['name', 'phone', 'address', 'email'],
-        'contact' => CRM_Core_SelectValues::contactTokens(),
-      ];
-
-      foreach ($tokens['domain'] as $token) {
-        $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
-      }
-    }
-
     //get all required contacts detail.
     if (!empty($contactIds)) {
-      // get the contact details.
-      list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
-        FALSE, FALSE, NULL,
-        [],
-        'CRM_Event_BAO_Participant'
-      );
-      foreach ($currentContactDetails as $contactId => $contactValues) {
-        $contactDetails[$contactId] = $contactValues;
-      }
+      $contactDetails += civicrm_api3('Contact', 'get', ['id' => ['IN' => $contactIds, 'return' => 'display_name']])['values'];
     }
 
     //get all required events detail.
@@ -1320,15 +1297,14 @@ UPDATE  civicrm_participant
       }
 
       //check is it primary and has additional.
-      if (array_key_exists($participantId, $primaryANDAdditonalIds)) {
-        foreach ($primaryANDAdditonalIds[$participantId] as $additionalId) {
+      if (array_key_exists($participantId, $primaryANDAdditionalIds)) {
+        foreach ($primaryANDAdditionalIds[$participantId] as $additionalId) {
 
           if ($emailType) {
             $mail = self::sendTransitionParticipantMail($additionalId,
               $participantDetails[$additionalId],
               $eventDetails[$participantDetails[$additionalId]['event_id']],
-              $contactDetails[$participantDetails[$additionalId]['contact_id']],
-              $domainValues,
+              NULL,
               $emailType
             );
 
@@ -1347,8 +1323,7 @@ UPDATE  civicrm_participant
         $mail = self::sendTransitionParticipantMail($participantId,
           $participantValues,
           $eventDetails[$participantValues['event_id']],
-          $contactDetails[$participantValues['contact_id']],
-          $domainValues,
+          NULL,
           $emailType
         );
 
@@ -1394,8 +1369,6 @@ UPDATE  civicrm_participant
    *   Required event details.
    * @param array $contactDetails
    *   Required contact details.
-   * @param array $domainValues
-   *   Required domain values.
    * @param string $mailType
    *   (eg 'approval', 'confirm', 'expired' ).
    *
@@ -1406,12 +1379,17 @@ UPDATE  civicrm_participant
     $participantValues,
     $eventDetails,
     $contactDetails,
-    &$domainValues,
     $mailType
   ) {
     //send emails.
     $mailSent = FALSE;
 
+    if (!$contactDetails) {
+      $contactDetails = civicrm_api3('Contact', 'getsingle', [
+        'id' => $participantValues['contact_id'],
+        'return' => ['email', 'display_name'],
+      ]);
+    }
     //don't send confirmation mail to additional
     //since only primary able to confirm registration.
     if (!empty($participantValues['registered_by_id']) &&
@@ -1419,6 +1397,7 @@ UPDATE  civicrm_participant
     ) {
       return $mailSent;
     }
+
     $toEmail = $contactDetails['email'] ?? NULL;
     if ($toEmail) {
 
@@ -1437,26 +1416,25 @@ UPDATE  civicrm_participant
       }
 
       //take a receipt from as event else domain.
-      $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
+      $receiptFrom = CRM_Core_BAO_Domain::getFromEmail();
+
       if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }
 
-      list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      list($mailSent, $subject) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'groupName' => 'msg_tpl_workflow_event',
-          'valueName' => 'participant_' . strtolower($mailType),
+          'workflow' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,
+          'tokenContext' => ['participantId' => $participantId],
           'tplParams' => [
-            'contact' => $contactDetails,
-            'domain' => $domainValues,
             'participant' => $participantValues,
             'event' => $eventDetails,
             'paidEvent' => $eventDetails['is_monetary'] ?? NULL,
             'isShowLocation' => $eventDetails['is_show_location'] ?? NULL,
             'isAdditional' => $participantValues['registered_by_id'],
-            'isExpired' => $mailType == 'Expired',
-            'isConfirm' => $mailType == 'Confirm',
+            'isExpired' => $mailType === 'Expired',
+            'isConfirm' => $mailType === 'Confirm',
             'checksumValue' => $checksumValue,
           ],
           'from' => $receiptFrom,
@@ -1500,7 +1478,7 @@ UPDATE  civicrm_participant
    *
    * @return string
    */
-  public function updateStatusMessage($participantId, $statusChangeTo, $fromStatusId) {
+  public static function updateStatusMessage($participantId, $statusChangeTo, $fromStatusId) {
     $statusMsg = NULL;
     $results = self::transitionParticipants([$participantId],
       $statusChangeTo, $fromStatusId, TRUE
@@ -1619,8 +1597,7 @@ UPDATE  civicrm_participant
    * @param int $newStatusId
    *   New status.
    *
-   * @return bool
-   *   true if allowed
+   * @return array
    */
   public static function getValidAdditionalIds($participantId, $oldStatusId, $newStatusId) {
 
@@ -1895,10 +1872,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
       return $details;
     }
-    //verify participant status is still Registered
-    if ($details['status'] != 'Registered') {
+    // Verify participant status is one that can be self-cancelled
+    if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
       $details['eligible'] = FALSE;
-      $details['ineligible_message'] = "You cannot transfer or cancel your registration for " . $eventTitle . ' as you are not currently registered for this event.';
+      $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
       return $details;
     }
     // Determine if it's too late to self-service cancel/transfer.

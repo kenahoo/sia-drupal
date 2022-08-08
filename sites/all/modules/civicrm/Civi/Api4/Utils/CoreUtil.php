@@ -12,9 +12,9 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\API\Exception\NotImplementedException;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
-use Civi\Api4\Entity;
-use Civi\Api4\Event\CreateApi4RequestEvent;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -39,24 +39,23 @@ class CoreUtil {
    * @return string|\Civi\Api4\Generic\AbstractEntity
    */
   public static function getApiClass($entityName) {
-    $e = new CreateApi4RequestEvent($entityName);
-    \Civi::dispatcher()->dispatch('civi.api4.createRequest', $e);
-    return $e->className;
+    $className = 'Civi\Api4\\' . $entityName;
+    if (class_exists($className)) {
+      return $className;
+    }
+    return self::getInfoItem($entityName, 'class');
   }
 
   /**
-   * Get item from an entity's getInfo array
+   * Get a piece of metadata about an entity
    *
    * @param string $entityName
    * @param string $keyToReturn
    * @return mixed
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
-    $info = Entity::get(FALSE)
-      ->addWhere('name', '=', $entityName)
-      ->addSelect($keyToReturn)
-      ->execute()->first();
-    return $info ? $info[$keyToReturn] ?? NULL : NULL;
+    $provider = \Civi::service('action_object_provider');
+    return $provider->getEntities()[$entityName][$keyToReturn] ?? NULL;
   }
 
   /**
@@ -76,11 +75,7 @@ class CoreUtil {
    * @return string
    */
   public static function getTableName($entityName) {
-    if (strpos($entityName, 'Custom_') === 0) {
-      $customGroup = substr($entityName, 7);
-      return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
-    }
-    return AllCoreTables::getTableForEntityName($entityName);
+    return self::getInfoItem($entityName, 'table_name');
   }
 
   /**
@@ -90,15 +85,13 @@ class CoreUtil {
    * @return string|NULL
    */
   public static function getApiNameFromTableName($tableName) {
-    $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
-    // Real entities
-    if ($entityName) {
-      // Verify class exists
-      return self::getApiClass($entityName) ? $entityName : NULL;
+    $provider = \Civi::service('action_object_provider');
+    foreach ($provider->getEntities() as $entityName => $info) {
+      if (($info['table_name'] ?? NULL) === $tableName) {
+        return $entityName;
+      }
     }
-    // Multi-value custom group pseudo-entities
-    $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
-    return self::isCustomEntity($customGroup) ? "Custom_$customGroup" : NULL;
+    return NULL;
   }
 
   /**
@@ -118,35 +111,32 @@ class CoreUtil {
    * For a given API Entity, return the types of custom fields it supports and the column they join to.
    *
    * @param string $entityName
-   * @return array|mixed|null
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @return array{extends: array, column: string, grouping: mixed}|null
    */
   public static function getCustomGroupExtends(string $entityName) {
-    // Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs (Contact, Participant).
+    // Custom_group.extends pretty much maps 1-1 with entity names, except for Contact.
     switch ($entityName) {
       case 'Contact':
         return [
           'extends' => array_merge(['Contact'], array_keys(\CRM_Core_SelectValues::contactType())),
           'column' => 'id',
-        ];
-
-      case 'Participant':
-        return [
-          'extends' => ['Participant', 'ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'],
-          'column' => 'id',
+          'grouping' => ['contact_type', 'contact_sub_type'],
         ];
 
       case 'RelationshipCache':
         return [
           'extends' => ['Relationship'],
           'column' => 'relationship_id',
+          'grouping' => 'relationship_type_id',
         ];
     }
-    if (array_key_exists($entityName, \CRM_Core_SelectValues::customGroupExtends())) {
+    $customGroupExtends = array_column(\CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), NULL, 'id');
+    $extendsSubGroups = \CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions();
+    if (array_key_exists($entityName, $customGroupExtends)) {
       return [
         'extends' => [$entityName],
         'column' => 'id',
+        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::findAll($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
       ];
     }
     return NULL;
@@ -223,11 +213,50 @@ class CoreUtil {
    */
   public static function checkAccessDelegated(string $entityName, string $actionName, array $record, int $userID) {
     $apiRequest = Request::create($entityName, $actionName, ['version' => 4]);
-    // TODO: Should probably emit civi.api.authorize for checking guardian permission; but in APIv4 with std cfg, this is de-facto equivalent.
-    if (!$apiRequest->isAuthorized()) {
+    // First check gatekeeper permissions via the kernel
+    $kernel = \Civi::service('civi_api_kernel');
+    try {
+      [$actionObjectProvider] = $kernel->resolve($apiRequest);
+      $kernel->authorize($actionObjectProvider, $apiRequest);
+    }
+    catch (UnauthorizedException $e) {
       return FALSE;
     }
+    // Gatekeeper permission check passed, now check fine-grained permission
     return static::checkAccessRecord($apiRequest, $record, $userID);
+  }
+
+  /**
+   * @return \Civi\Api4\Service\Schema\SchemaMap
+   */
+  public static function getSchemaMap() {
+    $cache = \Civi::cache('metadata');
+    $schemaMap = $cache->get('api4.schema.map');
+    if (!$schemaMap) {
+      $schemaMap = \Civi::service('schema_map_builder')->build();
+      $cache->set('api4.schema.map', $schemaMap);
+    }
+    return $schemaMap;
+  }
+
+  /**
+   * Fetches database references + those returned by hook
+   *
+   * @see \CRM_Utils_Hook::referenceCounts()
+   * @param string $entityName
+   * @param int $entityId
+   * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
+   * @throws NotImplementedException
+   */
+  public static function getRefCount(string $entityName, $entityId) {
+    $daoName = self::getInfoItem($entityName, 'dao');
+    if (!$daoName) {
+      throw new NotImplementedException("Cannot getRefCount for $entityName - dao not found.");
+    }
+    /** @var \CRM_Core_DAO $dao */
+    $dao = new $daoName();
+    $dao->id = $entityId;
+    return $dao->getReferenceCounts();
   }
 
 }

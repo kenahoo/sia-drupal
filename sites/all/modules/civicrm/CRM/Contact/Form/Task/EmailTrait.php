@@ -118,16 +118,19 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  protected function traitPreProcess() {
+  protected function traitPreProcess(): void {
+    $this->addExpectedSmartyVariable('rows');
     if ($this->isSearchContext()) {
       // Currently only the contact email form is callable outside search context.
       parent::preProcess();
     }
+    else {
+      // E-notice prevention in Task.tpl
+      $this->assign('isSelectedContacts', FALSE);
+    }
     $this->setContactIDs();
     $this->assign('single', $this->_single);
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('isAdmin', 1);
-    }
+    $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
   }
 
   /**
@@ -190,7 +193,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       // get the details for all selected contacts ( to, cc and bcc contacts )
       $allContactDetails = civicrm_api3('Contact', 'get', [
         'id' => ['IN' => $this->_allContactIds],
-        'return' => ['sort_name', 'email', 'do_not_email', 'is_deceased', 'on_hold', 'display_name', 'preferred_mail_format'],
+        'return' => ['sort_name', 'email', 'do_not_email', 'is_deceased', 'on_hold', 'display_name'],
         'options' => ['limit' => 0],
       ])['values'];
 
@@ -311,7 +314,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
     return $defaults;
   }

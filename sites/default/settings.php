@@ -753,3 +753,6 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  * Remove the leading hash sign to enable.
  */
 # $conf['theme_debug'] = TRUE;
+
+# See https://www.drupal.org/node/3298661 - need to fix the underlying problem at some point
+$conf['sa_core_2022_012_override'] = TRUE;

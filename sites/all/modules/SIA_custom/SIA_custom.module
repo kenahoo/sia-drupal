@@ -319,7 +319,7 @@ function ticketLine($desc, $id, $reserved) {
 }
 
 
-getid3_load();
+//getid3_load();
 
 ## Voice-part index
 function vp_index($a) {

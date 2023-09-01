@@ -143,6 +143,15 @@ function singer_data($groups=['Current Singers']): civicrm_api3 {
   return $api;
 }
 
+function emlinken($url) {
+  if (!$url) return '';
+
+  return sprintf(
+    '<a href="%s"><img src="%s" style="width: 100px" alt="Profile image" /></a>',
+    $url, $url
+  );
+}
+
 function singer_roster2() {
     $api = singer_data();
 
@@ -153,7 +162,7 @@ function singer_roster2() {
                      format_phones(CRM_Core_BAO_Phone::allPhones($c->id)),
                      sprintf("%s<br>%s, %s %s", $c->street_address, $c->city,
                              $c->state_province, $c->postal_code),
-          $c->image_URL ? sprintf('<img src="%s" style="width: 100px" alt="Profile image" />', $c->image_URL) : ''
+                     emlinken($c->image_URL)
         );
     }, $api->values);
 }

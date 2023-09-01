@@ -138,7 +138,7 @@ function singer_data($groups=['Current Singers']): civicrm_api3 {
     'group' => $group_list,
     'sequential' => 1,
     'rowCount' => 10000,
-    'return' => 'custom_4,display_name,email,phone,street_address,city,state_province,postal_code,id',
+    'return' => 'custom_4,display_name,email,phone,street_address,city,state_province,postal_code,id,image_URL',
     'sort' => 'custom_4,last_name,first_name']);
   return $api;
 }
@@ -152,7 +152,8 @@ function singer_roster2() {
                              $c->display_name, $c->email, $c->email),
                      format_phones(CRM_Core_BAO_Phone::allPhones($c->id)),
                      sprintf("%s<br>%s, %s %s", $c->street_address, $c->city,
-                             $c->state_province, $c->postal_code)
+                             $c->state_province, $c->postal_code),
+          $c->image_URL ? sprintf('<img src="%s" style="width: 100px" alt="Profile image" />', $c->image_URL) : ''
         );
     }, $api->values);
 }
@@ -190,7 +191,7 @@ function SIA_custom_tokens($type, $tokens, array $data = array(), array $options
         } elseif ($name == 'singer_roster_html') {
           $rows = singer_roster2();
           $val = theme('table',
-            array('header' => array('Voice Part', 'Name', 'Phone', 'Address'),
+            array('header' => array('Voice Part', 'Name', 'Phone', 'Address', 'Photo'),
               'rows' => $rows)
           );
           $replacements[$original] = $val;

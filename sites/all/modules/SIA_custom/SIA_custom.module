@@ -243,14 +243,14 @@ function collaborator_concerts() {
       foreach ($collabs as $c) {
         if ($c['target_id'] == $node->nid) {
           $got[] = ('<li><a href="' . url('node/' . $concert_node->nid) . '">' . $concert_node->title . '</a>, ' .
-            date_create($concert_node->field_concert_date[und][0]['value'])->format('F Y') . '</li>');
+            date_create($concert_node->field_concert_date['und'][0]['value'])->format('F Y') . '</li>');
         }
       }
     }
   }
 
   if ($got) {
-    return "<strong>SIA Performances:</strong><ul>" . implode($got, "\n") . "</ul>";
+    return "<strong>SIA Performances:</strong><ul>" . implode("\n", $got) . "</ul>";
   } else {
     return '';
   }
